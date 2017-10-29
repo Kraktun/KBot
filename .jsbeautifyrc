@@ -1,0 +1,33 @@
+{
+  "java": {
+    "indent_class": true,
+    "indent_with_tabs": 0,
+    "input_tab_size": 8,
+	"output_tab_size": 4,
+	"indent_columns": 4,
+	"nl_if_brace": "add",  # "if () {" vs "if () \n {"
+	"nl_for_brace": "add",   # "for () {" vs "for () \n {"
+	"nl_else_brace": "add",  # "else {" vs "else \n {"
+	"nl_while_brace": "add",  # "while () {" vs "while () \n {"
+	"nl_switch_brace": "add",  # "switch () {" vs "switch () \n {"
+	"sp_arith": "add",
+	"sp_assign": "add",
+	"sp_bool": "add",
+	"sp_compare": "add",
+	"sp_inside_paren": "add",
+	"sp_before_sparen": "add",
+	"sp_inside_sparen": "remove",
+	"sp_before_semi": "remove",
+	"utf8_force": true,
+	"sp_before_template_paren": "add",
+	"sp_sparen_brace": "add",
+	"sp_inside_square": "remove",
+	"sp_inside_braces": "ignore",
+	"sp_fparen_brace" : "add",
+	"sp_brace_catch" : "add",
+	"sp_brace_finally" : "add",
+	"nl_catch_brace" : "remove",
+	"nl_brace_catch": "remove",
+	"sp_catch_paren": "add"
+	}
+}

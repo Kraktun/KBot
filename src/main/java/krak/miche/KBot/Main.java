@@ -40,9 +40,8 @@ public class Main {
         }
         try {
             ApiContextInitializer.init();
-            TelegramBotsApi telegramBotsApi = createTelegramBotsApi();
+            TelegramBotsApi telegramBotsApi = new TelegramBotsApi();
             try {
-                // Register long polling bots. They work regardless type of TelegramBotsApi we are creating
                 DefaultBotOptions options = new DefaultBotOptions();
                 if (BuildVars.isMainBotEnabled)
                     telegramBotsApi.registerBot(new CommandsHandler(options, true, BuildVars.BOT_USERNAME));
@@ -55,21 +54,5 @@ public class Main {
         } catch (Exception e) {
             BotLogger.error(LOGTAG, e);
         }
-    }
-
-    private static TelegramBotsApi createTelegramBotsApi() throws TelegramApiException {
-        TelegramBotsApi telegramBotsApi;
-        // Default (long polling only)
-        telegramBotsApi = createLongPollingTelegramBotsApi();
-
-        return telegramBotsApi;
-    }
-
-    /**
-     * @brief Creates a Telegram Bots Api to use Long Polling (getUpdates) bots.
-     * @return TelegramBotsApi to register the bots.
-     */
-    private static TelegramBotsApi createLongPollingTelegramBotsApi() {
-        return new TelegramBotsApi();
     }
 }

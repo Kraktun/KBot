@@ -30,8 +30,8 @@ public class BuildVars {
     public static String DEFAULT_LANG = "en";
     public static final int DEFAULT_UTC = +1;
     public static String DEFAULT_INFO = "";
-    public static boolean isTestBotEnabled = false; //True if you want to use test bot
-    public static boolean isMainBotEnabled = true; //True if you want to use main bot
+    public static boolean isTestBotEnabled = true; //True if you want to use test bot
+    public static boolean isMainBotEnabled = false; //True if you want to use main bot
 
     public static final int MAX_REMINDER_LENGTH = 2500;
     public static final int MAX_FEEDBACK_LENGTH = 2500;

@@ -15,13 +15,10 @@ import java.sql.SQLException;
 public class BlacklistHandler {
 
     public static final String LOGTAG = "BLACKLISTHANDLER";
-    private DatabaseManager databaseManager = DatabaseManager.getInstance();
+    private static DatabaseManager databaseManager = DatabaseManager.getInstance();
 
-    public BlacklistHandler(){
 
-    }
-
-    public StringBuilder blacklist(String message, String language) {
+    public static StringBuilder blacklist(String message, String language) {
         StringBuilder messageTextBuilder;
         if (message == null || message.length() < 1)
         {

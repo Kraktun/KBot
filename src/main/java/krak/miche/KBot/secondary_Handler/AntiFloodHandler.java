@@ -4,36 +4,28 @@ package krak.miche.KBot.secondary_Handler;
 import krak.miche.KBot.database.DatabaseManager;
 import krak.miche.KBot.services.Localizer;
 
-import static krak.miche.KBot.database.SQLUtil.*;
-
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.concurrent.locks.ReentrantLock;
 
-
 import static krak.miche.KBot.BuildVars.*;
+import static krak.miche.KBot.database.SQLUtil.*;
 
-
-//Not sure if it's the best implementation
-
-
-
-/*Come funziona sta roba:
-    Ogni ANTIFLOODTIMESLICEMIN il run() aumenta "l'età" dei messaggi inviati di una unità di tempo
-    Se l'età supera la soglia di tempo da controllare, il messaggio viene rimosso dalla lista
-    A ogni nuovo messaggio inviato, questo viene aggiunto in lista, si fa il conteggio degli effettivi
-    messaggi mandati nell'unità di tempo e se supera il limite consentito lo segnala
- */
+//Better to use queues next time
 /**
  * @author Kraktun
  * @version 1.0
+ * Every BuildVars.ANTIFLOODTIMESLICEMIN the AntifloodJob runs the execute(), this increases messages age by 1
+ * If age is greater than the Time slice in the selected group the message is removed from the list
+ * Every time a message is sent in a group, it is inserted in its sender's list (for a specific group)
+ * if with that message the user has sent more than the allowed Number of Messages it is signaled to the calling method
+ * @todo Remove unused user/group objects so the garbage collector can delete them
  */
 
 public class AntiFloodHandler {
 
-
-    //Note that time slices don't start when someone set the antiflood, so if you chose 6 sec
+    // Note that time slices don't start when someone set the antiflood, so if you chose 6 sec
     // and in the first 2 seconds someone exceeds the max number of messages, but the bot ends its
     // timeslice(ANTIFLOODTIMESLICEMIN) after the first second, the user is not removed
     public static final String LOGTAG = "ANTIFLOODHANDLER";
@@ -44,11 +36,18 @@ public class AntiFloodHandler {
     private static boolean isShuttingDown = false;
 
 
+    /**
+     * Private constructor
+     * Initialize the list for groups
+     */
     private AntiFloodHandler() {
         groups = new ArrayList<>();
         isShuttingDown = false;
     }
 
+    /**
+     * @return instance of the class
+     */
     public static AntiFloodHandler getInstance() {
         final AntiFloodHandler currentInstance;
         if (instance == null)
@@ -68,44 +67,70 @@ public class AntiFloodHandler {
         return currentInstance;
     }
 
+    /**
+     * Updates antiflood settings for specific group
+     * @param group id of the group to update (negative long)
+     * @param messages number of messages for time slice (int > 0)
+     * @param timeSlice limit time for the messages to be counted (int > 0, multiple of BuildVars.ANTIFLOODTIMESLICEMIN)
+     * @return message with description if operation was successful
+     */
     public StringBuilder updateAntiflood(Long group, int messages, int timeSlice) {
         try {
             String language = databaseManager.getGroupLanguage(group);
-            databaseManager.updateGroupSettingsAntiflood(group, "true", timeSlice + "", messages + "");
-            updateGroup(group);
-            return new StringBuilder(Localizer.getString("done", language));
+            if (!isShuttingDown) {
+                databaseManager.updateGroupSettingsAntiflood(group, "true", timeSlice + "", messages + "");
+                updateGroup(group);
+                return new StringBuilder(Localizer.getString("done", language));
+            }
+            else
+                return new StringBuilder(Localizer.getString("error_shutdown", language));
         } catch (SQLException e) {
             return new StringBuilder(Localizer.getString("error_update_settings", DEFAULT_LANG));
         }
     }
 
+    /**
+     * Starts or stops antiflood for selected group
+     * @param group id of the group to update (negative long)
+     * @param activated true\false to start or stop antiflood
+     * @return message with description if operation was successful
+     */
     public StringBuilder setAntiflood(Long group, String activated) {
         try {
             String language = databaseManager.getGroupLanguage(group);
-            if (activated.equals("start"))
-            {
-                databaseManager.updateGroupSettingsAntiflood(group, "true");
-                updateGroup(group);
-                return new StringBuilder(Localizer.getString("antiflood_active", language));
-            }
-            else if (activated.equals("stop"))
-            {
-                databaseManager.updateGroupSettingsAntiflood(group, "false");
-                return new StringBuilder(Localizer.getString("antiflood_stopped", language));
+            if (!isShuttingDown) {
+                if (activated.equals("start")) {
+                    databaseManager.updateGroupSettingsAntiflood(group, "true");
+                    updateGroup(group);
+                    return new StringBuilder(Localizer.getString("antiflood_active", language));
+                } else if (activated.equals("stop")) {
+                    databaseManager.updateGroupSettingsAntiflood(group, "false");
+                    return new StringBuilder(Localizer.getString("antiflood_stopped", language));
+                } else
+                    return new StringBuilder(Localizer.getString("error", language));
             }
             else
-                return new StringBuilder(Localizer.getString("error", language));
+                return new StringBuilder(Localizer.getString("error_shutdown", language));
         } catch (SQLException e) {
             return new StringBuilder(Localizer.getString("error_antiflood", DEFAULT_LANG));
         }
     }
 
+    /**
+     * Adds group to antiflood
+     * @param groupL id of the group to add (negative long)
+     */
     private void addGroup(Long groupL) {
         String group = longtoString(groupL);
         int[] options = getAntifloodSettings(groupL);
         groups.add(new GroupObject(group, options));
     }
 
+    /**
+     * Get antiflood settings for selected group from DB
+     * @param groupL id of the group (negative long)
+     * @return int[2] where int[0] = number of messages, int[1] = time slice
+     */
     private int[] getAntifloodSettings(Long groupL) {
         String[] temp = databaseManager.getAntifloodSett(groupL);
         if (temp == null)
@@ -120,6 +145,10 @@ public class AntiFloodHandler {
         }
     }
 
+    /**
+     * Updates group settings in Antiflood object retrieving them from DB
+     * @param groupL id of the group (negative long)
+     */
     private void updateGroup(Long groupL) {
         String group = longtoString(groupL);
         boolean exist = false;
@@ -141,26 +170,33 @@ public class AntiFloodHandler {
         }
     }
 
-    //return true if user has sent more messages than those defined in options
+    /**
+     * Adds 1 message to the count for selected user in selected group
+     * @param groupL id of the group (negative long)
+     * @param user id of the user (int)
+     * @return true if user has sent more messages than those allowed, otherwise return false
+     */
     public boolean addUserMessage(Long groupL, int user) {
         String group = longtoString(groupL);
         boolean risposta = false;
         lock.lock();
-        try{
-            for (GroupObject greap : groups)
-            {
-                if (greap.getID().equals(group))
-                {
-                    risposta = greap.addMessage(user);
+        try {
+            if (!isShuttingDown) {
+                for (GroupObject greap : groups) {
+                    if (greap.getID().equals(group)) {
+                        risposta = greap.addMessage(user);
+                    }
                 }
             }
-        }
-        finally {
+        } finally {
             lock.unlock();
         }
         return risposta;
     }
 
+    /**
+     * Increases messages age looping through groups and then users
+     */
     public void execute() {
         lock.lock();
         if (!isShuttingDown) {
@@ -174,6 +210,9 @@ public class AntiFloodHandler {
         }
     }
 
+    /**
+     * Stops antiflood (both insertion and aging of messages) waiting for it to be terminated
+     */
     public void interrupt() {
         lock.lock();
         try {

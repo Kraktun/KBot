@@ -5,6 +5,7 @@ package krak.miche.KBot.database;
  * @author Kraktun
  * @version 1.0
  * Class to store strings to execute in database
+ * See below for a description of the structure of the DB
  */
 
 class CreationStrings {

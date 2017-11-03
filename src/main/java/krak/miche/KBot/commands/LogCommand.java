@@ -16,6 +16,10 @@ import static krak.miche.KBot.BuildVars.SUPER_ADMINS;
 /**
  * @author Kraktun
  * @version 1.0
+ * Manages logging options for groups:
+ * If used followed by start/stop it enables or disables logging
+ * If used followed by default/invert it changes the way it stores messages as
+ * explained in the help message
  */
 
 public class LogCommand extends BotCommand {

@@ -19,6 +19,8 @@ import static krak.miche.KBot.BuildVars.SUPER_ADMINS;
 /**
  * @author Kraktun
  * @version 1.0
+ * Get the log of the group where it is used.
+ * Note: it is both saved locally and sent in chat.
  */
 
 public class ExportLogCommand extends BotCommand {

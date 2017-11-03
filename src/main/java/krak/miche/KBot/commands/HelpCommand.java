@@ -1,8 +1,8 @@
 package krak.miche.KBot.commands;
 
 import krak.miche.KBot.database.DatabaseManager;
-import krak.miche.KBot.services.Localizer;
 import krak.miche.KBot.secondary_Handler.HelpHandler;
+import krak.miche.KBot.services.Localizer;
 import org.telegram.telegrambots.api.methods.send.SendMessage;
 import org.telegram.telegrambots.api.objects.Chat;
 import org.telegram.telegrambots.api.objects.User;
@@ -17,6 +17,8 @@ import org.telegram.telegrambots.logging.BotLogger;
  * @version 1.0
  * Get a list of all the commands.
  * The list is different if used in user chat or group chat.
+ * Note: some commands are not inserted in the list because are meant
+ * to be used only by SUPER_ADMINS
  */
 
 public class HelpCommand extends BotCommand {
@@ -39,15 +41,13 @@ public class HelpCommand extends BotCommand {
         {
             helpMessageBuilder = new StringBuilder("<b>Help</b>\n");
             helpMessageBuilder.append(Localizer.getString("help", language)).append("\n");
-            HelpHandler helpHandler = new HelpHandler();
-            helpMessageBuilder.append(helpHandler.getHelpUser());
+            helpMessageBuilder.append(HelpHandler.getHelpUser());
         }
         else if (chat.isGroupChat())
         {
             helpMessageBuilder = new StringBuilder("<b>Help</b>\n");
             helpMessageBuilder.append(Localizer.getString("help", language)).append("\n");
-            HelpHandler helpHandler = new HelpHandler();
-            helpMessageBuilder.append(helpHandler.getHelpGroup());
+            helpMessageBuilder.append(HelpHandler.getHelpGroup());
         }
         SendMessage helpMessage = new SendMessage();
         helpMessage.setChatId(chat.getId().toString());

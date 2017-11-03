@@ -13,11 +13,7 @@ import krak.miche.KBot.structures.CommandsStatic;
 public class HelpHandler {
     private static final String LOGTAG = "HELPHANDLER";
 
-
-    public HelpHandler() {
-    }
-
-    public StringBuilder getHelpUser() {
+    public static StringBuilder getHelpUser() {
         StringBuilder additionalCommands = new StringBuilder();
         for (CommandObject command : CommandsStatic.USER_COMMANDS)
         {
@@ -26,7 +22,7 @@ public class HelpHandler {
         return additionalCommands;
     }
 
-    public StringBuilder getHelpGroup() {
+    public static StringBuilder getHelpGroup() {
         StringBuilder additionalCommands = new StringBuilder();
         for (CommandObject command : CommandsStatic.GROUP_COMMANDS)
         {

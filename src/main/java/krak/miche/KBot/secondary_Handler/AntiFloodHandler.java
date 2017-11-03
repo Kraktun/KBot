@@ -117,13 +117,14 @@ public class AntiFloodHandler {
     }
 
     /**
-     * Adds group to antiflood
+     * Adds group to antiflood if it is present in DB
      * @param groupL id of the group to add (negative long)
      */
     private void addGroup(Long groupL) {
         String group = longtoString(groupL);
         int[] options = getAntifloodSettings(groupL);
-        groups.add(new GroupObject(group, options));
+        if (options!=null)
+            groups.add(new GroupObject(group, options));
     }
 
     /**
@@ -147,6 +148,8 @@ public class AntiFloodHandler {
 
     /**
      * Updates group settings in Antiflood object retrieving them from DB
+     * or adds the group if it does not exist
+     * Fails if group is not in DB or if an error occurs
      * @param groupL id of the group (negative long)
      */
     private void updateGroup(Long groupL) {
@@ -155,6 +158,8 @@ public class AntiFloodHandler {
         lock.lock();
         try {
             int[] options = getAntifloodSettings(groupL);
+            if (options == null)
+                return;
             for (GroupObject greap : groups)
             {
                 if (greap.getID().equals(group))
@@ -222,42 +227,65 @@ public class AntiFloodHandler {
         }
     }
 
-//All important methods are executed inside the lock
-
+    /**
+     * Class that represents a group
+     * Keeps a lift of the users in this group
+     * Note: all methods that change important variables
+     * are called while inside a lock
+     */
     private class GroupObject {
         private String groupID;
-        //0 = number of messages
-        //1 = timeSlice
+        //options[0] = number of messages
+        //options[1] = timeSlice
         private int[] options;
         private ArrayList<UserObject> users;
 
+        /**
+         * Initialize an object
+         * @param group id of the group (negative long to String)
+         * @param options options for antiflood
+         */
         private GroupObject(String group, int[] options) {
             groupID = group;
             this.options = options;
             users = new ArrayList<>();
         }
 
+        /**
+         * @return timeSlice
+         */
         int getTimeSlice()
         {
             return options[1];
         }
 
+        /**
+         * @return id of the group
+         */
         String getID() {
             return groupID;
         }
 
+        /**
+         * @return messages for timeslice allowed
+         */
         int getMessages() {
             return options[0];
         }
 
+        /**
+         * Update options for chosen group
+         * @param options new options for the group
+         */
         void setOptions(int[] options)
         {
             this.options = options;
         }
 
-        //adds a message to the count and
-        //return true if message is in the limit of antiflood
-        //false if it breaks the rule
+        /**
+         * adds a message to the count
+         * @return true if message is in the limit of antiflood, false if it breaks the rule
+         */
         boolean addMessage(int user)
         {
             lock.lock();
@@ -285,11 +313,13 @@ public class AntiFloodHandler {
             }
         }
 
-        //called by run() inside the lock
+        /**
+         * Called by execute to loop throw users to increase messages age
+         */
         void increaseMessagesAge() {
             for (UserObject uss : users)
             {
-                uss.updateMessages(options[1]);
+                uss.updateMessages(getTimeSlice());
                 if (uss.getMessagesCount() > 0)
                 {
                     uss.increaseAge();
@@ -298,22 +328,39 @@ public class AntiFloodHandler {
         }
     }
 
+    /**
+     * Class that represents a user
+     * Keeps a lift of his messages
+     * Note: all methods that change important variables
+     * are called while inside a lock
+     */
     private class UserObject {
         int user;
         private ArrayList<FloodMessage> messages;
         int messageCount;
 
+        /**
+         * Initialize a user
+         * @param user id of the user
+         */
         private UserObject(int user) {
             this.user = user;
             messages = new ArrayList<>();
             messageCount = 0;
         }
 
+        /**
+         * Adds a message to the list
+         */
         private void addMessage() {
             messages.add(new FloodMessage());
             messageCount++;
         }
 
+        /**
+         * Check if a message is old enough to be removed
+         * @param timeSlice timeslice for the group
+         */
         private void updateMessages(int timeSlice) {
             if (messageCount > 0)
             {
@@ -329,6 +376,9 @@ public class AntiFloodHandler {
             }
         }
 
+        /**
+         * @return number of messages sent by this user in last timeslice
+         */
         private int getMessagesCount() {
             return messageCount;
         }
@@ -341,27 +391,39 @@ public class AntiFloodHandler {
                 }
         }
 
-        private ArrayList<FloodMessage> getMessages() {
-            return messages;
-        }
-
+        /**
+         * @return id of the user
+         */
         private int getID() {
             return user;
         }
     }
 
+    /**
+     * Class that represents a message
+     */
     private class FloodMessage {
 
         private int timeSent = 0;
 
+        /**
+         * Initialize a message with age 0
+         */
         private FloodMessage() {
             timeSent = 0;
         }
 
+        /**
+         * Increase message age of ANTIFLOODTIMESLICEMIN
+         */
         private void increaseTime() {
             timeSent += ANTIFLOODTIMESLICEMIN;
         }
 
+        /**
+         * @param timeSlice for this group
+         * @return true is message is older than timeSlice and should be removed
+         */
         private boolean isOldMessage(int timeSlice)
         {
             return timeSent > timeSlice;

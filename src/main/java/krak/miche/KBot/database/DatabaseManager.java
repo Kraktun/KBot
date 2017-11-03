@@ -87,19 +87,27 @@ public class DatabaseManager {
     //_______________________________________________________________________________________________
     //DATABASE INITIALIZATION
 
-    public void attachMiscDB()  throws SQLException
+    /**
+     * Attaches Misc DB to the main DB
+     * @throws SQLException if an error occurs
+     */
+    private void attachMiscDB()  throws SQLException
     {
         connection.executeQueryAttach(ATTACH_MISC);
     }
 
-    public void attachGroupsAdminDB()  throws SQLException
+    /**
+     * Attaches Groups DB to the main DB
+     * @throws SQLException if an error occurs
+     */
+    private void attachGroupsAdminDB()  throws SQLException
     {
         connection.executeQueryAttach(ATTACH_GROUPSADMIN);
     }
 
     /**
      * Initialize users table
-     *
+     * @throws SQLException if an error occurs
      */
     public void initializeUsers()  throws SQLException
     {
@@ -110,7 +118,7 @@ public class DatabaseManager {
 
     /**
      * Initialize feedback table
-     *
+     * @throws SQLException if an error occurs
      */
     public void initializeFeedback()  throws SQLException
     {
@@ -120,7 +128,7 @@ public class DatabaseManager {
 
     /**
      * Initialize logs table
-     *
+     * @throws SQLException if an error occurs
      */
     public void initializeLogs()  throws SQLException
     {
@@ -130,7 +138,7 @@ public class DatabaseManager {
 
     /**
      * Initialize reminders table
-     *
+     * @throws SQLException if an error occurs
      */
     public void initializeReminders()  throws SQLException
     {
@@ -140,9 +148,9 @@ public class DatabaseManager {
 
     /**
      * Initialize command table:
-     * This table contains the last command which requires a different handling
-     * from the bot. It is used for commands which needs parameters in different messages
-     *
+     * This table contains the last command that requires a different handling
+     * from the bot. It is used for commands that need parameters in different messages
+     * @throws SQLException if an error occurs
      */
     public void initializeCommandTable()  throws SQLException
     {
@@ -153,7 +161,7 @@ public class DatabaseManager {
     /**
      * Initialize group table:
      * This table contains a list of all the groups where the bot is active
-     *
+     * @throws SQLException if an error occurs
      */
     public void initializeGroupTable()  throws SQLException
     {
@@ -164,8 +172,9 @@ public class DatabaseManager {
     /**
      * Initialize user group table:
      * This table named as the group ID contains the users with status for that group
-     * Only Elected admins (including group admins) and blacklisted users are saved here, not all users
-     *
+     * Only Selected admins (including group admins) and blacklisted users are saved here, not all users
+     * @param groupID ID of the group
+     * @throws SQLException if an error occurs
      */
     public void initializeUserGroupTable(Long groupID)  throws SQLException
     {
@@ -177,7 +186,8 @@ public class DatabaseManager {
     /**
      * Initialize group settings table:
      * This table named as the group ID contains the settings saved for that group
-     *
+     * @param groupID ID of the group
+     * @throws SQLException if an error occurs
      */
     public void initializeGroupSettingsTable(Long groupID)  throws SQLException
     {
@@ -192,8 +202,7 @@ public class DatabaseManager {
 
 
     /**
-     * Answers: Is user already in database?
-     *
+     * Check if user is already in DB
      * @return true/false
      */
     public boolean isDBUser(int userDB)
@@ -219,7 +228,6 @@ public class DatabaseManager {
 
     /**
      * Retrieve user status from database
-     *
      * @return user status
      */
     public String getUserStatus(int userDB)
@@ -246,7 +254,6 @@ public class DatabaseManager {
 
     /**
      * Short way to determine if user has used "/stop" command
-     *
      * @return true/false
      */
     public boolean isRemovedStatus(int userDB)
@@ -257,7 +264,6 @@ public class DatabaseManager {
 
     /**
      * Short way to determine if user is an admin
-     *
      * @return true/false
      */
     public boolean isAdminStatus(int userDB)
@@ -269,7 +275,6 @@ public class DatabaseManager {
     /**
      * Short way to determine if user is a super admin
      * Use SUPER_ADMIN list instead of this method to determine if an user is a super admin
-     *
      * @return true/false
      */
     public boolean isSuperAdminStatus(int userDB)
@@ -280,7 +285,6 @@ public class DatabaseManager {
 
     /**
      * Short way to determine if user is blacklisted
-     *
      * @return true/false
      */
     public boolean isBlackStatus(int userDB)
@@ -293,7 +297,6 @@ public class DatabaseManager {
 
     /**
      * Short way to determine if user is a power user
-     *
      * @return true/false
      */
     public boolean isPowerUserStatus(int userDB)
@@ -304,9 +307,9 @@ public class DatabaseManager {
 
     /**
      * Add user to database with chosen status
-     *
      * @param userID = id of the user
      * @param userStatus = status of the user
+     * @throws SQLException if an error occurs
      */
     public void addDBUser(int userID, String userStatus, String username, String language, int UTC, String info)  throws SQLException
     {
@@ -316,57 +319,52 @@ public class DatabaseManager {
 
     /**
      * Changes user username in users table
-     *
      * @param userDB = Id of the user
      * @param newUsername = new status of the user
+     * @throws SQLException if an error occurs
      */
     public void changeUserUsername(int userDB, String newUsername) throws SQLException {
 
         connection.executeUPD(CHANGE_USER_USERNAME, newUsername, userDB);
-
     }
 
     /**
      * Changes user UTC Time in users table
-     *
      * @param userDB = Id of the user
      * @param UTC = new UTC of the user
+     * @throws SQLException if an error occurs
      */
     public void changeUserUTC(int userDB, int UTC) throws SQLException {
 
         connection.executeUPD(CHANGE_USER_UTC, UTC, userDB);
-
     }
 
     /**
      * Changes user status in users table
-     *
      * @param userDB = Id of the user
      * @param newStatus = new status of the user
+     * @throws SQLException if an error occurs
      */
     public void changeUserStatus(int userDB, String newStatus) throws SQLException {
 
         newStatus = newStatus.toUpperCase();
         connection.executeUPD(CHANGE_USER_STATUS, newStatus, userDB);
-
     }
 
     /**
      * Removes user from users table
-     *
      * @param userDB = user to remove
+     * @throws SQLException if an error occurs
      */
     public void removeUser(int userDB) throws SQLException {
 
         connection.executeUPD(REMOVE_USER, userDB);
-        UtilsMain.log("Removed user " + userDB);
-
     }
 
     /**
      * Retrieve all users in users table with ID and status
-     *
      * @return ID + status + username of all users
+     * @throws SQLException if an error occurs
      */
     public String getAllUsers() throws SQLException {
 
@@ -385,8 +383,8 @@ public class DatabaseManager {
 
     /**
      * Retrieve all admins in users table with ID and status
-     *
      * @return username + status of all admins
+     * @throws SQLException if an error occurs
      */
     public String getAllAdmins() throws SQLException {
 
@@ -406,9 +404,9 @@ public class DatabaseManager {
 
     /**
      * Set user language
-     *
      * @param userDB = Id of the user
      * @param language = language
+     * @throws SQLException if an error occurs
      */
     public void changeUserLanguage(int userDB, String language) throws SQLException {
 
@@ -417,9 +415,9 @@ public class DatabaseManager {
 
     /**
      * Set user info
-     *
      * @param userDB = Id of the user
      * @param info = info
+     * @throws SQLException if an error occurs
      */
     public void changeUserInfo(int userDB, String info) throws SQLException {
 
@@ -428,8 +426,8 @@ public class DatabaseManager {
 
     /**
      * Retrieve user language from database if not present returns default language
-     *
      * @return user language
+     * @throws SQLException if an error occurs
      */
     public String getUserLanguage(int userDB)
     {
@@ -457,8 +455,8 @@ public class DatabaseManager {
 
     /**
      * Retrieve user language from database if not present returns default language
-     *
      * @return user language
+     * @throws SQLException if an error occurs
      */
     public int getUserUTC(int userDB)
     {
@@ -487,9 +485,9 @@ public class DatabaseManager {
 
     /**
      * Insert feedback into feedback table
-     *
      * @param userID = id of the user who sent the feedback
      * @param feedback = feedback to insert
+     * @throws SQLException if an error occurs
      */
     public void insertFeedback(int userID, String feedback)  throws SQLException
     {
@@ -505,8 +503,8 @@ public class DatabaseManager {
 
     /**
      * Returns all the feedback in the feedback table (with Id of who sent it)
-     *
      * @return all feedbacks
+     * @throws SQLException if an error occurs
      */
     public String getAllFeedbacks() throws SQLException {
 
@@ -524,9 +522,9 @@ public class DatabaseManager {
 
     /**
      * Returns the length of the feedback already stored in the feedback table for selected user
-     *
      * @param userID = ID of the user
      * @return feddback length
+     * @throws SQLException if an error occurs
      */
     public int getFeedbacklength(int userID) throws SQLException {
 
@@ -544,9 +542,9 @@ public class DatabaseManager {
 
     /**
      * Private method to update a feedback from a user with another feedback
-     *
      * @param userID = Id of the user
      * @return old feedback + new feedback
+     * @throws SQLException if an error occurs
      */
     private String getFeedbackFromUser(int userID) throws SQLException {
 
@@ -567,8 +565,8 @@ public class DatabaseManager {
 
     /**
      * Check if user has already an entry in feedback table
-     *
      * @return true/false
+     * @throws SQLException if an error occurs
      */
     private boolean isDBFeedbackUser(int userDB)
     {
@@ -593,7 +591,7 @@ public class DatabaseManager {
 
     /**
      * Deletes feedback table
-     *
+     * @throws SQLException if an error occurs
      */
     public void clearFeedback() throws SQLException
     {
@@ -605,12 +603,12 @@ public class DatabaseManager {
 
     /**
      * Insert log into log table
-     *
      * @param groupID = Id of the group
      * @param userID = id of the user
      * @param username = username of the user
      * @param date = date of the message
      * @param message = message
+     * @throws SQLException if an error occurs
      */
     public void insertLog(long groupID, int userID, String username, String date, String message)  throws SQLException
     {
@@ -620,9 +618,9 @@ public class DatabaseManager {
 
     /**
      * Returns a list of the messages sent as logObjects
-     *
      * @param groupID = ID of the group
      * @return array of logs
+     * @throws SQLException if an error occurs
      */
     public ArrayList<LogObject> getLogForGroup(long groupID) throws SQLException {
 
@@ -646,7 +644,8 @@ public class DatabaseManager {
 
     /**
      * Deletes log table
-     *
+     * @param groupID ID of the group to clear
+     * @throws SQLException if an error occurs
      */
     public void clearLogForGroup(long groupID) throws SQLException
     {
@@ -660,10 +659,10 @@ public class DatabaseManager {
 
     /**
      * Insert reminder into reminder table
-     *
      * @param userID = id of the user who set the reminder
      * @param date = formatted date for the reminder dd.hh.mm.ss
      * @param message = text in reminder
+     * @throws SQLException if an error occurs
      */
     public void insertReminder(String userID, String date, String message, boolean isTimer)  throws SQLException
     {
@@ -677,8 +676,8 @@ public class DatabaseManager {
 
     /**
      * Returns all the reminders
-     *
      * @return all reminders
+     * @throws SQLException if an error occurs
      */
     public ArrayList<Reminder> getReminders() throws SQLException {
 
@@ -698,9 +697,9 @@ public class DatabaseManager {
 
     /**
      * Get reminder for selected user
-     *
      * @param userID = Id of the user
      * @return Reminder
+     * @throws SQLException if an error occurs
      */
     public Reminder getReminderFromUser(int userID) throws SQLException {
 
@@ -724,7 +723,6 @@ public class DatabaseManager {
 
     /**
      * Check if user has already an entry in reminders table
-     *
      * @return true/false
      */
     private boolean isDBReminderUser(int userD)
@@ -750,7 +748,7 @@ public class DatabaseManager {
 
     /**
      * Deletes reminders table
-     *
+     * @throws SQLException if an error occurs
      */
     public void clearReminders() throws SQLException
     {
@@ -762,7 +760,6 @@ public class DatabaseManager {
 
     /**
      * Check if user has a pending command
-     *
      * @param userDB = id of the user to check
      * @return true/false
      */
@@ -790,9 +787,9 @@ public class DatabaseManager {
     /**
      * Check if user is in command database, if so it adds param1
      * if not it cast an exception.
-     *
      * @param userDB = Id of the user
      * @param param1 = param to insert
+     * @throws SQLException if an error occurs
      */
     public void insertCommandParam1(int userDB, String param1) throws SQLException {
         String send = INSERT_PARAM1;
@@ -805,11 +802,11 @@ public class DatabaseManager {
     }
 
     /**
-     * Check if user is in command database, if so it adds param1
+     * Check if user is in command database, if so it adds param2
      * if not it cast an exception.
-     *
      * @param userDB = Id of the user
      * @param param2 = param to insert
+     * @throws SQLException if an error occurs
      */
     public void insertCommandParam2(int userDB, String param2) throws SQLException {
         String send = INSERT_PARAM2;
@@ -822,11 +819,11 @@ public class DatabaseManager {
     }
 
     /**
-     * Check if user is in command database, if so it adds param1
+     * Check if user is in command database, if so it adds param3
      * if not it cast an exception.
-     *
      * @param userDB = Id of the user
      * @param param3 = param to insert
+     * @throws SQLException if an error occurs
      */
     public void insertCommandParam3(int userDB, String param3) throws SQLException {
         String send = INSERT_PARAM3;
@@ -841,9 +838,9 @@ public class DatabaseManager {
     /**
      * Check if user is in command database, if so it updates the command with the new one
      * and resets params if not it adds it.
-     *
      * @param userDB = Id of the user
      * @param command = command to insert
+     * @throws SQLException if an error occurs
      */
     public void pushCommand(int userDB, String command) throws SQLException {
         String send = INSERT_COMMAND;
@@ -861,7 +858,6 @@ public class DatabaseManager {
 
     /**
      * Returns last command saved for user
-     *
      * @param userDB = ID of the user
      * @return last command
      */
@@ -888,8 +884,7 @@ public class DatabaseManager {
     }
 
     /**
-     * Returns last command saved for user
-     *
+     * Returns last command param1 saved for user
      * @param userDB = ID of the user
      * @return param1
      */
@@ -916,8 +911,7 @@ public class DatabaseManager {
     }
 
     /**
-     * Returns last command saved for user
-     *
+     * Returns last command param2 saved for user
      * @param userDB = ID of the user
      * @return param2
      */
@@ -944,8 +938,7 @@ public class DatabaseManager {
     }
 
     /**
-     * Returns last command saved for user
-     *
+     * Returns last command param3 saved for user
      * @param userDB = ID of the user
      * @return param3
      */
@@ -973,8 +966,8 @@ public class DatabaseManager {
 
     /**
      * Removes user from command table
-     *
      * @param userDB = user to remove
+     * @throws SQLException if an error occurs
      */
     public void removeUserCommand(int userDB) throws SQLException {
 
@@ -989,7 +982,6 @@ public class DatabaseManager {
 
     /**
      * Check if group is in database
-     *
      * @param chatID group id
      * @return true/false
      */
@@ -1016,8 +1008,8 @@ public class DatabaseManager {
 
     /**
      * Add group to groups database
-     *
      * @param groupID = id of he group
+     * @throws SQLException if an error occurs
      */
     public void addGroup(Long groupID)  throws SQLException
     {
@@ -1027,8 +1019,8 @@ public class DatabaseManager {
 
     /**
      * Retrieve alla groups in groups table
-     *
      * @return ID of all groups
+     * @throws SQLException if an error occurs
      */
     public String getAllGroups() throws SQLException {
 
@@ -1045,8 +1037,8 @@ public class DatabaseManager {
 
     /**
      * Remove group from database (but keeps the settings)
-     *
      * @param groupID = id of he group
+     * @throws SQLException if an error occurs
      */
     public void removeGroup(Long groupID)  throws SQLException
     {
@@ -1061,10 +1053,10 @@ public class DatabaseManager {
 
     /**
      * Add user to group specific database with chosen status
-     *
      * @param groupID = id of he group
      * @param userID = id of the user
      * @param userStatus = status of the user
+     * @throws SQLException if an error occurs
      */
     public void addGroupUser(Long groupID, int userID, String userStatus, String username, String info)  throws SQLException
     {
@@ -1075,10 +1067,10 @@ public class DatabaseManager {
 
     /**
      * Changes user status in user group table
-     *
      * @param groupID = id of the group
      * @param userDB = Id of the user
      * @param newStatus = new status of the user
+     * @throws SQLException if an error occurs
      */
     public void changeUserGroupStatus(Long groupID, int userDB, String newStatus) throws SQLException {
 
@@ -1089,10 +1081,10 @@ public class DatabaseManager {
 
     /**
      * Changes user username in user group table
-     *
      * @param groupID = id of the group
      * @param userDB = Id of the user
      * @param newUsername = new username of the user
+     * @throws SQLException if an error occurs
      */
     public void changeUserGroupUsername(Long groupID, int userDB, String newUsername) throws SQLException {
 
@@ -1102,10 +1094,10 @@ public class DatabaseManager {
 
     /**
      * Changes user info in user group table
-     *
      * @param groupID = id of the group
      * @param userDB = Id of the user
      * @param newInfo = new info for the user
+     * @throws SQLException if an error occurs
      */
     public void changeUserGroupInfo(Long groupID, int userDB, String newInfo) throws SQLException {
 
@@ -1115,7 +1107,6 @@ public class DatabaseManager {
 
     /**
      * Check if user is in selected group
-     *
      * @param groupID = id of he group
      * @param userDB = Id of the user
      * @return true/false
@@ -1143,7 +1134,6 @@ public class DatabaseManager {
 
     /**
      * Check if user in selected group is blacklisted
-     *
      * @param groupID = id of he group
      * @param userDB = Id of the user
      * @return true/false
@@ -1164,7 +1154,6 @@ public class DatabaseManager {
 
     /**
      * Check if user in selected group is an admin
-     *
      * @param groupID = id of he group
      * @param userDB = Id of the user
      * @return true/false
@@ -1184,7 +1173,7 @@ public class DatabaseManager {
     }
 
     /**
-     *  Get status for selected user in selected group
+     * Get status for selected user in selected group
      * @param groupID group
      * @param userDB user to check
      * @return status of user
@@ -1213,9 +1202,9 @@ public class DatabaseManager {
     }
 
     /**
-     * Retrieve alla users in group users table with ID and status (ADMIN\BLACKLISTED)
-     *
+     * Retrieve all users in group users table with ID and status (ADMIN\BLACKLISTED)
      * @return ID + status of all users in database
+     * @throws SQLException if an error occurs
      */
     public String getAdminsFromGroup(Long groupID) throws SQLException {
 
@@ -1239,8 +1228,8 @@ public class DatabaseManager {
 
     /**
      * Initialize group settings table. Called with /start only on first run
-     *
      * @param groupID = id of the group
+     * @throws SQLException if an error occurs
      */
     public void initializeGroupSettings(Long groupID) throws SQLException {
 
@@ -1255,11 +1244,11 @@ public class DatabaseManager {
     /**
      * Update antiflood settings (number of message for slice time)
      * Parameters check (if they are int etc) must be done in the calling method
-     *
      * @param groupID = id of the group
      * @param activated = true/false if antiflood is activated
      * @param sliceTime =  time to check
      * @param messageNumber = number of messages
+     * @throws SQLException if an error occurs
      */
     public void updateGroupSettingsAntiflood(Long groupID, String activated, String sliceTime, String messageNumber) throws SQLException {
 
@@ -1270,9 +1259,9 @@ public class DatabaseManager {
     /**
      * Update antiflood settings (number of message for slice time)
      * Parameters check (if they are int etc) must be done in the calling method
-     *
      * @param groupID = id of the group
      * @param activated = true/false if antiflood is activated
+     * @throws SQLException if an error occurs
      */
     public void updateGroupSettingsAntiflood(Long groupID, String activated) throws SQLException {
 
@@ -1282,7 +1271,6 @@ public class DatabaseManager {
 
     /**
      * Checks if antiflood is active in the group
-     *
      * @param groupID = id of the group
      * @return true/false
      */
@@ -1311,7 +1299,6 @@ public class DatabaseManager {
 
     /**
      * Retrieves antiflood settings (check for consistency is performed when inserted, not extracted)
-     *
      * @param groupID = id of the group
      * @return String[2] where 0 = number of messages, 1 = timeSlice
      */
@@ -1343,9 +1330,9 @@ public class DatabaseManager {
     /**
      * Update language settings
      * Parameters check must be done in the calling method
-     *
      * @param groupID = id of the group
      * @param language = language
+     * @throws SQLException if an error occurs
      */
     public void updateGroupSettingsLanguage(Long groupID, String language) throws SQLException {
 
@@ -1355,9 +1342,9 @@ public class DatabaseManager {
 
     /**
      * Retrieves language (check for consistency is performed when inserted, not extracted)
-     *
      * @param groupID = id of the group
      * @return language
+     * @throws SQLException if an error occurs
      */
     public String getGroupLanguage(Long groupID)
     {
@@ -1388,9 +1375,9 @@ public class DatabaseManager {
     /**
      * Update log settings
      * Parameters check must be done in the calling method
-     *
      * @param groupID = id of the group
      * @param set = true to enable, false to disable
+     * @throws SQLException if an error occurs
      */
     public void setGroupSettingsLog(Long groupID, boolean set) throws SQLException {
 
@@ -1404,9 +1391,9 @@ public class DatabaseManager {
     /**
      * Update log settings
      * Parameters check must be done in the calling method
-     *
      * @param groupID = id of the group
      * @param type = default\invert
+     * @throws SQLException if an error occurs
      */
     public void updateGroupLogType(Long groupID, String type) throws SQLException {
 
@@ -1416,7 +1403,6 @@ public class DatabaseManager {
 
     /**
      * Retrieves log mode (check for consistency is performed when inserted, not extracted)
-     *
      * @param groupID = id of the group
      * @return log type
      */
@@ -1446,7 +1432,6 @@ public class DatabaseManager {
 
     /**
      * Check if log is default type
-     *
      * @param groupID = id of the group
      * @return true/false
      */
@@ -1457,7 +1442,6 @@ public class DatabaseManager {
 
     /**
      * Checks if logging is active in the group
-     *
      * @param groupID = id of the group
      * @return true/false
      */
@@ -1487,9 +1471,9 @@ public class DatabaseManager {
     /**
      * Update utc settings
      * Parameters check must be done in the calling method
-     *
      * @param groupID = id of the group
      * @param UTCvalue = default\invert
+     * @throws SQLException if an error occurs
      */
     public void updateGroupUTC(Long groupID, String UTCvalue) throws SQLException {
 
@@ -1498,8 +1482,7 @@ public class DatabaseManager {
     }
 
     /**
-     * Retrieves utc (check for consistency is performed when inserted, not extracted)
-     *
+     * Retrieves utc (check for consistency is performed when inserted, not extracted), default if not present
      * @param groupID = id of the group
      * @return utc
      */
@@ -1532,7 +1515,8 @@ public class DatabaseManager {
 
     /**
      * Executes a custom sql command
-     *
+     * @param query query to execute
+     * @throws SQLException if an error occurs
      */
     public void executeCustomSQL(String query) throws SQLException {
 
@@ -1541,11 +1525,11 @@ public class DatabaseManager {
 
 
     /**
-     * Sostituisce il PRIMO ? con un parametro passato e restituisce il query completo
+     * Replaces the first ? with the param and returns the resulting query
      *
-     * @param query Stringa da analizzare
-     * @param param1 primo ? da sostituire
-     * @return stringa con il primo ? sostituito con param1
+     * @param query query with ? to replace
+     * @param param1 param to insert
+     * @return query with the first ? replaced with param1
      */
     private String replaceInterrogatives(String query, String param1)
     {
@@ -1561,7 +1545,7 @@ public class DatabaseManager {
 
     /**
      * Closes connection with database
-     *
+     * @throws SQLException if an error occurs
      */
     public void shutdown()  throws SQLException
     {

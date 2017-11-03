@@ -18,7 +18,7 @@ import java.sql.SQLException;
  * @author Kraktun
  * @version 1.0
  * Set user as REMOVED in DB, the user is not removed from the database unless you
- * use /rmuser
+ * explicitly use /rmuser
  */
 
 public class StopCommand extends BotCommand {

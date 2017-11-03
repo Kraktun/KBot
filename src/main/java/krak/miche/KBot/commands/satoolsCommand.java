@@ -3,7 +3,7 @@ package krak.miche.KBot.commands;
 
 import krak.miche.KBot.BuildVars;
 import krak.miche.KBot.database.DatabaseManager;
-import krak.miche.KBot.keyboards.satoolsKeyboard;
+import krak.miche.KBot.keyboards.SatoolsKeyboard;
 import krak.miche.KBot.services.Localizer;
 import org.telegram.telegrambots.api.methods.send.SendMessage;
 import org.telegram.telegrambots.api.objects.Chat;
@@ -43,8 +43,7 @@ public class satoolsCommand extends BotCommand {
             {
                 try {
                     databaseManager.pushCommand(userID, "satools");
-                    satoolsKeyboard keyboard = new satoolsKeyboard();
-                    answer.setReplyMarkup(keyboard.sendCustomKeyboard());
+                    answer.setReplyMarkup(SatoolsKeyboard.sendCustomKeyboard());
                     answer.setText("Choose an option:");
                 } catch (SQLException e) {
                     BotLogger.error(LOGTAG, e);

@@ -18,7 +18,7 @@ import org.telegram.telegrambots.logging.BotLogger;
  * @author Kraktun
  * @version 1.0
  * This command is no more necessary as of now.
- * But I live it here if necessary in the future.
+ * But I leave it here if necessary in the future.
  */
 
 public class InitializeCommand extends BotCommand {
@@ -37,7 +37,6 @@ public class InitializeCommand extends BotCommand {
     @Override
     public void execute(AbsSender absSender, User user, Chat chat, String[] arguments) {
         StringBuilder messageTextBuilder;
-        InitializeHandler handlerinit = new InitializeHandler();
         DatabaseManager databaseManager = DatabaseManager.getInstance();
         String language;
         if (chat.isUserChat())
@@ -47,23 +46,23 @@ public class InitializeCommand extends BotCommand {
             {
 
                 //INITIALIZE USERS TABLE
-                messageTextBuilder = handlerinit.startUsersTable();
+                messageTextBuilder = InitializeHandler.startUsersTable();
                 messageTextBuilder.append("\n");
 
                 //INITIALIZE FEEDBACKS TABLE
-                messageTextBuilder.append(handlerinit.startFeedbackTable());
+                messageTextBuilder.append(InitializeHandler.startFeedbackTable());
                 messageTextBuilder.append("\n");
 
                 //INITIALIZE COMMANDS TABLE
-                messageTextBuilder.append(handlerinit.startCommandsTable());
+                messageTextBuilder.append(InitializeHandler.startCommandsTable());
                 messageTextBuilder.append("\n");
 
                 //INITIALIZE GROUPS TABLE
-                messageTextBuilder.append(handlerinit.startGroupTable());
+                messageTextBuilder.append(InitializeHandler.startGroupTable());
                 messageTextBuilder.append("\n");
 
                 //INITIALIZE LOGS TABLE
-                messageTextBuilder.append(handlerinit.startLogsTable());
+                messageTextBuilder.append(InitializeHandler.startLogsTable());
                 messageTextBuilder.append("\n");
 
                 SendMessage answer4 = new SendMessage();

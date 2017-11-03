@@ -14,12 +14,9 @@ import java.sql.SQLException;
 public class ClearFeedbackHandler {
 
     public static final String LOGTAG = "CLEARFEEDBACKHANDLER";
-    private DatabaseManager databaseManager = DatabaseManager.getInstance();
 
-    public ClearFeedbackHandler() {
-    }
-
-    public StringBuilder clearFeedbacks() {
+    public static StringBuilder clearFeedbacks() {
+        DatabaseManager databaseManager = DatabaseManager.getInstance();
         StringBuilder messageTextBuilder;
         try {
             databaseManager.clearFeedback();

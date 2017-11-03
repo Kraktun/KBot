@@ -39,8 +39,7 @@ public class GetAdminsCommand extends BotCommand {
         }
         else if (chat.isGroupChat())
         {
-            GetAdminsFromGroupHandler adminsHandler = new GetAdminsFromGroupHandler();
-            messageTextBuilder = adminsHandler.getAdmins(chat.getId());
+            messageTextBuilder = GetAdminsFromGroupHandler.getAdmins(chat.getId());
         }
         SendMessage answer = new SendMessage();
         answer.setChatId(chat.getId().toString());

@@ -6,6 +6,11 @@ import org.quartz.InterruptableJob;
 import org.quartz.JobExecutionContext;
 import org.quartz.JobExecutionException;
 
+/**
+ * @author Kraktun
+ * @version 1.0
+ * Wrapper class to manage Antiflood thread
+ */
 public class AntifloodJob implements InterruptableJob {
 
     public static final String LOGTAG = "ANTIFLOODJOB";

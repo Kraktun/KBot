@@ -16,6 +16,7 @@ import org.telegram.telegrambots.logging.BotLogger;
  * @author Kraktun
  * @version 1.0
  * Command to properly disconnect the database and backup reminders
+ * Useless as of now
  */
 
 public class ShutdownCommand extends BotCommand {

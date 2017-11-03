@@ -27,13 +27,9 @@ import java.util.List;
 public class InitializeHandler {
 
     public static final String LOGTAG = "INITIALIZEHANDLER";
-    private DatabaseManager databaseManager = DatabaseManager.getInstance();
 
-    public InitializeHandler() {
-
-    }
-
-    public StringBuilder startUsersTable() {
+    public static StringBuilder startUsersTable() {
+        DatabaseManager databaseManager = DatabaseManager.getInstance();
         StringBuilder messageTextBuilder;
         try {
             databaseManager.initializeUsers();
@@ -138,7 +134,8 @@ public class InitializeHandler {
         return messageTextBuilder;
     }
 
-    public StringBuilder startFeedbackTable() {
+    public static StringBuilder startFeedbackTable() {
+        DatabaseManager databaseManager = DatabaseManager.getInstance();
         StringBuilder message2;
         try {
             databaseManager.initializeFeedback();
@@ -151,7 +148,8 @@ public class InitializeHandler {
         return message2;
     }
 
-    public StringBuilder startLogsTable() {
+    public static StringBuilder startLogsTable() {
+        DatabaseManager databaseManager = DatabaseManager.getInstance();
         StringBuilder message2;
         try {
             databaseManager.initializeLogs();
@@ -165,7 +163,8 @@ public class InitializeHandler {
         return message2;
     }
 
-    public StringBuilder startCommandsTable() {
+    public static StringBuilder startCommandsTable() {
+        DatabaseManager databaseManager = DatabaseManager.getInstance();
         StringBuilder message3;
         try {
             databaseManager.initializeCommandTable();
@@ -178,7 +177,8 @@ public class InitializeHandler {
         return message3;
     }
 
-    public StringBuilder startGroupTable() {
+    public static StringBuilder startGroupTable() {
+        DatabaseManager databaseManager = DatabaseManager.getInstance();
         StringBuilder message4;
         try {
             databaseManager.initializeGroupTable();
@@ -192,7 +192,8 @@ public class InitializeHandler {
         return message4;
     }
 
-    public StringBuilder startUserGroupTable(Long groupID) {
+    public static StringBuilder startUserGroupTable(Long groupID) {
+        DatabaseManager databaseManager = DatabaseManager.getInstance();
         StringBuilder message4;
         try {
             databaseManager.initializeUserGroupTable(groupID);
@@ -214,7 +215,8 @@ public class InitializeHandler {
         return message4;
     }
 
-    public void addAdminsGroup(AbsSender absSender, Long groupID, int user) {
+    public static void addAdminsGroup(AbsSender absSender, Long groupID, int user) {
+        DatabaseManager databaseManager = DatabaseManager.getInstance();
         GetChatAdministrators getAdmins = new GetChatAdministrators();
         getAdmins.setChatId(groupID);
         List<User> adminsUsers = new ArrayList<>();
@@ -288,7 +290,8 @@ public class InitializeHandler {
         }
     }
 
-    public void startGroupSettings(Long groupID) {
+    public static void startGroupSettings(Long groupID) {
+        DatabaseManager databaseManager = DatabaseManager.getInstance();
         try {
             databaseManager.initializeGroupSettings(groupID);
             BotLogger.info(LOGTAG, "Group" + groupID + " Settings Initialized");

@@ -2,8 +2,8 @@ package krak.miche.KBot.secondary_Handler;
 
 
 import krak.miche.KBot.database.DatabaseManager;
-import krak.miche.KBot.services.Localizer;
 import krak.miche.KBot.handler.CommandsHandler;
+import krak.miche.KBot.services.Localizer;
 import org.telegram.telegrambots.api.methods.groupadministration.GetChatMember;
 import org.telegram.telegrambots.api.objects.ChatMember;
 import org.telegram.telegrambots.api.objects.User;
@@ -20,12 +20,9 @@ import java.util.Scanner;
 
 public class GetAdminsFromGroupHandler {
     public static final String LOGTAG = "GETUSERSFROMGROUPHANDLER";
-    private DatabaseManager databaseManager = DatabaseManager.getInstance();
 
-    public GetAdminsFromGroupHandler() {
-    }
-
-    public StringBuilder getAdmins(Long groupID) {
+    public static StringBuilder getAdmins(Long groupID) {
+        DatabaseManager databaseManager = DatabaseManager.getInstance();
         StringBuilder messageTextBuilder;
         String language = databaseManager.getGroupLanguage(groupID);
         try {

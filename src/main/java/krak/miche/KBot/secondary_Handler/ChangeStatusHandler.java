@@ -16,12 +16,9 @@ import java.sql.SQLException;
 public class ChangeStatusHandler {
 
     public static final String LOGTAG = "CHANGESTATUSHANDLER";
-    private DatabaseManager databseManager = DatabaseManager.getInstance();
 
-    public ChangeStatusHandler() {
-    }
-
-    public StringBuilder updateStatus(String user, String status, String language) {
+    public static StringBuilder updateStatus(String user, String status, String language) {
+        DatabaseManager databseManager = DatabaseManager.getInstance();
         StringBuilder messageTextBuilder;
         int userID;
         try {

@@ -11,6 +11,8 @@ import org.telegram.telegrambots.bots.commandbot.commands.BotCommand;
 import org.telegram.telegrambots.exceptions.TelegramApiException;
 import org.telegram.telegrambots.logging.BotLogger;
 
+import static krak.miche.KBot.BuildVars.DEFAULT_UTC;
+
 /**
  * @author Kraktun
  * @version 1.0
@@ -22,7 +24,7 @@ public class SetUTCCommand extends BotCommand {
     private static final String LOGTAG = "SETUTCCOMMAND";
 
     public SetUTCCommand() {
-        super( "setutc", "This command is used to set your UTC (default +2)" );
+        super( "setutc", "This command is used to set your UTC (default " + DEFAULT_UTC + " )" );
     }
 
     @Override

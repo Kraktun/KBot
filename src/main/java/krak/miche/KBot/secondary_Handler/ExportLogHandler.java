@@ -1,7 +1,7 @@
 package krak.miche.KBot.secondary_Handler;
 
-import krak.miche.KBot.database.SQLUtil;
 import krak.miche.KBot.database.DatabaseManager;
+import krak.miche.KBot.database.SQLUtil;
 import krak.miche.KBot.services.UtilsMain;
 import krak.miche.KBot.structures.LogObject;
 import org.telegram.telegrambots.logging.BotLogger;

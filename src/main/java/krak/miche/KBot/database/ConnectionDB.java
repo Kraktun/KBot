@@ -18,15 +18,22 @@ class ConnectionDB {
     private static final String LOGTAG = "CONNECTIONDB";
     private Connection currentConnection;
 
-
+    /**
+     * Opens a connection to the DB
+     */
     ConnectionDB() {
         this.currentConnection = openConnection();
     }
 
+    /**
+     * Connects to the DB
+     * @return connection to the DB
+     */
     private Connection openConnection() {
         Connection connection = null;
         try {
             Class.forName(BuildVars.controllerDB).newInstance();
+            //For derby
             //Properties props = new Properties(); props.put("user", BuildVars.usernameDB);
             //props.put("password", BuildVars.password);
             //connection = DriverManager.getConnection(BuildVars.linkDB, props);
@@ -38,6 +45,9 @@ class ConnectionDB {
         return connection;
     }
 
+    /**
+     * Closes connection to the DB
+     */
     void closeConnection() {
         try {
             commitTransaction();
@@ -47,17 +57,10 @@ class ConnectionDB {
         DbUtils.closeQuietly(currentConnection);
     }
 
-    void closeConnection(PreparedStatement preparedStatement) {
-        DbUtils.closeQuietly(preparedStatement);
-        DbUtils.closeQuietly(currentConnection);
-    }
-
-    void closeConnection(PreparedStatement preparedStatement, ResultSet resultSet) {
-        DbUtils.closeQuietly(resultSet);
-        DbUtils.closeQuietly(preparedStatement);
-        DbUtils.closeQuietly(currentConnection);
-    }
-
+    /**
+     * Controls the version of the DB
+     * @return version of the DB, 0 if it's first run
+     */
     public int checkVersion() {
         int max = 0;
         try {
@@ -106,27 +109,56 @@ class ConnectionDB {
         }
     }
 
-    //committransaction doesn't work here
+    /**
+     * Run a query
+     * @param query query to run
+     * @return ResultSet from the query
+     * @throws SQLException if an error occurs
+     */
     ResultSet runSqlQuery(String query) throws SQLException {
         final PreparedStatement statement = this.currentConnection.prepareStatement(query);
-        return statement.executeQuery();
+        try {
+            return statement.executeQuery();
+        }
+        finally {
+            statement.closeOnCompletion();
+        }
     }
 
+    /**
+     * Run a query
+     * @param query query to run
+     * @param value first param (string) of the query
+     * @return ResultSet from the query
+     * @throws SQLException if an error occurs
+     */
     ResultSet runSqlQuery(String query, String value) throws SQLException {
         final PreparedStatement statement;
         statement = this.currentConnection.prepareStatement(query);
         statement.setString(1, value);
-        return statement.executeQuery();
+        try {
+            return statement.executeQuery();
+        }
+        finally {
+            statement.closeOnCompletion();
+        }
     }
 
+    /**
+     * Execute a query
+     * @param query query to execute
+     * @return execution result
+     * @throws SQLException if an error occurs
+     */
     Boolean executeQuery(String query) throws SQLException {
         final PreparedStatement statement;
         statement = this.currentConnection.prepareStatement(query);
-        try{
+        try {
             initTransaction();
-            return statement.execute();}
+            return statement.execute();
+        }
         finally {
-            statement.closeOnCompletion();
+            statement.close();
             commitTransaction();
         }
     }
@@ -134,21 +166,31 @@ class ConnectionDB {
     Boolean executeQueryAttach(String query) throws SQLException {
         final PreparedStatement statement;
         statement = this.currentConnection.prepareStatement(query);
-        try{return statement.execute();}
+        try {
+            return statement.execute();
+        }
         finally {
             statement.close();
         }
     }
 
+    /**
+     * Execute an update
+     * @param query query to execute
+     * @param param1 first param to set
+     * @return execution result
+     * @throws SQLException if an error occurs
+     */
     int executeUPD(String query, String param1) throws SQLException {
         final PreparedStatement statement;
         statement = this.currentConnection.prepareStatement(query);
         statement.setString(1, param1);
-        try{
+        try {
             initTransaction();
-            return statement.executeUpdate();}
+            return statement.executeUpdate();
+        }
         finally {
-            statement.closeOnCompletion();
+            statement.close();
             commitTransaction();
         }
     }
@@ -158,11 +200,12 @@ class ConnectionDB {
         statement = this.currentConnection.prepareStatement(query);
         statement.setString(1, param1);
         statement.setInt(2,param2);
-        try{
+        try {
             initTransaction();
-            return statement.executeUpdate();}
+            return statement.executeUpdate();
+        }
         finally {
-            statement.closeOnCompletion();
+            statement.close();
             commitTransaction();
         }
     }
@@ -172,11 +215,12 @@ class ConnectionDB {
         statement = this.currentConnection.prepareStatement(query);
         statement.setInt(1, param1);
         statement.setInt(2,param2);
-        try{
+        try {
             initTransaction();
-            return statement.executeUpdate();}
+            return statement.executeUpdate();
+        }
         finally {
-            statement.closeOnCompletion();
+            statement.close();
             commitTransaction();
         }
     }
@@ -186,11 +230,12 @@ class ConnectionDB {
          statement = this.currentConnection.prepareStatement(query);
             statement.setInt(1, param1);
             statement.setString(2, param2);
-        try{
+        try {
             initTransaction();
             return statement.executeUpdate();
-        }finally {
-            statement.closeOnCompletion();
+        }
+        finally {
+            statement.close();
             commitTransaction();
         }
     }
@@ -203,11 +248,12 @@ class ConnectionDB {
         statement.setString(3, param3);
         statement.setString(4,param4);
         statement.setString(5, param5);
-        try{
+        try {
             initTransaction();
-            return statement.executeUpdate();}
+            return statement.executeUpdate();
+        }
         finally {
-            statement.closeOnCompletion();
+            statement.close();
             commitTransaction();
         }
     }
@@ -217,11 +263,12 @@ class ConnectionDB {
         statement = this.currentConnection.prepareStatement(query);
         statement.setString(1, param1);
         statement.setString(2,param2);
-        try{
+        try {
             initTransaction();
-            return statement.executeUpdate();}
+            return statement.executeUpdate();
+        }
         finally {
-            statement.closeOnCompletion();
+            statement.close();
             commitTransaction();
         }
     }
@@ -230,11 +277,12 @@ class ConnectionDB {
         final PreparedStatement statement;
         statement = this.currentConnection.prepareStatement(query);
         statement.setInt(1, param1);
-        try{
+        try {
             initTransaction();
-            return statement.executeUpdate();}
+            return statement.executeUpdate();
+        }
         finally {
-            statement.closeOnCompletion();
+            statement.close();
             commitTransaction();
         }
     }
@@ -245,26 +293,12 @@ class ConnectionDB {
         statement.setString(1, param1);
         statement.setInt(2, param2);
         statement.setString(3, param3);
-        try{
+        try {
             initTransaction();
-            return statement.executeUpdate();}
-        finally {
-            statement.closeOnCompletion();
-            commitTransaction();
+            return statement.executeUpdate();
         }
-    }
-
-    int executeUPD(String query, int param1, String param2, String param3) throws SQLException {
-        final PreparedStatement statement;
-        statement = this.currentConnection.prepareStatement(query);
-        statement.setInt(1, param1);
-        statement.setString(2, param2);
-        statement.setString(3, param3);
-        try{
-            initTransaction();
-            return statement.executeUpdate();}
         finally {
-            statement.closeOnCompletion();
+            statement.close();
             commitTransaction();
         }
     }
@@ -276,11 +310,12 @@ class ConnectionDB {
         statement.setString(2, param2);
         statement.setString(3, param3);
         statement.setString(4, param4);
-        try{
+        try {
             initTransaction();
-            return statement.executeUpdate();}
+            return statement.executeUpdate();
+        }
         finally {
-            statement.closeOnCompletion();
+            statement.close();
             commitTransaction();
         }
     }
@@ -292,11 +327,12 @@ class ConnectionDB {
         statement.setString(2, param2);
         statement.setString(3, param3);
         statement.setString(4, param4);
-        try{
+        try {
             initTransaction();
-            return statement.executeUpdate();}
+            return statement.executeUpdate();
+        }
         finally {
-            statement.closeOnCompletion();
+            statement.close();
             commitTransaction();
         }
     }
@@ -310,11 +346,12 @@ class ConnectionDB {
         statement.setString(4, param4);
         statement.setInt(5, param5);
         statement.setString(6, param6);
-        try{
+        try {
             initTransaction();
-            return statement.executeUpdate();}
+            return statement.executeUpdate();
+        }
         finally {
-            statement.closeOnCompletion();
+            statement.close();
             commitTransaction();
         }
     }
@@ -327,11 +364,12 @@ class ConnectionDB {
         statement.setString(3, param3);
         statement.setString(4, param4);
         statement.setString(5, param5);
-        try{
+        try {
             initTransaction();
-            return statement.executeUpdate();}
+            return statement.executeUpdate();
+        }
         finally {
-            statement.closeOnCompletion();
+            statement.close();
             commitTransaction();
         }
     }

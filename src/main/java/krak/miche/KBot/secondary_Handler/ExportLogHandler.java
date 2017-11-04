@@ -19,34 +19,47 @@ import java.util.Calendar;
 
 public class ExportLogHandler {
     private static final String LOGTAG = "EXPORTLOGHANDLER";
-    private static final String folder = "/Logs/";
+    private static final String LOGS_FOLDER = "/Logs/";
 
-    public ExportLogHandler() {
-    }
-
+    /**
+     * Save log for selected group as a text file
+     * @param groupID id of the group
+     * @return File written
+     */
     public static File write(long groupID) {
         String group = "G" + SQLUtil.longtoString(groupID);
         File file = null;
         String timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss").format(Calendar.getInstance().getTime());
         try {
-            file = UtilsMain.writeFile(group + "_" + timeStamp, extractLogs(groupID), folder);
+            file = UtilsMain.writeFile(group + "_" + timeStamp, extractLogs(groupID), LOGS_FOLDER);
         } catch (Exception e) {
             BotLogger.error(LOGTAG, e);
         }
         return file;
     }
 
+    /**
+     * Saves log for selected group as a text file, with custom name
+     * @param groupID id of the group
+     * @param name name for the file
+     * @return File written
+     */
     public static File write(long groupID, String name) {
         String group = "G" + SQLUtil.longtoString(groupID);
         File file = null;
         try {
-            file = UtilsMain.writeFile(group + "_" + name, extractLogs(groupID), folder);
+            file = UtilsMain.writeFile(group + "_" + name, extractLogs(groupID), LOGS_FOLDER);
         } catch (Exception e) {
             BotLogger.error(LOGTAG, e);
         }
         return file;
     }
 
+    /**
+     * Extracts and formats log for selected group
+     * @param groupID id of the group
+     * @return String with formatted log
+     */
     private static String extractLogs(long groupID) {
         DatabaseManager databaseManager = DatabaseManager.getInstance();
         ArrayList<LogObject> listLog;

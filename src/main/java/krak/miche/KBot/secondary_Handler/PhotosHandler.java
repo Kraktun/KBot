@@ -11,11 +11,21 @@ import org.telegram.telegrambots.logging.BotLogger;
 
 import java.util.List;
 
+/**
+ * @author Kraktun
+ * @version 1.0
+ */
 public class PhotosHandler {
 
     public static final String LOGTAG = "PHOTOSHANDLER";
     private static final String IMG_EXTENSION = ".jpg";
 
+    /**
+     * Download photo from message containing photo and save locally
+     * Note: only biggest photo is saved
+     * @param telegramLongPollingBot Bot that received the update (necessary to get the url)
+     * @param message message containing the photo
+     */
     public static void getPhotoFromMessage(TelegramLongPollingCommandBot telegramLongPollingBot, Message message) {
         String fileName;
         if (message.getChat().isGroupChat())

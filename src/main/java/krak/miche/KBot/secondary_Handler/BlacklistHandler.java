@@ -18,6 +18,12 @@ public class BlacklistHandler {
     private static DatabaseManager databaseManager = DatabaseManager.getInstance();
 
 
+    /**
+     * Changes user status to blacklisted
+     * @param message message containing user id to blacklist
+     * @param language language of the user who sent the command
+     * @return result of operation
+     */
     public static StringBuilder blacklist(String message, String language) {
         StringBuilder messageTextBuilder;
         if (message == null || message.length() < 1)

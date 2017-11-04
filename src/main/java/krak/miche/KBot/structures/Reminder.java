@@ -40,6 +40,12 @@ public class Reminder {
         return isTimer;
     }
 
+    /**
+     * Check if text sent as reminder is a timer or a date
+     * @param type type to check between timer and date
+     * @param text formatted timer/date to check
+     * @return true if check is successful
+     */
     public static boolean isFormattedReminder(String type, String text) {
         if (type.equalsIgnoreCase("t"))
             return isFormattedTimer(text);
@@ -48,6 +54,11 @@ public class Reminder {
         return false;
     }
 
+    /**
+     * Check if string is a formatted timer
+     * @param text string to check
+     * @return true if is a correct timer
+     */
     private static boolean isFormattedTimer(String text) {
         try {
             Scanner in = new Scanner(text);
@@ -63,6 +74,11 @@ public class Reminder {
         }
     }
 
+    /**
+     * Check if string is a formatted date
+     * @param text string to check
+     * @return true if is a correct date
+     */
     private static boolean isFormattedDate(String text) {
         try {
             Scanner in = new Scanner(text);
@@ -82,6 +98,12 @@ public class Reminder {
         }
     }
 
+    /**
+     * Converts timers to dates
+     * @param timer string containing the timer
+     * @param UTC target utc
+     * @return timer converted to a date format
+     */
     public static String timerToDate(String timer, int UTC) {
         Scanner in = new Scanner(timer);
         in.useDelimiter("\\.");

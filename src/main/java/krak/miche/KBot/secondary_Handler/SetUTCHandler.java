@@ -12,15 +12,17 @@ import java.time.LocalDateTime;
  * @author Kraktun
  * @version 1.0
  */
-
 public class SetUTCHandler {
 
     private static final String LOGTAG = "SETUTCHANDLER";
 
-    public SetUTCHandler() {
-
-    }
-
+    /**
+     * Updates UTC for user/group
+     * @param isGroup true if the id is a group
+     * @param utcTime new utc for the user/group
+     * @param ID id of the user/group
+     * @return message with result of operation
+     */
     public static StringBuilder insertUTC(boolean isGroup, String utcTime, long ID) {
         StringBuilder messageTextBuilder;
         DatabaseManager databaseManager = DatabaseManager.getInstance();

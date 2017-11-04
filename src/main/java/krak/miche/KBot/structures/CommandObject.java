@@ -2,13 +2,10 @@ package krak.miche.KBot.structures;
 
 import java.util.Scanner;
 
-import static krak.miche.KBot.BuildVars.BOT_USERNAME;
-
 /**
  * @author Kraktun
  * @version 1.0
  */
-
 public class CommandObject {
 
     private final String command;

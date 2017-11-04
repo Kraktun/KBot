@@ -10,20 +10,23 @@ import org.telegram.telegrambots.logging.BotLogger;
 import java.sql.SQLException;
 
 import static krak.miche.KBot.BuildVars.*;
-import static krak.miche.KBot.BuildVars.BLACKLISTED_STATUS;
 
 /**
  * @author Kraktun
  * @version 1.0
  */
-
 public class SetUserGroupHandler {
+
     public static final String LOGTAG = "SETUSERGROUPHANDLER";
     private DatabaseManager databaseManager = DatabaseManager.getInstance();
 
-    public SetUserGroupHandler() {
-    }
-
+    /**
+     * Update status for user in selected group
+     * @param chatID id of the group
+     * @param user user whose status should be changed
+     * @param status new status
+     * @return message with result of operation
+     */
     public StringBuilder updateStatus(Long chatID, User user, String status) {
         StringBuilder messageTextBuilder;
         String language = databaseManager.getGroupLanguage(chatID);
@@ -78,6 +81,13 @@ public class SetUserGroupHandler {
         }
     }
 
+    /**
+     * Update status for user in selected group
+     * @param chatID id of the group
+     * @param userID ID of the user whose status should be changed
+     * @param status new status
+     * @return message with result of operation
+     */
     public StringBuilder updateStatus(Long chatID, int userID, String status) {
         StringBuilder messageTextBuilder;
         String language = databaseManager.getGroupLanguage(chatID);

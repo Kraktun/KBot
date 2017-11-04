@@ -11,7 +11,7 @@ import java.util.MissingResourceException;
 import java.util.PropertyResourceBundle;
 import java.util.ResourceBundle;
 
-//Inspired by https://github.com/rubenlagus/TelegramBotsExample/blob/master/src/main/java/org/telegram/services/LocalisationService.java
+//Partly from https://github.com/rubenlagus/TelegramBotsExample/blob/master/src/main/java/org/telegram/services/LocalisationService.java
 public class Localizer {
 
     private static final String STRINGS_FILE_NAME = "strings";
@@ -20,7 +20,6 @@ public class Localizer {
 
     /**
      * Get a string in default language (en)
-     *
      * @param key key of the resource to fetch
      * @return fetched string or error message otherwise
      */
@@ -36,7 +35,6 @@ public class Localizer {
 
     /**
      * Get a string in default language
-     *
      * @param key key of the resource to fetch
      * @return fetched string or error message otherwise
      */

@@ -35,8 +35,7 @@ public class RetrieveFeedbackCommand extends BotCommand {
         {
             if (BuildVars.SUPER_ADMINS.contains(user.getId()))
             {
-                RetrieveFeedbackHandler feedHandler = new RetrieveFeedbackHandler();
-                messageTextBuilder = feedHandler.getFeedbacks();
+                messageTextBuilder = RetrieveFeedbackHandler.getFeedbacks();
             }
             SendMessage answer = new SendMessage();
             answer.setChatId(chat.getId().toString());

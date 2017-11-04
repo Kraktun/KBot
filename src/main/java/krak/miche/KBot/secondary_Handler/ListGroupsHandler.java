@@ -12,13 +12,15 @@ import java.sql.SQLException;
  */
 
 public class ListGroupsHandler {
+
     public static final String LOGTAG = "LISTUSERSHANDLER";
-    private DatabaseManager databaseManager = DatabaseManager.getInstance();
+    private static DatabaseManager databaseManager = DatabaseManager.getInstance();
 
-    public ListGroupsHandler() {
-    }
-
-    public StringBuilder getGroups() {
+    /**
+     * Get a list of groups where the bot is active
+     * @return list of group with the bot
+     */
+    public static StringBuilder getGroups() {
         StringBuilder messageTextBuilder;
         try {
             String groups = databaseManager.getAllGroups();

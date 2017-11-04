@@ -38,8 +38,7 @@ public class ListUserCommand extends BotCommand {
         {
             if (BuildVars.SUPER_ADMINS.contains(user.getId()))
             {
-                ListUsersHandler usersHandler = new ListUsersHandler();
-                messageTextBuilder = usersHandler.getUsers();
+                messageTextBuilder = ListUsersHandler.getUsers();
             }
             SendMessage answer = new SendMessage();
             answer.setChatId(chat.getId().toString());

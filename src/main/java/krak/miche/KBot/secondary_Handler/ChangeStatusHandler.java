@@ -17,6 +17,13 @@ public class ChangeStatusHandler {
 
     public static final String LOGTAG = "CHANGESTATUSHANDLER";
 
+    /**
+     * Changes user status in database
+     * @param user id of the user
+     * @param status new status for the user
+     * @param language language of the user who sent the command
+     * @return result of operation
+     */
     public static StringBuilder updateStatus(String user, String status, String language) {
         DatabaseManager databseManager = DatabaseManager.getInstance();
         StringBuilder messageTextBuilder;

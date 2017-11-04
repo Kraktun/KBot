@@ -25,9 +25,11 @@ import static krak.miche.KBot.database.SQLUtil.*;
 
 public class AntiFloodHandler {
 
-    // Note that time slices don't start when someone set the antiflood, so if you chose 6 sec
-    // and in the first 2 seconds someone exceeds the max number of messages, but the bot ends its
-    // timeslice(ANTIFLOODTIMESLICEMIN) after the first second, the user is not removed
+    /*
+     * Note that time slices don't start when someone set the antiflood, so if you chose 6 sec
+     * and in the first 2 seconds someone exceeds the max number of messages, but the bot ends its
+     * timeslice(ANTIFLOODTIMESLICEMIN) after the first second, the user is not removed
+     */
     public static final String LOGTAG = "ANTIFLOODHANDLER";
     private DatabaseManager databaseManager = DatabaseManager.getInstance();
     private ArrayList<GroupObject> groups;

@@ -38,8 +38,7 @@ public class removeUserCommand extends BotCommand {
         {
             if (BuildVars.SUPER_ADMINS.contains(user.getId()) || databaseManager.isAdminStatus(user.getId()))
             {
-                RemoveUserHandler removeHandler = new RemoveUserHandler();
-                messageTextBuilder = removeHandler.removeUser(arguments[0], language);
+                messageTextBuilder = RemoveUserHandler.removeUser(arguments[0], language);
             }
             SendMessage answer = new SendMessage();
             answer.setChatId(chat.getId().toString());

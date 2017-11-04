@@ -3,11 +3,9 @@ package krak.miche.KBot.secondary_Handler;
 
 import krak.miche.KBot.handler.CommandsHandler;
 import krak.miche.KBot.database.DatabaseManager;
-
-import static krak.miche.KBot.BuildVars.*;
-
 import krak.miche.KBot.services.Localizer;
 import krak.miche.KBot.services.UtilsMain;
+
 import org.telegram.telegrambots.api.methods.groupadministration.GetChatAdministrators;
 import org.telegram.telegrambots.api.methods.send.SendMessage;
 import org.telegram.telegrambots.api.objects.ChatMember;
@@ -15,9 +13,12 @@ import org.telegram.telegrambots.api.objects.User;
 import org.telegram.telegrambots.bots.AbsSender;
 import org.telegram.telegrambots.exceptions.TelegramApiException;
 import org.telegram.telegrambots.logging.BotLogger;
+
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
+
+import static krak.miche.KBot.BuildVars.*;
 
 /**
  * @author Kraktun
@@ -28,6 +29,11 @@ public class InitializeHandler {
 
     public static final String LOGTAG = "INITIALIZEHANDLER";
 
+    /**
+     * Initialize DB and adds users from the lists defined in BuildVars (ADMINS, SUPER_ADMINS, BLACK_LISTED, POWER_USERS)
+     * with corresponding status and username
+     * @return result of operation
+     */
     public static StringBuilder startUsersTable() {
         DatabaseManager databaseManager = DatabaseManager.getInstance();
         StringBuilder messageTextBuilder;
@@ -86,21 +92,21 @@ public class InitializeHandler {
             ++i;
         }
         i = 0;
-        while (POWER_USER.size() > i)
+        while (POWER_USERS.size() > i)
         {
-            if (databaseManager.isDBUser(POWER_USER.get(i)) && !databaseManager.isPowerUserStatus(POWER_USER.get(i)))
+            if (databaseManager.isDBUser(POWER_USERS.get(i)) && !databaseManager.isPowerUserStatus(POWER_USERS.get(i)))
             {
                 try {
-                    databaseManager.changeUserStatus(POWER_USER.get(i), POWER_USER_STATUS);
+                    databaseManager.changeUserStatus(POWER_USERS.get(i), POWER_USER_STATUS);
                 } catch (SQLException e) {
                     BotLogger.error(LOGTAG, e);
                     messageTextBuilder.append("Error changing to POWER_USER: " + e);
                 }
             }
-            else if (!databaseManager.isDBUser(POWER_USER.get(i)))
+            else if (!databaseManager.isDBUser(POWER_USERS.get(i)))
             {
                 try {
-                    databaseManager.addDBUser(POWER_USER.get(i), POWER_USER_STATUS, POWER_USER_USERNAMES.get(i), DEFAULT_LANG, DEFAULT_UTC, DEFAULT_INFO);
+                    databaseManager.addDBUser(POWER_USERS.get(i), POWER_USER_STATUS, POWER_USERS_USERNAMES.get(i), DEFAULT_LANG, DEFAULT_UTC, DEFAULT_INFO);
                 } catch (SQLException e) {
                     BotLogger.error(LOGTAG, e);
                     messageTextBuilder.append("Error adding POWER_USER: " + e);
@@ -108,21 +114,21 @@ public class InitializeHandler {
             }
             ++i;
             i = 0;
-            while (BLACK_LIST.size() > i)
+            while (BLACK_LISTED.size() > i)
             {
-                if (databaseManager.isDBUser(BLACK_LIST.get(i)) && !databaseManager.isBlackStatus(BLACK_LIST.get(i)))
+                if (databaseManager.isDBUser(BLACK_LISTED.get(i)) && !databaseManager.isBlackStatus(BLACK_LISTED.get(i)))
                 {
                     try {
-                        databaseManager.changeUserStatus(BLACK_LIST.get(i), BLACKLISTED_STATUS);
+                        databaseManager.changeUserStatus(BLACK_LISTED.get(i), BLACKLISTED_STATUS);
                     } catch (SQLException e) {
                         BotLogger.error(LOGTAG, e);
                         messageTextBuilder.append("Error changing to BLACKLISTED: " + e);
                     }
                 }
-                else if (!databaseManager.isDBUser(BLACK_LIST.get(i)))
+                else if (!databaseManager.isDBUser(BLACK_LISTED.get(i)))
                 {
                     try {
-                        databaseManager.addDBUser(BLACK_LIST.get(i), BLACKLISTED_STATUS, BLACK_LIST_USERNAMES.get(i), DEFAULT_LANG, DEFAULT_UTC, DEFAULT_INFO);
+                        databaseManager.addDBUser(BLACK_LISTED.get(i), BLACKLISTED_STATUS, BLACK_LISTED_USERNAMES.get(i), DEFAULT_LANG, DEFAULT_UTC, DEFAULT_INFO);
                     } catch (SQLException e) {
                         BotLogger.error(LOGTAG, e);
                         messageTextBuilder.append("Error adding BLACKLISTED: " + e);
@@ -134,6 +140,10 @@ public class InitializeHandler {
         return messageTextBuilder;
     }
 
+    /**
+     * Initialize feedback table
+     * @return result of operation
+     */
     public static StringBuilder startFeedbackTable() {
         DatabaseManager databaseManager = DatabaseManager.getInstance();
         StringBuilder message2;
@@ -148,6 +158,10 @@ public class InitializeHandler {
         return message2;
     }
 
+    /**
+     * Initialize log table
+     * @return result of operation
+     */
     public static StringBuilder startLogsTable() {
         DatabaseManager databaseManager = DatabaseManager.getInstance();
         StringBuilder message2;
@@ -163,6 +177,10 @@ public class InitializeHandler {
         return message2;
     }
 
+    /**
+     * Initialize commands table
+     * @return result of operation
+     */
     public static StringBuilder startCommandsTable() {
         DatabaseManager databaseManager = DatabaseManager.getInstance();
         StringBuilder message3;
@@ -177,6 +195,10 @@ public class InitializeHandler {
         return message3;
     }
 
+    /**
+     * Initialize groups table
+     * @return result of operation
+     */
     public static StringBuilder startGroupTable() {
         DatabaseManager databaseManager = DatabaseManager.getInstance();
         StringBuilder message4;
@@ -192,6 +214,11 @@ public class InitializeHandler {
         return message4;
     }
 
+    /**
+     * Initialize group specific table
+     * Contains a list of the users in the group
+     * @return result of operation
+     */
     public static StringBuilder startUserGroupTable(Long groupID) {
         DatabaseManager databaseManager = DatabaseManager.getInstance();
         StringBuilder message4;
@@ -215,12 +242,19 @@ public class InitializeHandler {
         return message4;
     }
 
+    /**
+     * Add admins defined in telegram group to bot DB
+     * @param absSender Bot that received the update
+     * @param groupID id of the group
+     * @param user user who sent the message (must be an admin of the group)
+     */
     public static void addAdminsGroup(AbsSender absSender, Long groupID, int user) {
         DatabaseManager databaseManager = DatabaseManager.getInstance();
         GetChatAdministrators getAdmins = new GetChatAdministrators();
         getAdmins.setChatId(groupID);
         List<User> adminsUsers = new ArrayList<>();
         List<Integer> adminsID = new ArrayList<>();
+        String language = databaseManager.getGroupLanguage(groupID);
         try {
             List<ChatMember> admins = absSender.execute(getAdmins);
             for (ChatMember admin : admins)
@@ -230,7 +264,7 @@ public class InitializeHandler {
             }
         } catch (TelegramApiException e) {
             BotLogger.error(LOGTAG, e);
-            String messageTextBuilder2 = "Error retrieving admins list";
+            String messageTextBuilder2 = Localizer.getString("error_getting_admin3", language);
             SendMessage answer = new SendMessage();
             answer.setChatId(groupID.toString());
             answer.setText(messageTextBuilder2);
@@ -256,7 +290,6 @@ public class InitializeHandler {
                     BotLogger.error(LOGTAG, e);
                 }
             }
-            String language = databaseManager.getGroupLanguage(groupID);
             //Adds admins to database
             StringBuilder message3 = new StringBuilder(Localizer.getString("admins_added_group", language));
             for (User anAdmin : adminsUsers)
@@ -290,6 +323,10 @@ public class InitializeHandler {
         }
     }
 
+    /**
+     * Initialize group settings table
+     * @param groupID id of the group
+     */
     public static void startGroupSettings(Long groupID) {
         DatabaseManager databaseManager = DatabaseManager.getInstance();
         try {

@@ -6,7 +6,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Why do I use this class and not the ICommandRegistry? Because in this way I can choose different descriptions for the same command
+ * I use this class and not the ICommandRegistry because in this way I can choose different descriptions for the same command
  * if /help is sent in user chat or in a group. I can also include commands which do not extend BotCommand (and are not in ICommandRegistry).
  *
  */

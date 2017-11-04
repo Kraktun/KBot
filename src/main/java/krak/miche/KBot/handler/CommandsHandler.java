@@ -171,8 +171,7 @@ public class CommandsHandler extends TelegramLongPollingCommandBot {
                     //value to changestatusSTATUS and changestatusSTATUS is performed exactly after ID without waiting for user input
                     case "removeuser": {
                         String userINT = message.getText();
-                        RemoveUserHandler removeHandler = new RemoveUserHandler();
-                        echoMessage.setText(removeHandler.removeUser(userINT, language).toString());
+                        echoMessage.setText(RemoveUserHandler.removeUser(userINT, language).toString());
                         break;
                     }
                     case "changestatusSTATUS":
@@ -242,8 +241,7 @@ public class CommandsHandler extends TelegramLongPollingCommandBot {
                         switch (command)
                         {
                         case "List Groups":
-                            ListGroupsHandler groupsHandler = new ListGroupsHandler();
-                            StringBuilder t1 = groupsHandler.getGroups();
+                            StringBuilder t1 = ListGroupsHandler.getGroups();
                             echoMessage.setText(t1.toString());
                             break;
                         case "Export":
@@ -251,8 +249,7 @@ public class CommandsHandler extends TelegramLongPollingCommandBot {
                             echoMessage.setText(t2.toString());
                             break;
                         case "List Users":
-                            ListUsersHandler usersHandler = new ListUsersHandler();
-                            StringBuilder t3 = usersHandler.getUsers();
+                            StringBuilder t3 = ListUsersHandler.getUsers();
                             echoMessage.setText(t3.toString());
                             break;
                         case "Remove User":
@@ -286,8 +283,7 @@ public class CommandsHandler extends TelegramLongPollingCommandBot {
                             }
                             break;
                         case "Get feedback":
-                            RetrieveFeedbackHandler feedHandler = new RetrieveFeedbackHandler();
-                            StringBuilder feed = feedHandler.getFeedbacks();
+                            StringBuilder feed = RetrieveFeedbackHandler.getFeedbacks();
                             echoMessage.setText(feed.toString());
                             break;
                         case "Clear Feedback":
@@ -295,11 +291,9 @@ public class CommandsHandler extends TelegramLongPollingCommandBot {
                             echoMessage.setText(feed2.toString());
                             break;
                         case "Shutdown":
-                            ShutdownHandler shutHandler = new ShutdownHandler();
                             try {
-                                shutHandler.shutJobs();
-                                shutHandler.preOFF(userID);
-                                StringBuilder shut = shutHandler.poweroff();
+                                ShutdownHandler.preOFF(userID);
+                                StringBuilder shut = ShutdownHandler.poweroff();
                                 echoMessage.setText(shut.toString());
                             } catch (SQLException e) {
                                 echoMessage.setText(Localizer.getString("error_shutdown_remove", language));

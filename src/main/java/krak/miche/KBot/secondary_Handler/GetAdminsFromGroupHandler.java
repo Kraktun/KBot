@@ -21,6 +21,12 @@ import java.util.Scanner;
 public class GetAdminsFromGroupHandler {
     public static final String LOGTAG = "GETUSERSFROMGROUPHANDLER";
 
+    /**
+     * Get a list of the admins in selected group from DB in the form
+     * USERNAME (or first + last name) : STATUS
+     * @param groupID id of the group
+     * @return List of all admins
+     */
     public static StringBuilder getAdmins(Long groupID) {
         DatabaseManager databaseManager = DatabaseManager.getInstance();
         StringBuilder messageTextBuilder;

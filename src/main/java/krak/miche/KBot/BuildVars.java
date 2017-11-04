@@ -13,10 +13,10 @@ public class BuildVars {
     public static final List<String> SUPER_ADMINS_USERNAMES = new ArrayList<>();
     public static final List<Integer> ADMINS = new ArrayList<>();
     public static final List<String> ADMINS_USERNAMES = new ArrayList<>();
-    public static final List<Integer> POWER_USER = new ArrayList<>();
-    public static final List<String> POWER_USER_USERNAMES = new ArrayList<>();
-    public static final List<Integer> BLACK_LIST = new ArrayList<>();
-    public static final List<String> BLACK_LIST_USERNAMES = new ArrayList<>();
+    public static final List<Integer> POWER_USERS = new ArrayList<>();
+    public static final List<String> POWER_USERS_USERNAMES = new ArrayList<>();
+    public static final List<Integer> BLACK_LISTED = new ArrayList<>();
+    public static final List<String> BLACK_LISTED_USERNAMES = new ArrayList<>();
     public static final int THREADS_INIT_DELAY = 15;
     public static final int ANTIFLOODTIMESLICEMIN = 2;
     public static final Long TASKSHUTDOWN = 2000L; //Milliseconds

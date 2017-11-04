@@ -8,6 +8,8 @@ import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.TimeZone;
 
+import static krak.miche.KBot.BuildVars.DEFAULT_UTC;
+
 /**
  * @author Kraktun
  * @version 1.0
@@ -16,10 +18,15 @@ import java.util.TimeZone;
 public class ExportHandler {
     private static final String LOGTAG = "EXPORTHANDLER";
 
+    /**
+     * Backups users and groups lists in a text file
+     * Uses current time as filename
+     * @return message with result of operation
+     */
     public static StringBuilder write() {
         StringBuilder messageTextBuilder;
         Calendar cal = Calendar.getInstance();
-        cal.setTimeZone(TimeZone.getTimeZone("GMT+2"));
+        cal.setTimeZone(TimeZone.getTimeZone("GMT +" + DEFAULT_UTC));
         String timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss").format(cal.getTime());
         try {
             UtilsMain.writeUsers(timeStamp);
@@ -31,6 +38,12 @@ public class ExportHandler {
         return messageTextBuilder;
     }
 
+    /**
+     * Backups users and groups lists in a text file
+     * Uses name  as filename
+     * @param name name of the file to save
+     * @return message with result of operation
+     */
     public static StringBuilder write(String name) {
         StringBuilder messageTextBuilder;
         try {

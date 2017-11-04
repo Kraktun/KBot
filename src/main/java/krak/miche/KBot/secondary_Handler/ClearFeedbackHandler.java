@@ -15,6 +15,10 @@ public class ClearFeedbackHandler {
 
     public static final String LOGTAG = "CLEARFEEDBACKHANDLER";
 
+    /**
+     * Drops feedback tables and recreate it
+     * @return message with result of operation
+     */
     public static StringBuilder clearFeedbacks() {
         DatabaseManager databaseManager = DatabaseManager.getInstance();
         StringBuilder messageTextBuilder;

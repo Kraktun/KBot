@@ -12,19 +12,22 @@ import java.sql.SQLException;
  * @author Kraktun
  * @version 1.0
  */
-
 public class ShutdownHandler {
+
     public static final String LOGTAG = "SHUTDOWNHANDLER";
-    private DatabaseManager databseManager = DatabaseManager.getInstance();
+    private static DatabaseManager databseManager = DatabaseManager.getInstance();
 
-    public ShutdownHandler() {
-    }
-
-    public StringBuilder poweroff() {
+    /**
+     * Prepares threads (reminders and antiflood) to be stopped
+     * Calls interrupt of both
+     * Then disconnects the DB
+     * @return message with result of operation
+     */
+    public static StringBuilder poweroff() {
         UtilsMain.killBots();
+        shutJobs();
         StringBuilder messageTextBuilder;
         ReminderHandler reminderHandler = ReminderHandler.getInstance();
-        reminderHandler.interrupt();
         reminderHandler.backupReminders();
         try {
             Thread.sleep(3000);
@@ -41,12 +44,19 @@ public class ShutdownHandler {
         return messageTextBuilder;
     }
 
-    //removes user from command table before disconnecting the database
-    public void preOFF(int userID) throws SQLException {
+    /**
+     * Removes user from command table before disconnecting the database
+     * to avoid problem on boot
+     * @param userID ID of the user to remove
+     */
+    public static void preOFF(int userID) throws SQLException {
         databseManager.removeUserCommand(userID);
     }
 
-    public void shutJobs() {
+    /**
+     * Shutdown threads for antiflood and reminders
+     */
+    private static void shutJobs() {
         JobExecutor jobExecutor = JobExecutor.getInstance();
         if (!jobExecutor.isShutdown())
             jobExecutor.shutdown();

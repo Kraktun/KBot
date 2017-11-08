@@ -10,12 +10,15 @@ import krak.miche.KBot.database.DatabaseManager;
 
 public class CheckStatusHandler {
     public static final String LOGTAG = "CHECKSTATUSHANDLER";
-    private DatabaseManager databaseManager = DatabaseManager.getInstance();
 
-    public CheckStatusHandler(){
-    }
-
-    public boolean isBlacklisted(Long groupID, int user){
+    /**
+     * Check if user's status in DB is 'BLACKLISTED' for chosen group
+     * @param groupID group where you want to check the user's status
+     * @param user id of the user
+     * @return true if user is blacklisted, false otherwise
+     */
+    public static boolean isBlacklisted(Long groupID, int user){
+        DatabaseManager databaseManager = DatabaseManager.getInstance();
         return databaseManager.isUserGroupBlacklisted(groupID, user);
     }
 }

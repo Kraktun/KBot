@@ -18,7 +18,8 @@ import java.sql.SQLException;
  * @author Kraktun
  * @version 1.0
  * Class to manage customSQL command:
- * Used only manually, can be quite dangerous
+ * Used only manually by SUPER_ADMINS, can be quite dangerous
+ * @todo add a confirm message
  */
 
 public class CustomSQLCommand extends BotCommand {
@@ -56,7 +57,8 @@ public class CustomSQLCommand extends BotCommand {
                     databaseManager.executeCustomSQL(command);
                     messageTextBuilder = new StringBuilder(Localizer.getString("done", language));
                 } catch (SQLException e) {
-                    messageTextBuilder = new StringBuilder(Localizer.getString("error_SQL", language) + " : " + e);
+                    messageTextBuilder = new StringBuilder(Localizer.getString("error_SQL", language));
+                    messageTextBuilder.append(" : ").append(e);
                     BotLogger.error(LOGTAG, e);
                 }
             }

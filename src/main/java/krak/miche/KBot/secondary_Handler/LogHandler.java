@@ -14,21 +14,23 @@ import java.sql.SQLException;
  * @author Kraktun
  * @version 1.0
  */
-
 public class LogHandler {
 
     public static final String LOGTAG = "LOGHANDLER";
 
-    public LogHandler() {
-
-    }
-
+    /**
+     * Logs message saving it in DB
+     * @param message message to save
+     * @param isDefault true if log type is default
+     * @return false if an error occurred
+     */
     public static boolean logMessage(Message message, boolean isDefault) {
         DatabaseManager databaseManager = DatabaseManager.getInstance();
         String name = getName(message.getFrom());
         if (name.equals(BuildVars.BOT_USERNAME) || name.equals(BuildVars.BOT_TEST_USERNAME))
             return true; //Don't save bot messages
-        String date = UtilsMain.getFormattedTime(message.getDate());
+        String groupUTC = databaseManager.getGroupUTC(message.getChatId());
+        String date = UtilsMain.getFormattedTime(message.getDate(), groupUTC);
         String text = message.getText() + "\n";
         if (isDefault)
             text = text.substring(1, text.length()); //Removes special char
@@ -41,6 +43,12 @@ public class LogHandler {
         return true;
     }
 
+    /**
+     * Set logging as ACTIVATED=true\false for selected group
+     * @param group id of the group
+     * @param activated true/false if you want to start/stop logging
+     * @return message with result of operation
+     */
     public static StringBuilder startLog(Long group, String activated) {
         DatabaseManager databaseManager = DatabaseManager.getInstance();
         try {
@@ -62,6 +70,12 @@ public class LogHandler {
         }
     }
 
+    /**
+     * Set logging type in DB
+     * @param group id of the group
+     * @param type type of logging to enable
+     * @return message with result of operation
+     */
     public static StringBuilder setLogType(Long group, String type) {
         DatabaseManager databaseManager = DatabaseManager.getInstance();
         try {
@@ -73,6 +87,11 @@ public class LogHandler {
         }
     }
 
+    /**
+     * Get name of the user to save in DB (not username)
+     * @param user user to get name
+     * @return String with first name or first + last name
+     */
     private static String getName(User user) {
         String userSecond = user.getLastName();
         if (userSecond != null  && !userSecond.equals(""))
@@ -83,8 +102,12 @@ public class LogHandler {
             return user.getFirstName();
     }
 
+    /**
+     * Check if message should be filtered and not logged
+     * @param message message to check
+     * @return true if message should not be logged
+     */
     public static boolean isSpecialMessage(Message message) {
         return message.getText().substring(0,1).equals(BuildVars.LOG_SPECIAL_CHAR);
     }
-
 }

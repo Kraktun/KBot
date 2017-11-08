@@ -16,7 +16,9 @@ import java.sql.SQLException;
 /**
  * @author Kraktun
  * @version 1.0
- * Class used to set a reminder. It simply push the first command of the chain.
+ * Class used to set a reminder. It simply push the first command of the chain
+ * in the DB.
+ * And sends the instruction to follow.
  */
 
 public class ReminderCommand extends BotCommand {

@@ -1,3 +1,5 @@
+[![Build Status](https://travis-ci.com/Kraktun/KBot.svg?token=Uor7RP8xsv27XrHhEVTp&branch=master)](https://travis-ci.com/Kraktun/KBot)
+
 ## Info
 Written with [TelegramBots](https://github.com/rubenlagus/TelegramBots) library
 following [TelegramBotsExample](https://github.com/rubenlagus/TelegramBotsExample)

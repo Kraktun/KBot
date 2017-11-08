@@ -11,10 +11,20 @@ import org.telegram.telegrambots.logging.BotLogger;
 
 import java.io.File;
 
+/**
+ * @author Kraktun
+ * @version 1.0
+ */
 public class SendFileHandler {
 
     private static final String LOGTAG = "SENDFILEHANDLER";
 
+    /**
+     * Sends file to chat
+     * @param chat chat where to send the file
+     * @param absSender bot that sends the file
+     * @param file file to send
+     */
     public static void sendFileToChat(Chat chat, AbsSender absSender, File file) {
         SendDocument sendDocument = new SendDocument();
         sendDocument = sendDocument.setChatId(chat.getId()).setNewDocument(file);

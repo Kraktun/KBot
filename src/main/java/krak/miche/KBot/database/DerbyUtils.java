@@ -5,7 +5,7 @@ import java.sql.SQLException;
 /**
  * @author Kraktun
  * @version 1.0
- * Helper class for database operations
+ * Helper class for database operations (only for oracle derby)
  */
 public class DerbyUtils {
 

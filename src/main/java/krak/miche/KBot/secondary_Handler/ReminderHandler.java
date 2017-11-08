@@ -25,9 +25,7 @@ import org.telegram.telegrambots.logging.BotLogger;
  * @author Kraktun
  * @version 1.0
  */
-
 public class ReminderHandler {
-
 
     public static final String LOGTAG = "REMINDERHANDLER";
     private DatabaseManager databaseManager = DatabaseManager.getInstance();
@@ -37,13 +35,20 @@ public class ReminderHandler {
     private ReentrantLock lock = new ReentrantLock();
     private static volatile ReminderHandler instance;
 
-
+    /**
+     * Private constructor
+     * Initialize the list for reminders
+     * and restores those in DB
+     */
     private ReminderHandler() {
         isShuttingDown = false;
         reminders = new ArrayList<>();
         restoreReminders();
     }
 
+    /**
+     * @return instance of the class
+     */
     public static ReminderHandler getInstance() {
         final ReminderHandler currentInstance;
         if (instance == null)
@@ -63,8 +68,15 @@ public class ReminderHandler {
         return currentInstance;
     }
 
-    //date check must be done before this point (or it messes up with restore from DB)
-    //returns true if you can insert the reminder, false if bot is shutting down
+    /**
+     * Adds a reminder
+     * Note: date check must be done before this point (or it messes up with restore from DB)
+     * @param user id of the user / group (groups id must be in form 'G229992922')
+     * @param message message of the reminder
+     * @param time time when the reminders should be sent
+     * @param isTimer true if 'time' is a count down, false if it's a date
+     * @return true if you can insert the reminder, false if bot is shutting down
+     */
     public boolean addReminder(String user, String message, String time, boolean isTimer) {
         //time must be in form dd.hh.mm.ss days, hours, minutes, seconds
         //or mm.dd.hh.mm
@@ -89,29 +101,31 @@ public class ReminderHandler {
         try {
             if (isShuttingDown)
             {
-                //lock.unlock();
                 return false;
             }
             if (!hasReminders)
                 hasReminders = true;
-            long dilay;
+            long delay;
             if (isTimer)
-                dilay = computeTimer(time);
+                delay = computeTimer(time);
             else
-                dilay = computeDate(time, utc);
-            if (dilay < 0)
+                delay = computeDate(time, utc);
+            if (delay < 0)
             {
                 message = Localizer.getString("reminder_missed", language) + "\n" + message;
-                dilay = BuildVars.REMINDERTIMESLICEMIN; //send it at the next run()
+                delay = BuildVars.REMINDERTIMESLICEMIN; //send it at the next run()
             }
-            BotLogger.info(LOGTAG, "Reminder set in: " + dilay);
-            reminders.add(new ReminderObject(message, user, dilay, time, isTimer));
+            BotLogger.info(LOGTAG, "Reminder set in: " + delay);
+            reminders.add(new ReminderObject(message, user, delay, time, isTimer));
         } finally {
             lock.unlock();
         }
         return true;
     }
 
+    /**
+     * Stops reminders thread (insertion and aging) waiting for it to be terminated
+     */
     public void interrupt() {
         lock.lock();
         try {
@@ -121,6 +135,10 @@ public class ReminderHandler {
         }
     }
 
+    /**
+     * Backup current reminders with their original time (timers are converted to dates) in DB
+     * New delay is calculated on restore
+     */
     void backupReminders() {
         lock.lock();
         try {
@@ -146,6 +164,11 @@ public class ReminderHandler {
         }
     }
 
+    /**
+     * Restores old reminders from DB.
+     * They are all saved as dates and not timers.
+     * Reminders are added as new reminders so delay is calculated again from current time.
+     */
     private void restoreReminders() {
         ArrayList<Reminder> newReminders = new ArrayList<>();
         lock.lock(); //to be sure that backup and restore are not simultaneous
@@ -175,7 +198,12 @@ public class ReminderHandler {
         }
     }
 
-
+    /**
+     * Increases reminders age
+     * If they reach their target hour they are sent to the user
+     * If the user stopped the bot or the bot was removed from the group
+     * the method fails with an exception (reminder is not saved)
+     */
     public void execute() throws JobExecutionException {
         lock.lock();
         try {
@@ -199,22 +227,34 @@ public class ReminderHandler {
         }
     }
 
+    /**
+     * Class that defines reminders objects
+     */
     private class ReminderObject {
+
         private String reminderMessage;
         private String user;
         private long userCode;
-        private long dilayTime;
+        private long delayTime;
         private String backupTime;
         private int timeConfig = 0; //number of cicle of run to wait before sending the reminder
         private boolean isTimer = false;
         private boolean isGroup = false;
 
-        private ReminderObject(String reminderMessage, String user, long dilayTime, String backupTime, boolean isTimer) {
+        /**
+         * New object, on creation prepares counters and aging
+         * @param reminderMessage message to send
+         * @param user user or group where to send the message
+         * @param delayTime difference in seconds between target hour and current hour
+         * @param backupTime time saved as a string for backup and restore purposes
+         * @param isTimer if true converts timers to dates
+         */
+        private ReminderObject(String reminderMessage, String user, long delayTime, String backupTime, boolean isTimer) {
             this.isTimer = isTimer;
             this.user = user;
             this.reminderMessage = reminderMessage;
-            this.dilayTime = dilayTime;
-            if (!user.substring(0,1).equals("G"))   // For the future I plan to add reminders also in groups
+            this.delayTime = delayTime;
+            if (!user.substring(0,1).equals("G"))   // If it isn't a group
             {
                 userCode = Long.valueOf(user);
                 isGroup = true;
@@ -233,15 +273,20 @@ public class ReminderHandler {
                 else
                     utc = databaseManager.getUserUTC(Long.valueOf(userCode).intValue());
                 this.backupTime = Reminder.timerToDate(backupTime, utc);
-                UtilsMain.println(this.backupTime);
                 this.isTimer = false;
             }
         }
 
+        /**
+         * Calculates number of cycles of execute() to perform before sending the reminder
+         */
         void setTimeConfig() {
-            timeConfig = (int)(long) ( dilayTime / BuildVars.REMINDERTIMESLICEMIN );
+            timeConfig = (int)(long) ( delayTime / BuildVars.REMINDERTIMESLICEMIN );
         }
 
+        /**
+         * Called on every execute() decrements the number of cycle before reminder is sent
+         */
         void updateTimeConfig() {
             if (timeConfig > 0)
                 --timeConfig;
@@ -249,29 +294,47 @@ public class ReminderHandler {
                 setTimeConfig();
         }
 
+        /**
+         * @return target time as a date
+         */
         String getBackupTime() {
             return backupTime;
         }
 
+        /**
+         * @return number of cycle of execute() before sending the message
+         */
         int getTimeConfig() {
             return timeConfig;
         }
 
+        /**
+         * @return user or group who set the reminder
+         */
         String getUser() {
             return user;
         }
 
+        /**
+         * @return message text
+         */
         String getMessage() {
             return reminderMessage;
         }
 
+        /**
+         * @return true if reminder is a timer
+         */
         boolean isTimerReminder() {
             return isTimer;
         }
 
+        /**
+         * Send the reminder to the user or group where it was set
+         * If user stopped the bot or bot was removed from group,
+         * ignore the reminder and don't backup it in database
+         */
         void sendReminder() {
-            //If user stopped the bot, ignore the reminder and don't backup it in database
-            //...someone who stopped the bot deserves this.
             if (!isGroup && ( databaseManager.isRemovedStatus(Long.valueOf(userCode).intValue()) || !databaseManager.isDBGroup(userCode) ))
                 return;
             SendMessage answer = new SendMessage();
@@ -287,10 +350,13 @@ public class ReminderHandler {
             }
             BotLogger.info(LOGTAG, "Reminder sent to: " + userCode);
         }
-
     }
 
-
+    /**
+     * Compute delay (difference in seconds between target time and current time)
+     * @param time time as a timer
+     * @return delay
+     */
     private long computeTimer(String time) {
         Scanner in = new Scanner(time);
         in.useDelimiter("\\.");
@@ -301,9 +367,13 @@ public class ReminderHandler {
         hours += days * 24; //converts days in hours
         long minutesLong = minutes + hours * 60; //converts hours to minutes
         return seconds + minutesLong * 60; //converts minutes to seconds
-
     }
 
+    /**
+     * Compute delay (difference in seconds between target time and current time)
+     * @param time time as a date
+     * @return delay
+     */
     private long computeDate(String time, int utc) {
         Scanner in = new Scanner(time);
         in.useDelimiter("\\.");
@@ -313,5 +383,4 @@ public class ReminderHandler {
         int minutes = Integer.parseInt(in.next());
         return UtilsMain.computeNextRun(months, days, hours, minutes, utc);
     }
-
 }

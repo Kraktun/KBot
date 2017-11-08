@@ -40,9 +40,8 @@ public class setUserCommand extends BotCommand {
             {
                 String status = arguments[1].toUpperCase();
                 String userTarget = arguments[0];
-                ChangeStatusHandler statusHandler = new ChangeStatusHandler();
                 try {
-                    messageTextBuilder = statusHandler.updateStatus(userTarget, status, language);
+                    messageTextBuilder = ChangeStatusHandler.updateStatus(userTarget, status, language);
                 } catch (NumberFormatException e) {
                     messageTextBuilder = new StringBuilder(Localizer.getString("invalid_input", language));
                 }

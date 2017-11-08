@@ -16,6 +16,8 @@ import org.telegram.telegrambots.logging.BotLogger;
  * @author Kraktun
  * @version 1.0
  * Class to manage clearfeedback command:
+ * can be used only by SUPER_ADMINS
+ * otherwise send a 'not_super_admin' message
  * @todo add inline confirm dialog
  */
 
@@ -36,8 +38,7 @@ public class ClearFeedbackCommand extends BotCommand {
             StringBuilder messageTextBuilder = new StringBuilder(Localizer.getString("not_super_admin", language));
             if (BuildVars.SUPER_ADMINS.contains(userID))
             {
-                ClearFeedbackHandler feddHandler = new ClearFeedbackHandler();
-                messageTextBuilder = feddHandler.clearFeedbacks();
+                messageTextBuilder = ClearFeedbackHandler.clearFeedbacks();
             }
             SendMessage answer = new SendMessage();
             answer.setChatId(chat.getId().toString());

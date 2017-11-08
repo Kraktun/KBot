@@ -14,8 +14,13 @@ import org.telegram.telegrambots.logging.BotLogger;
 public class DocumentsHandler {
 
     public static final String LOGTAG = "DOCUMENTSHANDLER";
-    public static final int MAX_SIZE = 20000000; //20MB
+    private static final int MAX_SIZE = 20000000; //20MB
 
+    /**
+     * Retrieves document from a message and saves it locally
+     * @param telegramLongPollingBot Bot that received the message, necessary to get the URL to download the file
+     * @param message message containing the document
+     */
     public static void getDocumentFromMessage(TelegramLongPollingCommandBot telegramLongPollingBot, Message message) {
         String fileName;
         if (message.getChat().isGroupChat())

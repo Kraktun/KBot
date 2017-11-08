@@ -16,7 +16,8 @@ import org.telegram.telegrambots.logging.BotLogger;
  * @author Kraktun
  * @version 1.0
  * Class to manage export command:
- * Saves a list of admins, blacklisted ecc. in a text file
+ * Saves a list of admins, blacklisted users ecc. in a text file
+ * Note: saves only Bot users, not for groups
  */
 
 public class ExportCommand extends BotCommand {
@@ -35,13 +36,11 @@ public class ExportCommand extends BotCommand {
         {
             if (BuildVars.SUPER_ADMINS.contains(user.getId()) && ( arguments == null || arguments.length == 0 ))
             {
-                ExportHandler expHandler = new ExportHandler();
-                messageTextBuilder = expHandler.write();
+                messageTextBuilder = ExportHandler.write();
             }
             else if (BuildVars.SUPER_ADMINS.contains(user.getId()))
             {
-                ExportHandler expHandler = new ExportHandler();
-                messageTextBuilder = expHandler.write(arguments[0]);
+                messageTextBuilder = ExportHandler.write(arguments[0]);
             }
             SendMessage answer = new SendMessage();
             answer.setChatId(chat.getId().toString());

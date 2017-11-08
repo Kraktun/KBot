@@ -13,23 +13,33 @@ import static org.quartz.TriggerBuilder.*;
 import static org.quartz.SimpleScheduleBuilder.simpleSchedule;
 import static krak.miche.KBot.BuildVars.*;
 
+/**
+ * @author Kraktun
+ * @version 1.0
+ */
 public class JobExecutor {
 
     public static final String LOGTAG = "EXECUTORJOB";
     private static volatile JobExecutor instance;
-    private final SchedulerFactory schedFact = new StdSchedulerFactory();
     private Scheduler scheduler;
     private static final String ANTIFLOOD_NAME = "Antiflood";
     private static final String REMINDERS_NAME = "Reminders";
 
+    /**
+     * Private constructor
+     */
     private JobExecutor() {
         try {
+            SchedulerFactory schedFact = new StdSchedulerFactory();
             scheduler = schedFact.getScheduler();
         } catch (SchedulerException e) {
             BotLogger.error(LOGTAG, e);
         }
     }
 
+    /**
+     * @return instance of the class
+     */
     public static JobExecutor getInstance() {
         final JobExecutor currentInstance;
         if (instance == null)
@@ -49,8 +59,10 @@ public class JobExecutor {
         return currentInstance;
     }
 
-    public void run(){
-
+    /**
+     * Starts antiflood and reminders threads
+     */
+    void run(){
         try {
             Thread.sleep(THREADS_INIT_DELAY);
             runAntiflood();
@@ -63,6 +75,10 @@ public class JobExecutor {
         }
     }
 
+    /**
+     * Kills antiflood and reminders threads
+     * @return false if an error occurred, true otherwise
+     */
     public boolean shutdown(){
         shutdownAntiflood();
         UtilsMain.log("Antiflood stopped");
@@ -78,6 +94,9 @@ public class JobExecutor {
         }
     }
 
+    /**
+     * @return true is scheduler is shutting down
+     */
     public boolean isShutdown() {
         try {
             return scheduler.isShutdown();
@@ -87,13 +106,16 @@ public class JobExecutor {
         }
     }
 
+    /**
+     * Starts antiflood thread and run it every ANTIFLOODTIMESLICEMIN
+     * @throws Exception if an error occurred
+     */
     private void runAntiflood() throws Exception {
-        // define the job and tie it to our HelloJob class
+        // define the job and tie it to our class
         JobDetail jobAntiflood = newJob(AntifloodJob.class)
                 .withIdentity(ANTIFLOOD_NAME, "group1")
                 .build();
-
-        // Trigger the job to run now, and then every 40 seconds
+        // Trigger the job to run now, and then every n seconds
         Trigger trigger = newTrigger()
                 .withIdentity("AntifloodTrigger", "group1")
                 .startNow()
@@ -102,18 +124,18 @@ public class JobExecutor {
                         .repeatForever())
                 .forJob(jobAntiflood)
                 .build();
-
         // Tell quartz to schedule the job using our trigger
         scheduler.scheduleJob(jobAntiflood, trigger);
     }
 
+    /**
+     * Starts reminders thread and run it every REMINDERTIMESLICEMIN
+     * @throws Exception if an error occurred
+     */
     private void runReminders() throws Exception {
-        // define the job and tie it to our HelloJob class
         JobDetail jobReminder = newJob(RemindersJob.class)
                 .withIdentity(REMINDERS_NAME, "group1")
                 .build();
-
-        // Trigger the job to run now, and then every 40 seconds
         Trigger trigger = newTrigger()
                 .withIdentity("RemindersTrigger", "group1")
                 .startNow()
@@ -122,16 +144,20 @@ public class JobExecutor {
                         .repeatForever())
                 .forJob(jobReminder)
                 .build();
-
-        // Tell quartz to schedule the job using our trigger
         scheduler.scheduleJob(jobReminder, trigger);
     }
 
+    /**
+     * Interrupts antiflood
+     */
     private void shutdownAntiflood() {
         AntiFloodHandler antiFloodHandler = AntiFloodHandler.getInstance();
         antiFloodHandler.interrupt();
     }
 
+    /**
+     * Interrupts reminders
+     */
     private void shutdownReminders() {
         ReminderHandler reminderHandler = ReminderHandler.getInstance();
         reminderHandler.interrupt();

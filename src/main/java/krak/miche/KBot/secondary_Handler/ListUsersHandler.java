@@ -2,6 +2,7 @@ package krak.miche.KBot.secondary_Handler;
 
 
 import krak.miche.KBot.database.DatabaseManager;
+import krak.miche.KBot.services.Localizer;
 import org.telegram.telegrambots.logging.BotLogger;
 
 import java.sql.SQLException;
@@ -12,13 +13,15 @@ import java.sql.SQLException;
  */
 
 public class ListUsersHandler {
+
     public static final String LOGTAG = "LISTUSERSHANDLER";
-    private DatabaseManager databaseManager = DatabaseManager.getInstance();
+    private static DatabaseManager databaseManager = DatabaseManager.getInstance();
 
-    public ListUsersHandler() {
-    }
-
-    public StringBuilder getUsers() {
+    /**
+     * Get a list of all the users that started the bot
+     * @return list of all the users
+     */
+    public static StringBuilder getUsers() {
         StringBuilder messageTextBuilder;
         try {
             String users = databaseManager.getAllUsers();
@@ -30,14 +33,18 @@ public class ListUsersHandler {
         return messageTextBuilder;
     }
 
-    public StringBuilder getAdmins() {
+    /**
+     * Get all admins of the bot
+     * @return List of all admins of the bot
+     */
+    public static StringBuilder getAdmins(String language) {
         StringBuilder messageTextBuilder;
         try {
             String users = databaseManager.getAllAdmins();
             messageTextBuilder = new StringBuilder("ADMINS LIST:\n" + users);
         } catch (SQLException e) {
             BotLogger.error(LOGTAG, e);
-            messageTextBuilder = new StringBuilder("Error retrieving admins list");
+            messageTextBuilder = new StringBuilder(Localizer.getString("error_getting_admin3", language));
         }
         return messageTextBuilder;
     }

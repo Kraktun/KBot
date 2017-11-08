@@ -18,8 +18,8 @@ import java.sql.SQLException;
  * @version 1.0
  * Class to manage feedback command:
  * This only inserts the user in the database
- * command table (later it will be managed by
- * processNonCommandUpdates())
+ * command table and asks the user to write the feedback
+ * (later it will be managed by processNonCommandUpdates())
  */
 
 public class FeedbackCommand extends BotCommand {

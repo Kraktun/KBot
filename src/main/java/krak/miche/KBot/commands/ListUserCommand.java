@@ -16,7 +16,9 @@ import org.telegram.telegrambots.logging.BotLogger;
 /**
  * @author Kraktun
  * @version 1.0
- * Class used to list users (simple way to check if something is wrong)
+ * Class used to list bot users (not for groups
+ * because a bot can't retrieve all the users in a group,
+ * only admins and who sends an update)
  */
 
 public class ListUserCommand extends BotCommand {
@@ -36,8 +38,7 @@ public class ListUserCommand extends BotCommand {
         {
             if (BuildVars.SUPER_ADMINS.contains(user.getId()))
             {
-                ListUsersHandler usersHandler = new ListUsersHandler();
-                messageTextBuilder = usersHandler.getUsers();
+                messageTextBuilder = ListUsersHandler.getUsers();
             }
             SendMessage answer = new SendMessage();
             answer.setChatId(chat.getId().toString());

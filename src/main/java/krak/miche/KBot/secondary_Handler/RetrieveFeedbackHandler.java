@@ -10,16 +10,16 @@ import java.sql.SQLException;
  * @author Kraktun
  * @version 1.0
  */
-
 public class RetrieveFeedbackHandler {
 
     public static final String LOGTAG = "RETRIEVEFEEDBACKHANDLER";
-    private DatabaseManager databaseManager = DatabaseManager.getInstance();
+    private static DatabaseManager databaseManager = DatabaseManager.getInstance();
 
-    public RetrieveFeedbackHandler() {
-    }
-
-    public StringBuilder getFeedbacks() {
+    /**
+     * Get all feedbacks from DB
+     * @return list of all feedbacks
+     */
+   public static StringBuilder getFeedbacks() {
         StringBuilder messageTextBuilder;
         try {
             String feedbacks = databaseManager.getAllFeedbacks();

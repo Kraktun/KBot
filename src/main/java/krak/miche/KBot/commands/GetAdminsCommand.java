@@ -34,13 +34,11 @@ public class GetAdminsCommand extends BotCommand {
         StringBuilder messageTextBuilder = new StringBuilder(Localizer.getString("not_allowed", language));
         if (chat.isUserChat())
         {
-            ListUsersHandler listUsersHandler = new ListUsersHandler();
-            messageTextBuilder = listUsersHandler.getAdmins();
+            messageTextBuilder = ListUsersHandler.getAdmins(language);
         }
         else if (chat.isGroupChat())
         {
-            GetAdminsFromGroupHandler adminsHandler = new GetAdminsFromGroupHandler();
-            messageTextBuilder = adminsHandler.getAdmins(chat.getId());
+            messageTextBuilder = GetAdminsFromGroupHandler.getAdmins(chat.getId());
         }
         SendMessage answer = new SendMessage();
         answer.setChatId(chat.getId().toString());

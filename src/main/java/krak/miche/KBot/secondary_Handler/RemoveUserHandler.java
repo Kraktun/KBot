@@ -14,14 +14,17 @@ import java.sql.SQLException;
  */
 
 public class RemoveUserHandler {
+
     public static final String LOGTAG = "REMOVEUSERSHANDLER";
-    private DatabaseManager databaseManager = DatabaseManager.getInstance();
+    private static DatabaseManager databaseManager = DatabaseManager.getInstance();
 
-    public RemoveUserHandler() {
-
-    }
-
-    public StringBuilder removeUser(String message, String language) {
+    /**
+     * Removes user from DB (user is removed from DB, not simply set as 'REMOVED')
+     * @param message message containing the ID of the user to remove
+     * @param language language of the user who sent the command
+     * @return result of operation
+     */
+    public static StringBuilder removeUser(String message, String language) {
         StringBuilder messageTextBuilder;
         if (message == null || message.length() < 1)
         {
@@ -64,5 +67,4 @@ public class RemoveUserHandler {
         }
         return messageTextBuilder;
     }
-
 }

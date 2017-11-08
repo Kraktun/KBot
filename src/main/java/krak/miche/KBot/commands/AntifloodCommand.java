@@ -19,8 +19,14 @@ import static krak.miche.KBot.BuildVars.*;
  * @author Kraktun
  * @version 1.0
  * Class to manage antiflood command:
- * Checks if params are corrects and then
- * send them to AntifloodHandler
+ * Checks if params are corrects and then send them to AntifloodHandler
+ * Managed error sources: (param1 = start/stop or messages, param2 = time slice)
+ * - null or non existing params
+ * - params are not positive (>0) int
+ * - it is not a group chat
+ * - param for time slice is not a multiple of 2
+ * - param doesn't equal 'start' or 'stop'
+ * - command not executed by an admin
  */
 
 public class AntifloodCommand extends BotCommand {
@@ -35,62 +41,55 @@ public class AntifloodCommand extends BotCommand {
     public void execute(AbsSender absSender, User user, Chat chat, String[] arguments) {
         StringBuilder rispondi;
         DatabaseManager databaseManager = DatabaseManager.getInstance();
-        if (chat.isGroupChat())
-        {
+        if (chat.isGroupChat()) {
             String language = databaseManager.getGroupLanguage(chat.getId());
-            String command = "";
-            int i = 0;
-            while (i < 3)
-            {
-                try {
-                    command = command + " " + arguments[i];
-                    ++i;
-                } catch (IndexOutOfBoundsException e) {
-                    break;
-                }
-            }
-            if (( SUPER_ADMINS.contains(user.getId()) || databaseManager.isUserGroupAdmin(chat.getId(), user.getId()) ))
-            {
-                if (i >= 2)
-                {
-                    String param1 = arguments[0];
-                    String param2 = arguments[1];
+            if (arguments == null || arguments.length == 0)
+                rispondi = new StringBuilder(Localizer.getString("syntax_error", language));
+            else {
+                String command = "";
+                int i = 0;
+                while (i < 3) {
                     try {
-                        int messages = Integer.parseInt(param1);
-                        int timeslice = Integer.parseInt(param2);
-                        if (timeslice % ANTIFLOODTIMESLICEMIN != 0)
-                        {
-                            rispondi = new StringBuilder(Localizer.getString("antiflood_not_multiple", language));
-                            rispondi.append(ANTIFLOODTIMESLICEMIN).append(" ");
-                            rispondi.append(Localizer.getString("antiflood_not_multiple_2", language));
+                        command = command + " " + arguments[i];
+                        ++i;
+                    } catch (IndexOutOfBoundsException e) {
+                        break;
+                    }
+                }
+                if ((SUPER_ADMINS.contains(user.getId()) || databaseManager.isUserGroupAdmin(chat.getId(), user.getId()))) {
+                    if (i >= 2) {
+                        String param1 = arguments[0];
+                        String param2 = arguments[1];
+                        try {
+                            int messages = Integer.parseInt(param1);
+                            int timeslice = Integer.parseInt(param2);
+                            if (timeslice % ANTIFLOODTIMESLICEMIN != 0) {
+                                rispondi = new StringBuilder(Localizer.getString("antiflood_not_multiple", language));
+                                rispondi.append(ANTIFLOODTIMESLICEMIN).append(" ");
+                                rispondi.append(Localizer.getString("antiflood_not_multiple_2", language));
+                            } else if (messages <= 0 || timeslice <= 0) {
+                                rispondi = new StringBuilder(Localizer.getString("syntax_error", language));
+                            } else {
+                                AntiFloodHandler antiflood = AntiFloodHandler.getInstance();
+                                rispondi = antiflood.updateAntiflood(chat.getId(), messages, timeslice);
+                            }
+                        } catch (NumberFormatException e) {
+                            rispondi = new StringBuilder(Localizer.getString("syntax_error", language));
+                        } catch (Exception e) {
+                            rispondi = new StringBuilder(Localizer.getString("error", language) + e);
                         }
-                        else
-                        {
+                    } else if (i == 1) {
+                        String param1 = arguments[0];
+                        if (param1.equals("start") || param1.equals("stop")) {
                             AntiFloodHandler antiflood = AntiFloodHandler.getInstance();
-                            rispondi = antiflood.updateAntiflood(chat.getId(), messages, timeslice);
-                        }
-                    } catch (NumberFormatException e) {
+                            rispondi = antiflood.setAntiflood(chat.getId(), param1);
+                        } else
+                            rispondi = new StringBuilder(Localizer.getString("syntax_error", language));
+                    } else
                         rispondi = new StringBuilder(Localizer.getString("syntax_error", language));
-                    } catch (Exception e) {
-                        rispondi = new StringBuilder(Localizer.getString("error", language) + e);
-                    }
-                }
-                else if (i == 1)
-                {
-                    String param1 = arguments[0];
-                    if (param1.equals("start") || param1.equals("stop"))
-                    {
-                        AntiFloodHandler antiflood = AntiFloodHandler.getInstance();
-                        rispondi = antiflood.setAntiflood(chat.getId(), param1);
-                    }
-                    else
-                        rispondi = new StringBuilder(Localizer.getString("syntax_error", language));
-                }
-                else
-                    rispondi = new StringBuilder(Localizer.getString("syntax_error", language));
+                } else
+                    rispondi = new StringBuilder(Localizer.getString("not_allowed", language));
             }
-            else
-                rispondi = new StringBuilder(Localizer.getString("not_allowed", language));
         }
         else
         {

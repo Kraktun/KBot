@@ -5,6 +5,11 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.Scanner;
 
+/**
+ * @author Kraktun
+ * @version 1.0
+ * Helper class for database operations (only sqlite)
+ */
 public class SQLUtil {
 
     private static final String LOGTAG = "SQLUtil";
@@ -31,11 +36,11 @@ public class SQLUtil {
     }
 
     /**
-     * Sostituisce il PRIMO # con un parametro passato e restituisce il query completo
+     * Replaces the first # with the param and returns the resulting query
      *
-     * @param query Stringa da analizzare
-     * @param param1 primo # da sostituire
-     * @return stringa con il primo # sostituito con param1
+     * @param query query with # to replace
+     * @param param1 param to insert
+     * @return query with the first # replaced with param1
      */
     private static String replace(String query, String param1)
     {
@@ -48,11 +53,15 @@ public class SQLUtil {
         return firstHalf +  param1 + secondHalf;
     }
 
+    /**
+     * Converts a long to a string without -
+     * @param id negative long
+     * @return string containing the absolute value of that long
+     */
     public static String longtoString(Long id)
     {
-        String tt = id + "";
-        if (tt.length() > 1 && tt.substring(0,1).equals("-"))
-            return tt.substring(1,tt.length());
-        return tt;
+        if (id<0)
+            return Math.abs(id) + "";
+        return id + "";
     }
 }

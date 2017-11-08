@@ -53,7 +53,7 @@ public class CommandsHandler extends TelegramLongPollingCommandBot {
         register(new BlacklistCommand());
         register(new ExportCommand());
         register(new setUserCommand());
-        register(new InitializeCommand());
+        //register(new InitializeCommand());
         //register(new ShutdownCommand());
         register(new removeUserCommand());
         register(new ListUserCommand());
@@ -171,15 +171,13 @@ public class CommandsHandler extends TelegramLongPollingCommandBot {
                     //value to changestatusSTATUS and changestatusSTATUS is performed exactly after ID without waiting for user input
                     case "removeuser": {
                         String userINT = message.getText();
-                        RemoveUserHandler removeHandler = new RemoveUserHandler();
-                        echoMessage.setText(removeHandler.removeUser(userINT, language).toString());
+                        echoMessage.setText(RemoveUserHandler.removeUser(userINT, language).toString());
                         break;
                     }
                     case "changestatusSTATUS":
                         String userSTATUS = message.getText();
                         String userCommandID = databaseManager.getCommandParam1(userID);
-                        ChangeStatusHandler statusHandler = new ChangeStatusHandler();
-                        echoMessage.setText(statusHandler.updateStatus(userCommandID, userSTATUS, language).toString());
+                        echoMessage.setText(ChangeStatusHandler.updateStatus(userCommandID, userSTATUS, language).toString());
                         break;
                     case "changestatusID": {
                         String userINT = message.getText();
@@ -196,8 +194,7 @@ public class CommandsHandler extends TelegramLongPollingCommandBot {
                     }
                     case "blacklistID": {
                         String userINT = message.getText();
-                        BlacklistHandler blacklistHandler = new BlacklistHandler();
-                        echoMessage.setText(blacklistHandler.blacklist(userINT, language).toString());
+                        echoMessage.setText(BlacklistHandler.blacklist(userINT, language).toString());
                         break;
                     }
                     case "remindmeMessage":
@@ -244,18 +241,15 @@ public class CommandsHandler extends TelegramLongPollingCommandBot {
                         switch (command)
                         {
                         case "List Groups":
-                            ListGroupsHandler groupsHandler = new ListGroupsHandler();
-                            StringBuilder t1 = groupsHandler.getGroups();
+                            StringBuilder t1 = ListGroupsHandler.getGroups();
                             echoMessage.setText(t1.toString());
                             break;
                         case "Export":
-                            ExportHandler expHandler = new ExportHandler();
-                            StringBuilder t2 = expHandler.write();
+                            StringBuilder t2 = ExportHandler.write();
                             echoMessage.setText(t2.toString());
                             break;
                         case "List Users":
-                            ListUsersHandler usersHandler = new ListUsersHandler();
-                            StringBuilder t3 = usersHandler.getUsers();
+                            StringBuilder t3 = ListUsersHandler.getUsers();
                             echoMessage.setText(t3.toString());
                             break;
                         case "Remove User":
@@ -289,21 +283,17 @@ public class CommandsHandler extends TelegramLongPollingCommandBot {
                             }
                             break;
                         case "Get feedback":
-                            RetrieveFeedbackHandler feedHandler = new RetrieveFeedbackHandler();
-                            StringBuilder feed = feedHandler.getFeedbacks();
+                            StringBuilder feed = RetrieveFeedbackHandler.getFeedbacks();
                             echoMessage.setText(feed.toString());
                             break;
                         case "Clear Feedback":
-                            ClearFeedbackHandler feed2Handler = new ClearFeedbackHandler();
-                            StringBuilder feed2 = feed2Handler.clearFeedbacks();
+                            StringBuilder feed2 = ClearFeedbackHandler.clearFeedbacks();
                             echoMessage.setText(feed2.toString());
                             break;
                         case "Shutdown":
-                            ShutdownHandler shutHandler = new ShutdownHandler();
                             try {
-                                shutHandler.shutJobs();
-                                shutHandler.preOFF(userID);
-                                StringBuilder shut = shutHandler.poweroff();
+                                ShutdownHandler.preOFF(userID);
+                                StringBuilder shut = ShutdownHandler.poweroff();
                                 echoMessage.setText(shut.toString());
                             } catch (SQLException e) {
                                 echoMessage.setText(Localizer.getString("error_shutdown_remove", language));
@@ -368,7 +358,7 @@ public class CommandsHandler extends TelegramLongPollingCommandBot {
                             destroyUserFromTable = false;
                             break;
                         case "Set UTC":
-                            echoMessage.setText(Localizer.getString("set_UTC", language));
+                            echoMessage.setText(Localizer.getString("set_UTC", language) + DEFAULT_UTC);
                             try {
                                 databaseManager.pushCommand(userID, "settingsUTC");
                             } catch (SQLException e) {
@@ -427,8 +417,7 @@ public class CommandsHandler extends TelegramLongPollingCommandBot {
                         case "/kick": case "/kick@" + BOT_USERNAME:
                             if (( !SUPER_ADMINS.contains(replyMSG.getFrom().getId()) && !databaseManager.isUserGroupAdmin(message.getChatId(), message.getFrom().getId()) ) && ( SUPER_ADMINS.contains(message.getFrom().getId()) || databaseManager.isUserGroupAdmin(message.getChatId(), message.getFrom().getId()) ))
                             {
-                                KickHandler kick = new KickHandler();
-                                rispondi = kick.kickUser(replyMSG.getFrom(), message.getChat());
+                                rispondi = KickHandler.kickUser(replyMSG.getFrom(), message.getChat(), this);
                             }
                             else
                                 rispondi = new StringBuilder(Localizer.getString("you_cant_do_this", language));
@@ -446,8 +435,7 @@ public class CommandsHandler extends TelegramLongPollingCommandBot {
                         case "/ban": case "/ban@" + BOT_USERNAME:
                             if (( !SUPER_ADMINS.contains(replyMSG.getFrom().getId()) && !databaseManager.isUserGroupAdmin(message.getChatId(), message.getFrom().getId()) ) && ( SUPER_ADMINS.contains(message.getFrom().getId()) || databaseManager.isUserGroupAdmin(message.getChatId(), message.getFrom().getId()) ))
                             {
-                                KickHandler kick = new KickHandler();
-                                rispondi = kick.kickUser(replyMSG.getFrom(), message.getChat());
+                                rispondi = KickHandler.kickUser(replyMSG.getFrom(), message.getChat(), this);
                                 SetUserGroupHandler setuser = new SetUserGroupHandler();
                                 rispondi.append("\n");
                                 rispondi.append(setuser.updateStatus(message.getChatId(), replyMSG.getFrom(), BLACKLISTED_STATUS).toString());
@@ -502,14 +490,12 @@ public class CommandsHandler extends TelegramLongPollingCommandBot {
                 {
                     StringBuilder rispondi = new StringBuilder(Localizer.getString("error_internal", language));
                     List<User> newUser = message.getNewChatMembers();
-                    CheckStatusHandler statt = new CheckStatusHandler();
                     for (User utente : newUser)
                     {
                         if (utente.getId()!=BOT_ID) {
                             rispondi = new StringBuilder(Localizer.getString("new_user", language) + getFormattedUsername(utente));
-                            if (statt.isBlacklisted(message.getChatId(), utente.getId())) {
-                                KickHandler kick = new KickHandler();
-                                kick.kickUser(utente, message.getChat());
+                            if (CheckStatusHandler.isBlacklisted(message.getChatId(), utente.getId())) {
+                                KickHandler.kickUser(utente, message.getChat(), this);
                                 rispondi.append("\n");
                                 rispondi.append(Localizer.getString("new_user_removed", language));
                             }
@@ -517,12 +503,11 @@ public class CommandsHandler extends TelegramLongPollingCommandBot {
                         else {
                             botIgnore = true;
                             if (!databaseManager.isDBGroup(message.getChatId())) {
-                                InitializeHandler initializeHandler = new InitializeHandler();
                                 try {
                                     databaseManager.addGroup(message.getChatId());
-                                    initializeHandler.startUserGroupTable(message.getChatId());
-                                    initializeHandler.startGroupSettings(message.getChatId());
-                                    initializeHandler.addAdminsGroup(this, message.getChatId(), BOT_ID);
+                                    InitializeHandler.startUserGroupTable(message.getChatId());
+                                    InitializeHandler.startGroupSettings(message.getChatId());
+                                    InitializeHandler.addAdminsGroup(this, message.getChatId(), BOT_ID);
                                     rispondi = new StringBuilder(Localizer.getString("group_added", language));
                                     rispondi.append("\n");
                                     rispondi.append(Localizer.getString("group_added_plus", language));
@@ -643,6 +628,10 @@ public class CommandsHandler extends TelegramLongPollingCommandBot {
                         BotLogger.error(LOGTAG, e);
                     }
                 }
+                /*
+                Rather than make a query on the DB every time (quite slow) It would be better to store groups with antiflood and logging
+                enabled in a list somewhere and update them on boot and when necessary.
+                 */
                 //ANTIFLOOD
                 if (!botIgnore && databaseManager.isAntifloodActive(message.getChatId()))
                 {
@@ -656,8 +645,7 @@ public class CommandsHandler extends TelegramLongPollingCommandBot {
                     {
                         if (!SUPER_ADMINS.contains(user) && !databaseManager.isUserGroupAdmin(chatID, user ))
                         {
-                            KickHandler kick = new KickHandler();
-                            risposta = kick.kickUser(message.getFrom(), message.getChat());
+                            risposta = KickHandler.kickUser(message.getFrom(), message.getChat(), this);
                             risposta.append("\n");
                             risposta.append(Localizer.getString("by_antiflood", language));
                             SendMessage riss = new SendMessage();

@@ -6,6 +6,11 @@ import org.quartz.InterruptableJob;
 import org.quartz.JobExecutionContext;
 import org.quartz.JobExecutionException;
 
+/**
+ * @author Kraktun
+ * @version 1.0
+ * Wrapper class to manage Reminders thread
+ */
 public class RemindersJob implements InterruptableJob {
 
     public static final String LOGTAG = "REMINDERSJOB";

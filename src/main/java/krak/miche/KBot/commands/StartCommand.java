@@ -2,7 +2,6 @@ package krak.miche.KBot.commands;
 
 import krak.miche.KBot.BuildVars;
 import krak.miche.KBot.database.DatabaseManager;
-import krak.miche.KBot.handler.CommandsHandler;
 import krak.miche.KBot.secondary_Handler.InitializeHandler;
 import krak.miche.KBot.services.UtilsMain;
 import krak.miche.KBot.services.Localizer;
@@ -85,18 +84,16 @@ public class StartCommand extends BotCommand {
                 {
                     language = databaseManager.getGroupLanguage(chat.getId());
                     //Reinitialize admin list if some new admins have been added
-                    InitializeHandler initializeHandler = new InitializeHandler();
-                    initializeHandler.addAdminsGroup(absSender, chatId, user.getId());
+                    InitializeHandler.addAdminsGroup(absSender, chatId, user.getId());
                     messageBuilder.append(Localizer.getString("done", language));
                 }
                 else
                 {
-                    InitializeHandler initializeHandler = new InitializeHandler();
                     try {
                         databaseManager.addGroup(chatId);
-                        initializeHandler.startUserGroupTable(chatId);
-                        initializeHandler.startGroupSettings(chatId);
-                        initializeHandler.addAdminsGroup(absSender, chatId, user.getId());
+                        InitializeHandler.startUserGroupTable(chatId);
+                        InitializeHandler.startGroupSettings(chatId);
+                        InitializeHandler.addAdminsGroup(absSender, chatId, user.getId());
                         messageBuilder.append(Localizer.getString("group_added", language));
                         messageBuilder.append("\n");
                         messageBuilder.append(Localizer.getString("group_added_plus", language));

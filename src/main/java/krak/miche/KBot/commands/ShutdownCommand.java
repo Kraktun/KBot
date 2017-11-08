@@ -16,6 +16,7 @@ import org.telegram.telegrambots.logging.BotLogger;
  * @author Kraktun
  * @version 1.0
  * Command to properly disconnect the database and backup reminders
+ * Useless as of now
  */
 
 public class ShutdownCommand extends BotCommand {
@@ -34,9 +35,7 @@ public class ShutdownCommand extends BotCommand {
         {
             if (BuildVars.SUPER_ADMINS.contains(user.getId()))
             {
-                ShutdownHandler shutdownHandler = new ShutdownHandler();
-                shutdownHandler.shutJobs();
-                messageTextBuilder = shutdownHandler.poweroff();
+                messageTextBuilder = ShutdownHandler.poweroff();
             }
             SendMessage answer = new SendMessage();
             answer.setChatId(chat.getId().toString());

@@ -4,7 +4,6 @@ package krak.miche.KBot.structures;
  * @author Kraktun
  * @version 1.0
  */
-
 public class LogObject {
 
     private long groupID;

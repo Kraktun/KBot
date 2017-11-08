@@ -1,7 +1,6 @@
 package krak.miche.KBot.secondary_Handler;
 
 
-
 import krak.miche.KBot.structures.CommandObject;
 import krak.miche.KBot.structures.CommandsStatic;
 
@@ -9,15 +8,15 @@ import krak.miche.KBot.structures.CommandsStatic;
  * @author Kraktun
  * @version 1.0
  */
-
 public class HelpHandler {
+
     private static final String LOGTAG = "HELPHANDLER";
 
-
-    public HelpHandler() {
-    }
-
-    public StringBuilder getHelpUser() {
+    /**
+     * Get a list of commands available for user chats
+     * @return list of commands with description
+     */
+    public static StringBuilder getHelpUser() {
         StringBuilder additionalCommands = new StringBuilder();
         for (CommandObject command : CommandsStatic.USER_COMMANDS)
         {
@@ -26,7 +25,11 @@ public class HelpHandler {
         return additionalCommands;
     }
 
-    public StringBuilder getHelpGroup() {
+    /**
+     * Get a list of commands available for group chats
+     * @return list of commands with description
+     */
+    public static StringBuilder getHelpGroup() {
         StringBuilder additionalCommands = new StringBuilder();
         for (CommandObject command : CommandsStatic.GROUP_COMMANDS)
         {

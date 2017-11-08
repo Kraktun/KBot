@@ -1,14 +1,14 @@
 package krak.miche.KBot.secondary_Handler;
 
 
+import krak.miche.KBot.services.UtilsMain;
 import org.telegram.telegrambots.logging.BotLogger;
-
 
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.TimeZone;
 
-import static krak.miche.KBot.services.UtilsMain.writeUsers;
+import static krak.miche.KBot.BuildVars.DEFAULT_UTC;
 
 /**
  * @author Kraktun
@@ -17,17 +17,19 @@ import static krak.miche.KBot.services.UtilsMain.writeUsers;
 
 public class ExportHandler {
     private static final String LOGTAG = "EXPORTHANDLER";
-    private StringBuilder messageTextBuilder;
 
-    public ExportHandler() {
-    }
-
-    public StringBuilder write() {
+    /**
+     * Backups users and groups lists in a text file
+     * Uses current time as filename
+     * @return message with result of operation
+     */
+    public static StringBuilder write() {
+        StringBuilder messageTextBuilder;
         Calendar cal = Calendar.getInstance();
-        cal.setTimeZone(TimeZone.getTimeZone("GMT+2"));
+        cal.setTimeZone(TimeZone.getTimeZone("GMT +" + DEFAULT_UTC));
         String timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss").format(cal.getTime());
         try {
-            writeUsers(timeStamp);
+            UtilsMain.writeUsers(timeStamp);
             messageTextBuilder = new StringBuilder("File " + timeStamp + " written");
         } catch (Exception e) {
             BotLogger.error(LOGTAG, e);
@@ -36,9 +38,16 @@ public class ExportHandler {
         return messageTextBuilder;
     }
 
-    public StringBuilder write(String name) {
+    /**
+     * Backups users and groups lists in a text file
+     * Uses name  as filename
+     * @param name name of the file to save
+     * @return message with result of operation
+     */
+    public static StringBuilder write(String name) {
+        StringBuilder messageTextBuilder;
         try {
-            writeUsers(name);
+            UtilsMain.writeUsers(name);
             messageTextBuilder = new StringBuilder("File " + name + " written");
         } catch (Exception e) {
             messageTextBuilder = new StringBuilder("Error writing file");

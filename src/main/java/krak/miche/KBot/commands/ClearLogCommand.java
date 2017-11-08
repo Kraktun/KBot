@@ -16,6 +16,9 @@ import java.sql.SQLException;
 /**
  * @author Kraktun
  * @version 1.0
+ * Manages clearlog command
+ * Used to delete all messages logged for the group where it is sent
+ * @todo add some way to confirm the deletion
  */
 
 public class ClearLogCommand extends BotCommand {

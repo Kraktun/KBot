@@ -14,12 +14,13 @@ import java.sql.SQLException;
 public class ClearFeedbackHandler {
 
     public static final String LOGTAG = "CLEARFEEDBACKHANDLER";
-    private DatabaseManager databaseManager = DatabaseManager.getInstance();
 
-    public ClearFeedbackHandler() {
-    }
-
-    public StringBuilder clearFeedbacks() {
+    /**
+     * Drops feedback tables and recreate it
+     * @return message with result of operation
+     */
+    public static StringBuilder clearFeedbacks() {
+        DatabaseManager databaseManager = DatabaseManager.getInstance();
         StringBuilder messageTextBuilder;
         try {
             databaseManager.clearFeedback();

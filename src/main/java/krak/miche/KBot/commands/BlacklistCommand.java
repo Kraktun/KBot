@@ -12,11 +12,16 @@ import org.telegram.telegrambots.bots.commandbot.commands.BotCommand;
 import org.telegram.telegrambots.exceptions.TelegramApiException;
 import org.telegram.telegrambots.logging.BotLogger;
 
+
 /**
  * @author Kraktun
  * @version 1.0
  * Class to manage blacklist command:
- * Can be used only by admins and in private chats
+ * Can be used only by admins and in private chats param is not checked here for consistency
+ * Managed error sources: (param = id to blacklist)
+ * - not user chat
+ * - null or non existing param
+ * - command not executed by an admin
  */
 
 public class BlacklistCommand extends BotCommand {
@@ -37,8 +42,7 @@ public class BlacklistCommand extends BotCommand {
                 messageTextBuilder = new StringBuilder(Localizer.getString("syntax_error", language));
             else if (databaseManager.isAdminStatus(user.getId()) || BuildVars.SUPER_ADMINS.contains(user.getId()))
             {
-                BlacklistHandler blacklistHandler = new BlacklistHandler();
-                messageTextBuilder = blacklistHandler.blacklist(arguments[0], language);
+               messageTextBuilder = BlacklistHandler.blacklist(arguments[0], language);
             }
             SendMessage answer = new SendMessage();
             answer.setChatId(chat.getId().toString());

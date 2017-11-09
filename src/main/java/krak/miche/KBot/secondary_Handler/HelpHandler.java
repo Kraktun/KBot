@@ -4,6 +4,9 @@ package krak.miche.KBot.secondary_Handler;
 import krak.miche.KBot.structures.CommandObject;
 import krak.miche.KBot.structures.CommandsStatic;
 
+import java.util.Comparator;
+import java.util.List;
+
 /**
  * @author Kraktun
  * @version 1.0
@@ -18,7 +21,8 @@ public class HelpHandler {
      */
     public static StringBuilder getHelpUser() {
         StringBuilder additionalCommands = new StringBuilder();
-        for (CommandObject command : CommandsStatic.USER_COMMANDS)
+        List<CommandObject> commands = sortCommands(CommandsStatic.USER_COMMANDS);
+        for (CommandObject command : commands)
         {
             additionalCommands.append("\n").append(command.getCommand()).append(": ").append(command.getDescription());
         }
@@ -31,10 +35,21 @@ public class HelpHandler {
      */
     public static StringBuilder getHelpGroup() {
         StringBuilder additionalCommands = new StringBuilder();
-        for (CommandObject command : CommandsStatic.GROUP_COMMANDS)
+        List<CommandObject> commands = sortCommands(CommandsStatic.GROUP_COMMANDS);
+        for (CommandObject command : commands)
         {
             additionalCommands.append("\n").append(command.getCommand()).append(": ").append(command.getDescription());
         }
         return additionalCommands;
+    }
+
+    private static List<CommandObject> sortCommands(List<CommandObject> oldList) {
+        oldList.sort(new Comparator<CommandObject>() {
+            @Override
+            public int compare(CommandObject o1, CommandObject o2) {
+                return o1.getCommand().compareTo(o2.getCommand());
+            }
+        });
+        return oldList;
     }
 }

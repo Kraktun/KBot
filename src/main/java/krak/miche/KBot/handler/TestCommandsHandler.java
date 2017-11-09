@@ -60,10 +60,9 @@ public class TestCommandsHandler extends TelegramLongPollingCommandBot {
         register(new LogCommand());
         register(new ExportLogCommand());
         register(new ClearLogCommand());
-        /*
         HelpCommand helpCommand = new HelpCommand(this);
         register(helpCommand);
-
+        /*
         registerDefaultAction(( absSender, message )->{
             if (message.getChat().isUserChat())
             {

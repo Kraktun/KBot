@@ -5,6 +5,8 @@ import krak.miche.KBot.BuildVars;
 import java.util.ArrayList;
 import java.util.List;
 
+import static krak.miche.KBot.BuildVars.DEFAULT_UTC;
+
 /**
  * I use this class and not the ICommandRegistry because in this way I can choose different descriptions for the same command
  * if /help is sent in user chat or in a group. I can also include commands which do not extend BotCommand (and are not in ICommandRegistry).
@@ -38,6 +40,7 @@ public class CommandsStatic {
         GROUP_COMMANDS.add(new CommandObject(false,"/log + default\\invert", "Change log type: default = only messages starting with '" + BuildVars.LOG_SPECIAL_CHAR + "' are saved; invert = the opposite"));
         GROUP_COMMANDS.add(new CommandObject(false,"/exportlog", "Use to save log messages as text"));
         GROUP_COMMANDS.add(new CommandObject(false,"/clearlog", "Deletes logs for selected group"));
+        GROUP_COMMANDS.add(new CommandObject(false,"/setutc + NUM", "This command is used to set your UTC (default +" + DEFAULT_UTC + ")\nThere should be no spaces between sign and NUM (ex. +3, -8)"));
 
         USER_COMMANDS.add(new CommandObject(false,"/blacklist", "This command can be used only by admins to blacklist users \n usage: \n command + [ID]"));
         USER_COMMANDS.add(new CommandObject(false,"/clearfeedback", "Delete all feedbacks"));
@@ -58,7 +61,7 @@ public class CommandsStatic {
         USER_COMMANDS.add(new CommandObject(false,"/satools", "Tools for admins"));
         USER_COMMANDS.add(new CommandObject(false,"/settings", "Used to define settings"));
         USER_COMMANDS.add(new CommandObject(false,"/setuser", "This command can be used only by admins to promote users \n usage: \n command + [ID] + [position] \n where position = \n[USER]\n[POWER_USER]\n[ADMIN]\n[BLACKLISTED]"));
-        USER_COMMANDS.add(new CommandObject(false,"/setutc", "This command is used to set your UTC (default +1)"));
+        USER_COMMANDS.add(new CommandObject(false,"/setutc + NUM", "This command is used to set your UTC (default +" + DEFAULT_UTC + ")\nThere should be no spaces between sign and NUM (ex. +3, -8)"));
         //USER_COMMANDS.add(new CommandObject(false,"/shutdown", "Disconnects the database"));
         USER_COMMANDS.add(new CommandObject(false,"/start", "With this command you can start the Bot"));
         USER_COMMANDS.add(new CommandObject(false,"/status", "This command returns your status (admin/power user/user)"));

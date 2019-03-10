@@ -23,3 +23,6 @@ hs_err_pid*
 .idea/*
 target/*
 .gradle/*
+src/main/java/com/miche/krak/kBot/BotConfig.java
+out/*
+

@@ -1,14 +1,7 @@
-[![Build Status](https://travis-ci.com/Kraktun/KBot.svg?token=Uor7RP8xsv27XrHhEVTp&branch=master)](https://travis-ci.com/Kraktun/KBot)
+[![Build Status](https://travis-ci.com/Kraktun/KBot.svg?token=Uor7RP8xsv27XrHhEVTp&branch=restartNew)](https://travis-ci.com/Kraktun/KBot)
 
 ## Info
 Written with [TelegramBots](https://github.com/rubenlagus/TelegramBots) library
-following [TelegramBotsExample](https://github.com/rubenlagus/TelegramBotsExample)
-
-## TO DO
-The plan is to make the bot modular, so:
-1) Completely rewrite [processNonCommandUpdates()](https://github.com/Kraktun/KBot/tree/master/src/krak/miche/handler/CommandsHandler.java#L101) to make it modular (replace all those switch with static methods)
-2) Change the way commands are stored, making a list of all the commands so if you change one you don't have to find all the occurrences
-3) Make methods in secondary_handlers static
 
 ## License
 

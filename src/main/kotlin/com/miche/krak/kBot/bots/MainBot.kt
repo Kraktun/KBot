@@ -12,7 +12,7 @@ import org.telegram.telegrambots.meta.api.objects.Message
 class MainBot(options: DefaultBotOptions) : TelegramLongPollingBot(options) {
 
     override fun getBotUsername(): String? {
-        return BotConfig.TEST_USER
+        return BotConfig.TEST_NAME
     }
 
     override fun getBotToken(): String? {

@@ -5,9 +5,9 @@ import com.miche.krak.kBot.utils.Target
 import org.telegram.telegrambots.meta.api.objects.Chat
 import org.telegram.telegrambots.meta.api.objects.User
 
-class FilterCommand(val targets : List<Target> = listOf(Target.USER, Target.GROUP, Target.CHANNEL),
-                    val privacy : Privacy = Privacy.USER,
-                    val argsNum : Int = 0) {
+class FilterCommand(private val targets : List<Target> = listOf(Target.USER, Target.GROUP, Target.CHANNEL),
+                    private val privacy : Privacy = Privacy.USER,
+                    private val argsNum : Int = 0) {
 
     fun filterFrom(user : User, chat : Chat) : Boolean {
         val userStatus = Privacy.ADMIN //TODO CHECK FROM DB
@@ -20,7 +20,7 @@ class FilterCommand(val targets : List<Target> = listOf(Target.USER, Target.GROU
         return true
     }
 
-    fun filterFormat(arguments : Array<String>) : Boolean {
+    fun filterFormat(arguments : List<String>) : Boolean {
         return arguments.size >= argsNum
     }
 

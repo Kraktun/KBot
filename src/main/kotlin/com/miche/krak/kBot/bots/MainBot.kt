@@ -1,6 +1,9 @@
 package com.miche.krak.kBot.bots
 
 import com.miche.krak.kBot.BotConfig
+import com.miche.krak.kBot.commands.CommandProcessor
+import com.miche.krak.kBot.commands.HelloCommand
+import com.miche.krak.kBot.commands.KCommand
 import org.telegram.telegrambots.bots.DefaultBotOptions
 import org.telegram.telegrambots.bots.TelegramLongPollingBot
 import org.telegram.telegrambots.meta.api.objects.Update
@@ -20,10 +23,11 @@ class MainBot(options: DefaultBotOptions) : TelegramLongPollingBot(options) {
     }
 
     init {
-
+        CommandProcessor.instance.registerCommand(HelloCommand())
     }
 
     override fun onUpdateReceived(update: Update) {
+        CommandProcessor.instance.fireCommand(update, this)
         if (update.hasMessage() && update.message.hasText()) {
             val message = SendMessage() // Create a SendMessage object with mandatory fields
                 .setChatId(update.message.chatId)

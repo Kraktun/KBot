@@ -9,7 +9,9 @@ import org.telegram.telegrambots.meta.exceptions.TelegramApiException
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage
 
 
-
+/**
+ * Simple hello command
+ */
 class HelloCommand : KCommand(command, desc) {
 
     companion object {

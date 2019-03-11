@@ -8,7 +8,9 @@ import org.quartz.SimpleScheduleBuilder.simpleSchedule
 import org.quartz.Scheduler
 import org.quartz.TriggerBuilder.newTrigger
 
-
+/**
+ * Executes jobs in set intervals
+ */
 class JobExecutor {
 
     companion object {
@@ -20,7 +22,7 @@ class JobExecutor {
     var isShutdown : Boolean = scheduler.isShutdown
 
     /**
-     * Starts antiflood and reminders threads
+     * Starts threads
      */
     fun run() {
         try {
@@ -34,7 +36,7 @@ class JobExecutor {
     }
 
     /**
-     * Kills test threads
+     * Kills threads
      * @return false if an error occurred, true otherwise
      */
     fun shutdown(): Boolean {

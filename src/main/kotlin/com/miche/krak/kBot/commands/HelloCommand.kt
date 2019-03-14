@@ -12,22 +12,16 @@ import org.telegram.telegrambots.meta.api.methods.send.SendMessage
 /**
  * Simple hello command
  */
-class HelloCommand : KCommand(command, desc) {
+class HelloCommand : CommandInterface {
 
-    companion object {
-        private const val command : String = "hello"
-        private const val desc : String = "Hi"
-    }
-
-    private val filter = FilterCommand(
-            targets = listOf(Target.USER, Target.GROUP),
-            privacy = Privacy.USER,
-            argsNum = 0)
-
+    val engine = BaseCommand(command = "hello",
+                    description = "Hi",
+                    targets = listOf(Target.USER, Target.GROUP),
+                    privacy = Privacy.USER,
+                    argsNum = 0,
+                    exe = this)
 
     override fun execute(absSender: AbsSender, user: User, chat: Chat, arguments: List<String>) {
-        if (!filter.filterFrom(user, chat) || !filter.filterFormat(arguments))
-            return
         val answer = SendMessage()
         answer.chatId = chat.id.toString()
         answer.text = "Hello there"

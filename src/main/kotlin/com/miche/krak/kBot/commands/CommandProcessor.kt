@@ -12,12 +12,12 @@ class CommandProcessor {
         val instance = CommandProcessor()
     }
 
-    var map = mutableMapOf<String, KCommand>()
+    var map = mutableMapOf<String, BaseCommand>()
 
     /**
      * Register command
      */
-    fun registerCommand(kCommand : KCommand) {
+    fun registerCommand(kCommand : BaseCommand) {
         if (map.containsKey(kCommand.command))
             throw CommandAlreadyRegisteredException()
         map[kCommand.command] = kCommand
@@ -29,7 +29,7 @@ class CommandProcessor {
      */
     fun fireCommand(update : Update, absSender: AbsSender) : Boolean{
         val commandInput = update.message.text.plus(" ").substringBefore(" ").substring(1) //take first word (Add space at the end), remove appended '/'
-        return map[commandInput]?.execute(absSender, update.message.from, update.message.chat, update.message.text.substringAfter(" ").split(" ")) != null
+        return map[commandInput]?.fire(absSender, update.message.from, update.message.chat, update.message.text.substringAfter(" ").split(" ")) != null
     }
 
     class CommandAlreadyRegisteredException : Exception() {

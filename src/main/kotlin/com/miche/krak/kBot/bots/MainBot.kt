@@ -1,6 +1,7 @@
 package com.miche.krak.kBot.bots
 
 import com.miche.krak.kBot.BotConfig
+import com.miche.krak.kBot.commands.BaseCommand
 import com.miche.krak.kBot.commands.CommandProcessor
 import com.miche.krak.kBot.commands.HelloCommand
 import org.telegram.telegrambots.bots.DefaultBotOptions
@@ -25,7 +26,7 @@ class MainBot(options: DefaultBotOptions) : TelegramLongPollingBot(options) {
      * Register Commands Handlers
      */
     init {
-        CommandProcessor.instance.registerCommand(HelloCommand())
+        CommandProcessor.instance.registerCommand(HelloCommand().engine)
     }
 
     /**

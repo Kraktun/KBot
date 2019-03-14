@@ -2,6 +2,7 @@ package com.miche.krak.kBot.commands
 
 import com.miche.krak.kBot.utils.Privacy
 import com.miche.krak.kBot.utils.Target
+import com.miche.krak.kBot.utils.getQualifiedUser
 import org.telegram.telegrambots.meta.api.objects.Chat
 import org.telegram.telegrambots.meta.api.objects.User
 import org.telegram.telegrambots.meta.bots.AbsSender
@@ -24,7 +25,7 @@ class HelloCommand : CommandInterface {
     override fun execute(absSender: AbsSender, user: User, chat: Chat, arguments: List<String>) {
         val answer = SendMessage()
         answer.chatId = chat.id.toString()
-        answer.text = "Hello there"
+        answer.text = "Hello there ${getQualifiedUser(user)}"
         try {
             absSender.execute(answer)
         } catch (e: TelegramApiException) {

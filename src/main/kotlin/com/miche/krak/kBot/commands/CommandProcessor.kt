@@ -28,10 +28,20 @@ class CommandProcessor {
      * Return false if no command was found
      */
     fun fireCommand(update : Update, absSender: AbsSender) : Boolean{
-        val commandInput = update.message.text.plus(" ").substringBefore(" ").substring(1) //take first word (Add space at the end), remove appended '/'
-        return map[commandInput]?.fire(absSender, update.message.from, update.message.chat, update.message.text.substringAfter(" ").split(" ")) != null
+        val commandInput = update.message.text.plus(" ") //Add space at the end, for single-word commands
+            .substringBefore(" ") //take first word
+            .substring(1) //remove pre-pended '/'
+        return map[commandInput]?.fire(absSender,
+            update.message.from,
+            update.message.chat,
+            update.message.text.substringAfter(" ") //take args from second word (first is the command)
+                .split(" ") //put each word in the list
+        )!= null //when key is not present, map[]? equals null
     }
 
+    /**
+     * Simple exception
+     */
     class CommandAlreadyRegisteredException : Exception() {
 
         override val message: String?

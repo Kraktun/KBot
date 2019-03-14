@@ -1,7 +1,6 @@
 package com.miche.krak.kBot.bots
 
-import com.miche.krak.kBot.BotConfig
-import com.miche.krak.kBot.commands.BaseCommand
+import com.miche.krak.kBot.*
 import com.miche.krak.kBot.commands.CommandProcessor
 import com.miche.krak.kBot.commands.HelloCommand
 import org.telegram.telegrambots.bots.DefaultBotOptions
@@ -15,11 +14,11 @@ import org.telegram.telegrambots.meta.api.objects.Message
 class MainBot(options: DefaultBotOptions) : TelegramLongPollingBot(options) {
 
     override fun getBotUsername(): String? {
-        return BotConfig.TEST_NAME
+        return TEST_NAME
     }
 
     override fun getBotToken(): String? {
-        return BotConfig.TEST_TOKEN
+        return TEST_TOKEN
     }
 
     /**

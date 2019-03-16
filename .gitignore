@@ -25,4 +25,5 @@ target/*
 .gradle/*
 src/main/kotlin/com/miche/krak/kBot/BotConfig.kt
 out/*
+build/*
 

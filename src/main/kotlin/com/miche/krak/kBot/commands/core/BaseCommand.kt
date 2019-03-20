@@ -1,4 +1,4 @@
-package com.miche.krak.kBot.commands
+package com.miche.krak.kBot.commands.core
 
 import com.miche.krak.kBot.utils.Privacy
 import com.miche.krak.kBot.utils.Target
@@ -14,7 +14,7 @@ class BaseCommand(
                 private val privacy : Privacy = Privacy.USER,
                 private val argsNum : Int = 0,
                 private val argsPattern : Pattern? = null,
-                private val exe : CommandInterface) {
+                private val exe : CommandInterface ) {
 
 
     fun fire(absSender: AbsSender, user: User, chat: Chat, arguments: List<String>) {
@@ -44,7 +44,7 @@ class BaseCommand(
      * Return true if command is formatted correctly
      */
     private fun filterFormat(arguments : List<String>) : Boolean {
-        //manage pattern (use pattern.?
+        //manage pattern (use pattern?.let{})
         return arguments.size >= argsNum
     }
 

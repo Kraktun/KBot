@@ -1,5 +1,7 @@
 package com.miche.krak.kBot.commands
 
+import com.miche.krak.kBot.commands.core.BaseCommand
+import com.miche.krak.kBot.commands.core.CommandInterface
 import com.miche.krak.kBot.utils.Privacy
 import com.miche.krak.kBot.utils.Target
 import com.miche.krak.kBot.utils.getQualifiedUser
@@ -15,12 +17,14 @@ import org.telegram.telegrambots.meta.api.methods.send.SendMessage
  */
 class HelloCommand : CommandInterface {
 
-    val engine = BaseCommand(command = "hello",
-                    description = "Hi",
-                    targets = listOf(Target.USER, Target.GROUP),
-                    privacy = Privacy.USER,
-                    argsNum = 0,
-                    exe = this)
+    val engine = BaseCommand(
+        command = "hello",
+        description = "Hi",
+        targets = listOf(Target.USER, Target.GROUP),
+        privacy = Privacy.USER,
+        argsNum = 0,
+        exe = this
+    )
 
     override fun execute(absSender: AbsSender, user: User, chat: Chat, arguments: List<String>) {
         val answer = SendMessage()

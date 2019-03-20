@@ -1,4 +1,4 @@
-package com.miche.krak.kBot.commands
+package com.miche.krak.kBot.commands.core
 
 import org.telegram.telegrambots.meta.api.objects.Chat
 import org.telegram.telegrambots.meta.api.objects.User

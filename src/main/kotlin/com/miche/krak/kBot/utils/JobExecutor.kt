@@ -11,10 +11,10 @@ import org.quartz.TriggerBuilder.newTrigger
 /**
  * Executes jobs in set intervals
  */
-class JobExecutor {
+class JobExecutor private constructor(){
 
     companion object {
-        val instance = JobExecutor()
+        val instance by lazy {JobExecutor()}
     }
 
     private var scheduler: Scheduler = StdSchedulerFactory().scheduler

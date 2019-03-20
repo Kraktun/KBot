@@ -1,7 +1,7 @@
 package com.miche.krak.kBot.bots
 
 import com.miche.krak.kBot.*
-import com.miche.krak.kBot.commands.CommandProcessor
+import com.miche.krak.kBot.commands.core.CommandProcessor
 import com.miche.krak.kBot.commands.HelloCommand
 import org.telegram.telegrambots.bots.DefaultBotOptions
 import org.telegram.telegrambots.bots.TelegramLongPollingBot

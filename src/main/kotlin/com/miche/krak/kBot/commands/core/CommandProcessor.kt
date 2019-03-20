@@ -1,4 +1,4 @@
-package com.miche.krak.kBot.commands
+package com.miche.krak.kBot.commands.core
 
 import org.telegram.telegrambots.meta.api.objects.Update
 import org.telegram.telegrambots.meta.bots.AbsSender
@@ -9,7 +9,7 @@ import org.telegram.telegrambots.meta.bots.AbsSender
 class CommandProcessor {
 
     companion object {
-        val instance = CommandProcessor()
+        val instance by lazy { CommandProcessor() }
     }
 
     var map = mutableMapOf<String, BaseCommand>()

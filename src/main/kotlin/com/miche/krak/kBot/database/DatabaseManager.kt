@@ -19,12 +19,12 @@ class DatabaseManager private constructor() {
     private fun connectDB() {
         val dbLink = getMainFolder() + "\\KBotDB.db"
         print(dbLink)
-        // Your connection properties here
         Database.connect("jdbc:sqlite:$dbLink", "org.sqlite.JDBC")
         TransactionManager.manager.defaultIsolationLevel = Connection.TRANSACTION_SERIALIZABLE // Or Connection.TRANSACTION_READ_UNCOMMITTED
 
         transaction {
-            SchemaUtils.create(Users)
+            addLogger(StdOutSqlLogger)
+            SchemaUtils.create(Users, Groups, GroupUsers)
         }
     }
 

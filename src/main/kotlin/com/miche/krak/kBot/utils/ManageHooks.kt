@@ -1,10 +1,17 @@
 package com.miche.krak.kBot.utils
 
+import com.miche.krak.kBot.database.DatabaseManager
+import com.miche.krak.kBot.predefinedUsers
+
 /**
  * What to execute on start
  */
 fun onStart() {
     println("Starting system")
+    //Insert predefined users
+    println("Adding predefined users")
+    DatabaseManager.instance.insertUser(predefinedUsers)
+    println("Predefined users added")
     JobExecutor.instance.run()
 }
 

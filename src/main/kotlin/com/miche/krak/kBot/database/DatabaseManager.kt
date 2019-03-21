@@ -1,15 +1,18 @@
 package com.miche.krak.kBot.database
 
+import com.miche.krak.kBot.objects.UserK
+import com.miche.krak.kBot.utils.Status
 import com.miche.krak.kBot.utils.getMainFolder
 import org.jetbrains.exposed.sql.*
 import org.jetbrains.exposed.sql.transactions.TransactionManager
 import org.jetbrains.exposed.sql.transactions.transaction
+import org.telegram.telegrambots.meta.api.objects.User
 import java.sql.Connection
 
 class DatabaseManager private constructor() {
 
     companion object {
-        @Volatile var instance = DatabaseManager()
+        val instance by lazy { DatabaseManager() }
     }
 
     init {
@@ -28,4 +31,35 @@ class DatabaseManager private constructor() {
         }
     }
 
+    fun insertUser(user : User, userStatus : Status, info : String? = null) {
+        transaction {
+            Users.insert {
+                it[id] = user.id
+                it[username] = user.userName
+                it[status] = userStatus.name
+                it[statusInfo] = info
+            }
+        }
+    }
+
+    fun insertUser(list : List<UserK>) {
+        transaction {
+            Users.batchInsert(list) {user ->
+                this[Users.id] = user.id
+                this[Users.username] = user.username
+                this[Users.status] = user.status.name
+                this[Users.statusInfo] = user.userInfo
+            }
+        }
+    }
+
+    fun getUser(userId : Int) : UserK {
+        val userK = UserK(id = userId, status = Status.USER)
+        transaction {
+            Users.select {Users.id eq userId}
+                .map { userK.username = it[Users.username]
+                    userK.status = Status.valueOf(it[Users.status].toUpperCase()) }
+        }
+        return userK
+    }
 }

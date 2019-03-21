@@ -10,6 +10,6 @@ enum class Target {
 /**
  * User
  */
-enum class Privacy {
-    USER, POWER_USER, ADMIN, DEV
+enum class Status {
+    BANNED, NOT_REGISTERED, USER, POWER_USER, ADMIN, DEV, CREATOR
 }

@@ -2,6 +2,8 @@ package com.miche.krak.kBot.commands.core
 
 import org.telegram.telegrambots.meta.api.objects.Update
 import org.telegram.telegrambots.meta.bots.AbsSender
+import java.util.concurrent.locks.ReentrantLock
+import kotlin.concurrent.withLock
 
 /**
  * Process commands from bot, locating the correct command to call
@@ -12,15 +14,18 @@ class CommandProcessor {
         val instance by lazy { CommandProcessor() }
     }
 
-    var map = mutableMapOf<String, BaseCommand>()
+    private var map = mutableMapOf<String, BaseCommand>()
+    private val lock = ReentrantLock()
 
     /**
      * Register command
      */
     fun registerCommand(kCommand : BaseCommand) {
-        if (map.containsKey(kCommand.command))
-            throw CommandAlreadyRegisteredException()
-        map[kCommand.command] = kCommand
+        lock.withLock {
+            if (map.containsKey(kCommand.command))
+                throw CommandAlreadyRegisteredException()
+            map[kCommand.command] = kCommand
+        }
     }
 
     /**
@@ -31,7 +36,11 @@ class CommandProcessor {
         val commandInput = update.message.text.plus(" ") //Add space at the end, for single-word commands
             .substringBefore(" ") //take first word
             .substring(1) //remove pre-pended '/'
-        return map[commandInput]?.fire(absSender,
+        var kCommand : BaseCommand? = null
+        lock.withLock {
+            kCommand = map[commandInput]
+        }
+        return kCommand?.fire(absSender,
             update.message.from,
             update.message.chat,
             update.message.text.substringAfter(" ") //take args from second word (first is the command)

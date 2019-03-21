@@ -3,6 +3,7 @@ package com.miche.krak.kBot.bots
 import com.miche.krak.kBot.*
 import com.miche.krak.kBot.commands.core.CommandProcessor
 import com.miche.krak.kBot.commands.HelloCommand
+import com.miche.krak.kBot.commands.StartCommand
 import org.telegram.telegrambots.bots.DefaultBotOptions
 import org.telegram.telegrambots.bots.TelegramLongPollingBot
 import org.telegram.telegrambots.meta.api.objects.Update
@@ -25,7 +26,9 @@ class MainBot(options: DefaultBotOptions) : TelegramLongPollingBot(options) {
      * Register Commands Handlers
      */
     init {
-        CommandProcessor.instance.registerCommand(HelloCommand().engine)
+        val commandProcessor = CommandProcessor.instance
+        commandProcessor.registerCommand(HelloCommand().engine)
+        commandProcessor.registerCommand(StartCommand().engine)
     }
 
     /**

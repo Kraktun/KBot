@@ -14,8 +14,8 @@ fun main() {
         try {
             mainThread.join()
         } catch (e: InterruptedException) {
-            //LOG
-            }
+            e.printStackTrace()
+        }
     })
 
     ApiContextInitializer.init()

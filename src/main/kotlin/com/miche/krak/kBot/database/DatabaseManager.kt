@@ -53,12 +53,16 @@ class DatabaseManager private constructor() {
         }
     }
 
-    fun getUser(userId : Int) : UserK {
-        val userK = UserK(id = userId, status = Status.USER)
+    fun getUser(userId : Int) : UserK? {
+        var userK : UserK? = null
         transaction {
             Users.select {Users.id eq userId}
-                .map { userK.username = it[Users.username]
-                    userK.status = Status.valueOf(it[Users.status].toUpperCase()) }
+                .map {
+                    userK = UserK(id = userId,
+                        status = Status.valueOf(it[Users.status].toUpperCase()),
+                        username = it[Users.username],
+                        userInfo = it[Users.statusInfo])
+                     }
         }
         return userK
     }

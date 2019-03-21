@@ -33,8 +33,7 @@ class HelloCommand : CommandInterface {
         try {
             absSender.execute(answer)
         } catch (e: TelegramApiException) {
-
+            e.printStackTrace()
         }
-
     }
 }

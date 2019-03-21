@@ -1,5 +1,6 @@
 package com.miche.krak.kBot.commands.core
 
+import com.miche.krak.kBot.database.DatabaseManager
 import com.miche.krak.kBot.utils.Status
 import com.miche.krak.kBot.utils.Target
 import org.telegram.telegrambots.meta.api.objects.Chat
@@ -10,13 +11,15 @@ import java.util.regex.Pattern
 class BaseCommand(
     val command : String,
     val description : String = "",
-    private val targets : List<Target> = listOf(Target.USER, Target.GROUP, Target.CHANNEL),
-    private val privacy : Status = Status.USER,
+    private val targets : List<Target>,
+    private val privacy : Status,
     private val argsNum : Int = 0,
     private val argsPattern : Pattern? = null,
     private val exe : CommandInterface ) {
 
-
+    /**
+     * Fire executable with passed values
+     */
     fun fire(absSender: AbsSender, user: User, chat: Chat, arguments: List<String>) {
         //apply filters
         if (filterAll(user, chat, arguments))
@@ -27,7 +30,7 @@ class BaseCommand(
      * Return true if message received comes from a valid chat
      */
     private fun filterFrom(user : User, chat : Chat) : Boolean {
-        val userStatus = Status.ADMIN //TODO CHECK FROM DB
+        val userStatus : Status = DatabaseManager.instance.getUser(user.id)?.status ?: Status.NOT_REGISTERED
         if (userStatus.ordinal < privacy.ordinal)
             return false
         val chatValue = if (chat.isGroupChat || chat.isSuperGroupChat) { Target.GROUP }

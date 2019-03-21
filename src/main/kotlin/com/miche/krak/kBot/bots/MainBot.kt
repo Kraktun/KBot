@@ -45,7 +45,6 @@ class MainBot(options: DefaultBotOptions) : TelegramLongPollingBot(options) {
                 } catch (e: TelegramApiException) {
                     e.printStackTrace()
                 }
-
             }
         }
     }

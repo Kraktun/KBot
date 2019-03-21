@@ -20,7 +20,7 @@ class StartCommand : CommandInterface {
 
     val engine = BaseCommand(
         command = "start",
-        description = "Hi",
+        description = "Start the bot",
         targets = listOf(Target.USER, Target.GROUP),
         privacy = Status.NOT_REGISTERED,
         argsNum = 0,
@@ -28,15 +28,17 @@ class StartCommand : CommandInterface {
     )
 
     override fun execute(absSender: AbsSender, user: User, chat: Chat, arguments: List<String>) {
-        DatabaseManager.instance.insertUser(user = user, userStatus = Status.USER)
+        if (chat.isUserChat && DatabaseManager.instance.getUser(user.id) != null) //Add only if not present, or it will overwrite current value
+            DatabaseManager.instance.insertUser(user = user, userStatus = Status.USER)
+        //If it's a group treat it differently
+        //TODO
         val answer = SendMessage()
         answer.chatId = chat.id.toString()
-        answer.text = "Welcome ${getQualifiedUser(user)} your id is: ${DatabaseManager.instance.getUser(user.id).id}"
+        answer.text = "Welcome ${getQualifiedUser(user)}"
         try {
             absSender.execute(answer)
         } catch (e: TelegramApiException) {
-
+            e.printStackTrace()
         }
-
     }
 }

@@ -30,9 +30,8 @@ class JobExecutor private constructor(){
             runTest()
             scheduler.start()
         } catch (e: Exception) {
-
+            e.printStackTrace()
         }
-
     }
 
     /**
@@ -84,5 +83,4 @@ class JobExecutor private constructor(){
     private fun preShutdown() {
 
     }
-
 }

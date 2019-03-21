@@ -1,7 +1,7 @@
-[![Build Status](https://travis-ci.com/Kraktun/KBot.svg?token=Uor7RP8xsv27XrHhEVTp&branch=restartNew)](https://travis-ci.com/Kraktun/KBot)
 
 ## Info
-Written with [TelegramBots](https://github.com/rubenlagus/TelegramBots) library
+Written with [TelegramBots](https://github.com/rubenlagus/TelegramBots)      
+and [Exposed](https://github.com/JetBrains/Exposed)   
 
 ## License
 

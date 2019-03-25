@@ -28,10 +28,12 @@ class StartCommand : CommandInterface {
     )
 
     override fun execute(absSender: AbsSender, user: User, chat: Chat, arguments: List<String>) {
-        if (chat.isUserChat && DatabaseManager.instance.getUser(user.id) != null) //Add only if not present, or it will overwrite current value
+        if (chat.isUserChat && DatabaseManager.instance.getUser(user.id) == null) //Add only if not present, or it will overwrite current value
             DatabaseManager.instance.insertUser(user = user, userStatus = Status.USER)
-        //If it's a group treat it differently
-        //TODO
+        else if (chat.isGroupChat && !DatabaseManager.instance.groupExists(chat.id)) {
+            //If it's a group insert the group and add the user who typed /start as admin
+            DatabaseManager.instance.addGroupUser(groupId = chat.id, userId = user.id, statusK = Status.ADMIN)
+        }
         val answer = SendMessage()
         answer.chatId = chat.id.toString()
         answer.text = "Welcome ${getQualifiedUser(user)}"

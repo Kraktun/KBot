@@ -1,6 +1,8 @@
 package com.miche.krak.kBot.database
 
+import com.miche.krak.kBot.objects.GroupK
 import com.miche.krak.kBot.objects.UserK
+import com.miche.krak.kBot.utils.GroupStatus
 import com.miche.krak.kBot.utils.Status
 import com.miche.krak.kBot.utils.getMainFolder
 import org.jetbrains.exposed.sql.*
@@ -31,6 +33,9 @@ class DatabaseManager private constructor() {
         }
     }
 
+    /**
+     * Insert single user in DB
+     */
     fun insertUser(user : User, userStatus : Status, info : String? = null) {
         transaction {
             Users.insert {
@@ -42,6 +47,9 @@ class DatabaseManager private constructor() {
         }
     }
 
+    /**
+     * Insert list of users in DB
+     */
     fun insertUser(list : List<UserK>) {
         transaction {
             Users.batchInsert(list) {user ->
@@ -53,6 +61,9 @@ class DatabaseManager private constructor() {
         }
     }
 
+    /**
+     * Get user from DB
+     */
     fun getUser(userId : Int) : UserK? {
         var userK : UserK? = null
         transaction {
@@ -65,5 +76,87 @@ class DatabaseManager private constructor() {
                      }
         }
         return userK
+    }
+
+    /**
+     * Return true if group exists inside the DB
+     */
+    fun groupExists(groupId: Long) : Boolean {
+        var result = false
+        transaction {
+            result = Groups.select {Groups.id eq groupId}.count() > 0
+        }
+        return result
+    }
+
+    /**
+     * Get group and all the members with a custom status
+     */
+    fun getGroup(groupId : Long) : GroupK? {
+        var groupK : GroupK? = null
+        val users : ArrayList<UserK> = arrayListOf()
+        transaction {
+            GroupUsers.select {GroupUsers.group eq groupId}
+                .forEach {
+                    users.add(UserK(id = it[GroupUsers.user],
+                        status = Status.valueOf(it[GroupUsers.status].toUpperCase()))
+                    )
+                }
+        }
+        if (users.size > 0)
+            groupK = GroupK(id = groupId, users = users)
+        return groupK
+    }
+
+    /**
+     * Add user to group with defined status
+     */
+    fun addGroupUser(groupId : Long, userId : Int, statusK : Status) {
+        transaction {
+            GroupUsers.insert {
+                it[group] = groupId
+                it[user] = userId
+                it[status] = statusK.name
+            }
+        }
+    }
+
+    /**
+     * Get user status in a group
+     */
+    fun getGroupUserStatus(groupId : Long, userId : Int) : Status {
+        var statusK : Status = Status.NOT_REGISTERED
+        transaction {
+            GroupUsers.select {GroupUsers.group eq groupId and (GroupUsers.user eq userId)}
+                .map {
+                    statusK = Status.valueOf(it[GroupUsers.status].toUpperCase())
+                }
+        }
+        return statusK
+    }
+
+    /**
+     * Get status of group
+     */
+    fun getGroupStatus(groupId : Long) : GroupStatus {
+        var statusK : GroupStatus = GroupStatus.NORMAL
+        transaction {
+            Groups.select {Groups.id eq groupId}
+                .map {
+                    statusK = GroupStatus.valueOf(it[Groups.status].toUpperCase())
+                }
+        }
+        return statusK
+    }
+
+    /**
+     * Update status of a group
+     */
+    fun updateGroupStatus(groupId : Long, statusK: GroupStatus) {
+        transaction {
+            Groups.update ({Groups.id eq groupId}) {
+                    it[Groups.status] = statusK.name
+            }
+        }
     }
 }

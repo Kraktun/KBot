@@ -12,12 +12,16 @@ object Users : Table() {
 }
 
 object Groups : Table() {
-    val id = integer("id").primaryKey()
+    val id = long("id").primaryKey()
+    val status = text("status")
 }
 
+/*
+A user in a group does not need to have started the bot in a private chat
+ */
 object GroupUsers : Table() {
-    val group = reference("group", Groups.id).primaryKey(0)
-    val user = reference("user", Users.id).primaryKey(1)
+    val group = reference("group", Groups.id, onDelete = ReferenceOption.CASCADE).primaryKey(0)
+    val user = integer("user").primaryKey(1)
     val status = text("status")
 }
 

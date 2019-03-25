@@ -1,6 +1,7 @@
 package com.miche.krak.kBot.commands.core
 
 import com.miche.krak.kBot.database.DatabaseManager
+import com.miche.krak.kBot.utils.GroupStatus
 import com.miche.krak.kBot.utils.Status
 import com.miche.krak.kBot.utils.Target
 import org.telegram.telegrambots.meta.api.objects.Chat
@@ -12,9 +13,11 @@ class BaseCommand(
     val command : String,
     val description : String = "",
     private val targets : List<Target>,
+    //Status is independent from the target in DB: private status may be != group status
+    //Here status depends on the target: if chat is group => status = groupStatus
     private val privacy : Status,
     private val argsNum : Int = 0,
-    private val argsPattern : Pattern? = null,
+    private val argsPattern : Pattern? = null, //TODO
     private val exe : CommandInterface ) {
 
     /**
@@ -27,20 +30,29 @@ class BaseCommand(
     }
 
     /**
-     * Return true if message received comes from a valid chat
+     * Apply all filters. Return true if everything is ok
+     */
+    private fun filterAll(user : User, chat : Chat, arguments : List<String>) : Boolean {
+        return filterFrom(user, chat) &&
+                filterFormat(arguments) &&
+                filterLock(user, chat) &&
+                filterStatus(user, chat)
+    }
+
+    /**
+     * Return true if message received comes from a valid chat and a valid user
      */
     private fun filterFrom(user : User, chat : Chat) : Boolean {
-        val userStatus : Status = DatabaseManager.instance.getUser(user.id)?.status ?: Status.NOT_REGISTERED
-        if (userStatus.ordinal < privacy.ordinal)
-            return false
-        val chatValue = if (chat.isGroupChat || chat.isSuperGroupChat) { Target.GROUP }
-        else if (chat.isChannelChat) {
-            Target.CHANNEL }
-        else {
+        var userStatus : Status = Status.NOT_REGISTERED
+        val chatValue = if (chat.isGroupChat || chat.isSuperGroupChat) {
+            userStatus = DatabaseManager.instance.getGroupUserStatus(chat.id, user.id)
+            Target.GROUP
+        } else if (chat.isUserChat) {
+            userStatus = DatabaseManager.instance.getUser(user.id)?.status ?: Status.NOT_REGISTERED
             Target.USER}
-        if (!targets.contains(chatValue))
-            return false
-        return true
+        else
+            Target.INVALID
+        return (userStatus >= privacy && targets.contains(chatValue))
     }
 
     /**
@@ -51,10 +63,22 @@ class BaseCommand(
         return arguments.size >= argsNum
     }
 
-    /**
-     * Apply all filters. Return true if everything is ok
-     */
-    private fun filterAll(user : User, chat : Chat, arguments : List<String>) : Boolean {
-        return filterFrom(user, chat) && filterFormat(arguments)
+    companion object {
+
+        /**
+         * Filter used for locked groups
+         */
+        fun filterLock(user: User, chat: Chat): Boolean {
+            return DatabaseManager.instance.getGroupStatus(chat.id) != GroupStatus.LOCKED ||
+                    DatabaseManager.instance.getGroupUserStatus(chat.id, user.id) >= Status.ADMIN
+        }
+
+        /**
+         * Filter used for banned users
+         */
+        fun filterStatus(user: User, chat: Chat): Boolean {
+            return DatabaseManager.instance.getUser(user.id)?.status != Status.BANNED &&
+                    DatabaseManager.instance.getGroupUserStatus(chat.id, user.id) >= Status.NOT_REGISTERED
+        }
     }
 }

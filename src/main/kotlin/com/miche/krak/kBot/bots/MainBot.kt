@@ -4,11 +4,13 @@ import com.miche.krak.kBot.*
 import com.miche.krak.kBot.commands.core.CommandProcessor
 import com.miche.krak.kBot.commands.HelloCommand
 import com.miche.krak.kBot.commands.StartCommand
+import com.miche.krak.kBot.commands.core.BaseCommand
 import org.telegram.telegrambots.bots.DefaultBotOptions
 import org.telegram.telegrambots.bots.TelegramLongPollingBot
 import org.telegram.telegrambots.meta.api.objects.Update
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage
+import org.telegram.telegrambots.meta.api.methods.updatingmessages.DeleteMessage
 import org.telegram.telegrambots.meta.api.objects.Message
 
 
@@ -36,7 +38,18 @@ class MainBot(options: DefaultBotOptions) : TelegramLongPollingBot(options) {
      */
     override fun onUpdateReceived(update: Update) {
         if (!CommandProcessor.instance.fireCommand(update, this)) {
-            if (update.hasMessage() && update.message.hasText()) {
+            //Check if chat is locked or user is banned  and if so delete the message
+            if (BaseCommand.filterLock(update.message.from, update.message.chat) ||
+                    BaseCommand.filterStatus(update.message.from, update.message.chat)) {
+                val message = DeleteMessage()
+                                .setChatId(update.message.chatId)
+                                .setMessageId(update.message.messageId)
+                try {
+                    execute(message)
+                } catch (e: TelegramApiException) {
+                    e.printStackTrace()
+                }
+            } else if (update.hasMessage() && update.message.hasText()) {
                 val message = SendMessage() // Create a SendMessage object with mandatory fields
                     .setChatId(update.message.chatId)
                     .setText(update.message.text)

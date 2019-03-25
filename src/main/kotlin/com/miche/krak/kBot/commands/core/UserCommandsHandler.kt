@@ -15,15 +15,15 @@ class UserCommandsHandler private constructor() {
     /*
     Map that contains a pair of user + chatId and the last command sent by the user in that chat
      */
-    private val map : MutableMap<Pair<Int, Int>, String> by lazy {
-        mutableMapOf<Pair<Int, Int>, String>()
+    private val map : MutableMap<Pair<Int, Long>, String> by lazy {
+        mutableMapOf<Pair<Int, Long>, String>()
     }
     private val lock = ReentrantLock()
 
     /**
      * Get last command sent in chatId by userId, null if not found
      */
-    fun getCommand(userId : Int, chatId : Int) : String? {
+    fun getCommand(userId : Int, chatId : Long) : String? {
         lock.withLock {
             return map[Pair(userId, chatId)]
         }
@@ -32,7 +32,7 @@ class UserCommandsHandler private constructor() {
     /**
      * Insert new command in chatId by userId
      */
-    fun insertCommand(userId : Int, chatId : Int, command : String) {
+    fun insertCommand(userId : Int, chatId : Long, command : String) {
         lock.withLock {
             map[Pair(userId, chatId)] = command
         }
@@ -41,7 +41,7 @@ class UserCommandsHandler private constructor() {
     /**
      * Last command by userId in chatId has been processed, so delete it.
      */
-    fun deleteCommand(userId : Int, chatId : Int) {
+    fun deleteCommand(userId : Int, chatId : Long) {
         lock.withLock {
             map.remove(Pair(userId, chatId))
         }

@@ -6,10 +6,10 @@ import kotlin.concurrent.withLock
 /**
  * Handles multi-input commands (commands that need more messages)
  */
-class UserCommandsHandler private constructor() {
+class MultiCommandsHandler private constructor() {
 
     companion object {
-        val instance by lazy { UserCommandsHandler() }
+        val instance by lazy { MultiCommandsHandler() }
     }
 
     /*

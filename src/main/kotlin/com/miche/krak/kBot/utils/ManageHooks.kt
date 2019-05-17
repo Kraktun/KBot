@@ -10,7 +10,9 @@ fun onStart() {
     println("Starting system")
     //Insert predefined users
     println("Adding predefined users")
+    println("DB is stored in: ")
     DatabaseManager.instance.insertUser(predefinedUsers)
+    println()
     println("Predefined users added")
     JobExecutor.instance.run()
 }

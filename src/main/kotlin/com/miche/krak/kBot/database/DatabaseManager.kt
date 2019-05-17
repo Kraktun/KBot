@@ -51,12 +51,27 @@ class DatabaseManager private constructor() {
      * Insert list of users in DB
      */
     fun insertUser(list : List<UserK>) {
-        transaction {
-            Users.batchInsert(list) {user ->
-                this[Users.id] = user.id
-                this[Users.username] = user.username
-                this[Users.status] = user.status.name
-                this[Users.statusInfo] = user.userInfo
+        try {
+            transaction {
+                Users.batchInsert(list) { user ->
+                    this[Users.id] = user.id
+                    this[Users.username] = user.username
+                    this[Users.status] = user.status.name
+                    this[Users.statusInfo] = user.userInfo
+                }
+            }
+        } catch (e: Exception) { //if a user in the list is already present, add one at a time
+            transaction {
+                for (user in list) {
+                    try {
+                        Users.insert {
+                            it[id] = user.id
+                            it[username] = user.username
+                            it[status] = user.status.name
+                            it[statusInfo] = user.userInfo
+                        }
+                    } catch (ee : Exception) {}
+                }
             }
         }
     }
@@ -87,6 +102,18 @@ class DatabaseManager private constructor() {
             result = Groups.select {Groups.id eq groupId}.count() > 0
         }
         return result
+    }
+
+    /**
+     * Insert group in DB
+     */
+    fun insertGroup(idd: Long) {
+        transaction {
+            Groups.insert {
+                it[id] = idd
+                it[status] = GroupStatus.NORMAL.toString()
+            }
+        }
     }
 
     /**

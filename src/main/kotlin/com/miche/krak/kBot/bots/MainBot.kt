@@ -1,9 +1,8 @@
 package com.miche.krak.kBot.bots
 
 import com.miche.krak.kBot.*
+import com.miche.krak.kBot.commands.*
 import com.miche.krak.kBot.commands.core.CommandProcessor
-import com.miche.krak.kBot.commands.HelloCommand
-import com.miche.krak.kBot.commands.StartCommand
 import com.miche.krak.kBot.commands.core.BaseCommand
 import org.telegram.telegrambots.bots.DefaultBotOptions
 import org.telegram.telegrambots.bots.TelegramLongPollingBot
@@ -16,8 +15,12 @@ import org.telegram.telegrambots.meta.api.objects.Message
 
 class MainBot(options: DefaultBotOptions) : TelegramLongPollingBot(options) {
 
+    companion object {
+        const val botName = TEST_NAME
+    }
+
     override fun getBotUsername(): String? {
-        return TEST_NAME
+        return botName
     }
 
     override fun getBotToken(): String? {
@@ -31,6 +34,9 @@ class MainBot(options: DefaultBotOptions) : TelegramLongPollingBot(options) {
         val commandProcessor = CommandProcessor.instance
         commandProcessor.registerCommand(HelloCommand().engine)
         commandProcessor.registerCommand(StartCommand().engine)
+        commandProcessor.registerCommand(HelpCommand().engine)
+        commandProcessor.registerCommand(LockCommand().engine)
+        commandProcessor.registerCommand(UnlockCommand().engine)
     }
 
     /**
@@ -39,8 +45,8 @@ class MainBot(options: DefaultBotOptions) : TelegramLongPollingBot(options) {
     override fun onUpdateReceived(update: Update) {
         if (!CommandProcessor.instance.fireCommand(update, this)) {
             //Check if chat is locked or user is banned  and if so delete the message
-            if (BaseCommand.filterLock(update.message.from, update.message.chat) ||
-                    BaseCommand.filterStatus(update.message.from, update.message.chat)) {
+            if (!BaseCommand.filterLock(update.message.from, update.message.chat) ||
+                    !BaseCommand.filterStatus(update.message.from, update.message.chat)) {
                 val message = DeleteMessage()
                                 .setChatId(update.message.chatId)
                                 .setMessageId(update.message.messageId)
@@ -49,10 +55,10 @@ class MainBot(options: DefaultBotOptions) : TelegramLongPollingBot(options) {
                 } catch (e: TelegramApiException) {
                     e.printStackTrace()
                 }
-            } else if (update.hasMessage() && update.message.hasText()) {
+            } else if (update.message.chat.isUserChat && update.hasMessage() && update.message.hasText()) {
                 val message = SendMessage() // Create a SendMessage object with mandatory fields
                     .setChatId(update.message.chatId)
-                    .setText(update.message.text)
+                    .setText("I'm a parrot\n ${update.message.text}")
                 try {
                     execute<Message, SendMessage>(message) // Call method to send the message
                 } catch (e: TelegramApiException) {

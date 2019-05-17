@@ -23,10 +23,12 @@ class BaseCommand(
     /**
      * Fire executable with passed values
      */
-    fun fire(absSender: AbsSender, user: User, chat: Chat, arguments: List<String>) {
+    fun fire(absSender: AbsSender, user: User, chat: Chat, arguments: List<String>) : Boolean {
         //apply filters
-        if (filterAll(user, chat, arguments))
+        return if (filterAll(user, chat, arguments)) {
             exe.execute(absSender, user, chat, arguments)
+            true
+        } else false
     }
 
     /**
@@ -66,19 +68,22 @@ class BaseCommand(
     companion object {
 
         /**
-         * Filter used for locked groups
+         * Filter used for locked groups.
+         * True if message is allowed.
          */
         fun filterLock(user: User, chat: Chat): Boolean {
-            return DatabaseManager.instance.getGroupStatus(chat.id) != GroupStatus.LOCKED ||
-                    DatabaseManager.instance.getGroupUserStatus(chat.id, user.id) >= Status.ADMIN
+            return !(chat.isGroupChat || chat.isSuperGroupChat) || (
+                    DatabaseManager.instance.getGroupStatus(chat.id) != GroupStatus.LOCKED ||
+                        DatabaseManager.instance.getGroupUserStatus(chat.id, user.id) >= Status.ADMIN)
         }
 
         /**
          * Filter used for banned users
+         * True if message is allowed.
          */
         fun filterStatus(user: User, chat: Chat): Boolean {
             return DatabaseManager.instance.getUser(user.id)?.status != Status.BANNED &&
-                    DatabaseManager.instance.getGroupUserStatus(chat.id, user.id) >= Status.NOT_REGISTERED
+                    DatabaseManager.instance.getGroupUserStatus(chat.id, user.id) != Status.BANNED
         }
     }
 }

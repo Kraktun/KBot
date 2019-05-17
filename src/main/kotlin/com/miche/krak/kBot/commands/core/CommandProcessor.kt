@@ -1,5 +1,6 @@
 package com.miche.krak.kBot.commands.core
 
+import com.miche.krak.kBot.bots.MainBot.Companion.botName
 import org.telegram.telegrambots.meta.api.objects.Update
 import org.telegram.telegrambots.meta.bots.AbsSender
 import java.util.concurrent.locks.ReentrantLock
@@ -28,6 +29,10 @@ class CommandProcessor {
         }
     }
 
+    fun getRegisteredCommands() : List<BaseCommand> {
+        return map.values.toList()
+    }
+
     /**
      * Execute command if it was registered.
      * Return false if no command was found
@@ -36,6 +41,8 @@ class CommandProcessor {
         val commandInput = update.message.text.plus(" ") //Add space at the end, for single-word commands
             .substringBefore(" ") //take first word
             .substring(1) //remove pre-pended '/'
+            .plus("@$botName") //fixes unrecognized commands in groups
+            .substringBefore("@$botName")
         var kCommand : BaseCommand? = null
         lock.withLock {
             kCommand = map[commandInput]
@@ -45,7 +52,7 @@ class CommandProcessor {
             update.message.chat,
             update.message.text.substringAfter(" ") //take args from second word (first is the command)
                 .split(" ") //put each word in the list
-        )!= null //when key is not present, map[]? equals null
+        ) == true //when key is not present, map[]? equals null
     }
 
     /**

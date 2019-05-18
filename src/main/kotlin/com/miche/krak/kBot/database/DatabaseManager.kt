@@ -149,6 +149,34 @@ class DatabaseManager private constructor() {
     }
 
     /**
+     * Add admins to group
+     * Exceptions are captured
+     */
+    fun addGroupAdmins(groupId : Long, admins : List<Int>) {
+        try {
+            transaction {
+                GroupUsers.batchInsert(admins) { userId ->
+                    this[GroupUsers.group] = groupId
+                    this[GroupUsers.user] = userId
+                    this[GroupUsers.status] = Status.ADMIN.toString()
+                }
+            }
+        } catch (e: Exception) { //if a user in the list is already present, add one at a time
+            transaction {
+                for (userId in admins) {
+                    try {
+                        GroupUsers.insert {
+                            it[group] = groupId
+                            it[user] = userId
+                            it[status] = Status.ADMIN.toString()
+                        }
+                    } catch (ee : Exception) {}
+                }
+            }
+        }
+    }
+
+    /**
      * Get user status in a group
      */
     fun getGroupUserStatus(groupId : Long, userId : Int) : Status {

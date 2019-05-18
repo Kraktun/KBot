@@ -6,6 +6,7 @@ import com.miche.krak.kBot.database.DatabaseManager
 import com.miche.krak.kBot.utils.Status
 import com.miche.krak.kBot.utils.Target
 import com.miche.krak.kBot.utils.getQualifiedUser
+import org.telegram.telegrambots.meta.api.methods.groupadministration.GetChatAdministrators
 import org.telegram.telegrambots.meta.api.objects.Chat
 import org.telegram.telegrambots.meta.api.objects.User
 import org.telegram.telegrambots.meta.bots.AbsSender
@@ -35,12 +36,27 @@ class StartCommand : CommandInterface {
             //If it's a group insert the group and add the user who typed /start as admin
             if (!DatabaseManager.instance.groupExists(chat.id)) {
                 DatabaseManager.instance.insertGroup(chat.id)
-                DatabaseManager.instance.addGroupUser(groupId = chat.id, userId = user.id, statusK = Status.ADMIN)
+                val getAdmins = GetChatAdministrators()
+                getAdmins.chatId = chat.id.toString()
+                try {
+                    val admins = absSender.execute(getAdmins)
+                    DatabaseManager.instance.addGroupAdmins(groupId = chat.id, admins = admins.map { admin -> admin.user.id })
+                } catch (e: TelegramApiException) {
+                    val error = SendMessage()
+                    error.chatId = chat.id.toString()
+                    error.text = "An error occurred: ${e.message}"
+                    try {
+                        absSender.execute(error)
+                    } catch (ee: TelegramApiException) {
+                        ee.printStackTrace()
+                    }
+                    e.printStackTrace()
+                }
             }
         }
         val answer = SendMessage()
         answer.chatId = chat.id.toString()
-        answer.text = "Welcome ${getQualifiedUser(user)}"
+        answer.text = "Welcome to me"
         try {
             absSender.execute(answer)
         } catch (e: TelegramApiException) {

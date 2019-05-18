@@ -18,7 +18,7 @@ class UnlockCommand : CommandInterface {
     val engine = BaseCommand(
         command = "unlock",
         description = "Unlock the group",
-        targets = listOf(Target.GROUP),
+        targets = listOf(Target.GROUP, Target.SUPERGROUP),
         privacy = Status.ADMIN,
         argsNum = 0,
         exe = this

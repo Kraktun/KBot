@@ -22,7 +22,7 @@ class StartCommand : CommandInterface {
     val engine = BaseCommand(
         command = "start",
         description = "Start the bot",
-        targets = listOf(Target.USER, Target.GROUP),
+        targets = listOf(Target.USER, Target.GROUP, Target.SUPERGROUP),
         privacy = Status.NOT_REGISTERED,
         argsNum = 0,
         exe = this

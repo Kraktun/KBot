@@ -18,7 +18,7 @@ class LockCommand : CommandInterface {
     val engine = BaseCommand(
         command = "lock",
         description = "Lock the group: only admins can send messages",
-        targets = listOf(Target.GROUP),
+        targets = listOf(Target.GROUP, Target.SUPERGROUP),
         privacy = Status.ADMIN,
         argsNum = 0,
         exe = this

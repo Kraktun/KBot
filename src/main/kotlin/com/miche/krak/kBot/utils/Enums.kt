@@ -5,7 +5,7 @@ package com.miche.krak.kBot.utils
  * Note that invalid is used where the bot can not manage commands yet
  */
 enum class Target {
-    INVALID, USER, GROUP
+    INVALID, USER, GROUP, SUPERGROUP
 }
 
 /**

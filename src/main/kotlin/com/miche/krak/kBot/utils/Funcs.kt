@@ -2,9 +2,12 @@ package com.miche.krak.kBot.utils
 
 import com.miche.krak.kBot.bots.MainBot
 import org.telegram.telegrambots.meta.api.objects.User
+import java.io.BufferedReader
 import java.io.File
+import java.io.IOException
+import java.io.InputStreamReader
 import java.net.URLDecoder
-
+import java.util.concurrent.TimeUnit
 
 
 /**
@@ -18,6 +21,25 @@ fun getQualifiedUser(user: User) : String {
         else -> user.firstName
     }
 }
+
+fun File.execute(timeoutAmount: Long ,
+                 timeoutUnit: TimeUnit,
+                 vararg arguments: String): String {
+    val process = ProcessBuilder(*arguments)
+        .directory(this)
+        .start()
+        .apply { waitFor(timeoutAmount, timeoutUnit) }
+
+    if (process.exitValue() != 0) {
+        return process.errorStream.bufferedReader().readText().substringBeforeLast("\n")
+    }
+    return process.inputStream.bufferedReader().readText().substringBeforeLast("\n")
+}
+
+fun File.execute(vararg arguments: String): String {
+    return this.execute(10, TimeUnit.SECONDS, *arguments)
+}
+
 
 /**
  * Get parent folder of java\jar file specified.

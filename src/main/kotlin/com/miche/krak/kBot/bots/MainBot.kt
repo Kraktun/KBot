@@ -4,6 +4,7 @@ import com.miche.krak.kBot.*
 import com.miche.krak.kBot.commands.*
 import com.miche.krak.kBot.commands.core.CommandProcessor
 import com.miche.krak.kBot.commands.core.BaseCommand
+import com.miche.krak.kBot.commands.core.MultiCommandsHandler
 import org.telegram.telegrambots.bots.DefaultBotOptions
 import org.telegram.telegrambots.bots.TelegramLongPollingBot
 import org.telegram.telegrambots.meta.api.objects.Update
@@ -38,6 +39,7 @@ class MainBot(options: DefaultBotOptions) : TelegramLongPollingBot(options) {
         commandProcessor.registerCommand(LockCommand().engine)
         commandProcessor.registerCommand(UnlockCommand().engine)
         commandProcessor.registerCommand(RestrictCommand().engine)
+        commandProcessor.registerCommand(YTCommand().engine)
     }
 
     /**
@@ -56,10 +58,12 @@ class MainBot(options: DefaultBotOptions) : TelegramLongPollingBot(options) {
                 } catch (e: TelegramApiException) {
                     e.printStackTrace()
                 }
+            } else if (MultiCommandsHandler.instance.fireCommand(update.message, this)){
+                //Nothing to do here
             } else if (update.message.chat.isUserChat && update.hasMessage() && update.message.hasText()) {
                 val message = SendMessage() // Create a SendMessage object with mandatory fields
-                    .setChatId(update.message.chatId)
-                    .setText("I'm a parrot\n ${update.message.text}")
+                        .setChatId(update.message.chatId)
+                        .setText("I'm a parrot\n ${update.message.text}")
                 try {
                     execute<Message, SendMessage>(message) // Call method to send the message
                 } catch (e: TelegramApiException) {

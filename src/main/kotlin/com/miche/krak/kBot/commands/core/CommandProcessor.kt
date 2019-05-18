@@ -51,7 +51,8 @@ class CommandProcessor {
             update.message.from,
             update.message.chat,
             update.message.text.substringAfter(" ") //take args from second word (first is the command)
-                .split(" ") //put each word in the list
+                .split(" "), //put each word in the list
+            update.message
         ) == true //when key is not present, map[]? equals null
     }
 

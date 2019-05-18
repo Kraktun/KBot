@@ -5,6 +5,7 @@ import com.miche.krak.kBot.utils.GroupStatus
 import com.miche.krak.kBot.utils.Status
 import com.miche.krak.kBot.utils.Target
 import org.telegram.telegrambots.meta.api.objects.Chat
+import org.telegram.telegrambots.meta.api.objects.Message
 import org.telegram.telegrambots.meta.api.objects.User
 import org.telegram.telegrambots.meta.bots.AbsSender
 import java.util.regex.Pattern
@@ -18,15 +19,17 @@ class BaseCommand(
     private val privacy : Status,
     private val argsNum : Int = 0,
     private val argsPattern : Pattern? = null, //TODO
+    private val filterFun : (Message) -> Boolean = {true}, //function with additional logic to execute before firing the command
+        //only non-intensive (aka non-DB) operations should be done here
     private val exe : CommandInterface ) {
 
     /**
      * Fire executable with passed values
      */
-    fun fire(absSender: AbsSender, user: User, chat: Chat, arguments: List<String>) : Boolean {
+    fun fire(absSender: AbsSender, user: User, chat: Chat, arguments: List<String>, message: Message) : Boolean {
         //apply filters
-        return if (filterAll(user, chat, arguments)) {
-            exe.execute(absSender, user, chat, arguments)
+        return if (filterAll(user, chat, arguments, message)) {
+            exe.execute(absSender, user, chat, arguments, message)
             true
         } else false
     }
@@ -34,8 +37,8 @@ class BaseCommand(
     /**
      * Apply all filters. Return true if everything is ok
      */
-    private fun filterAll(user : User, chat : Chat, arguments : List<String>) : Boolean {
-        return filterFrom(user, chat) &&
+    private fun filterAll(user : User, chat : Chat, arguments : List<String>, message: Message) : Boolean {
+        return filterFun(message) && filterFrom(user, chat) &&
                 filterFormat(arguments) &&
                 filterLock(user, chat) &&
                 filterStatus(user, chat)

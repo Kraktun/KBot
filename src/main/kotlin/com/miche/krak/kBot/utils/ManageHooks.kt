@@ -7,13 +7,13 @@ import com.miche.krak.kBot.predefinedUsers
  * What to execute on start
  */
 fun onStart() {
-    println("Starting system")
+    printlnK("Starting system")
     //Insert predefined users
-    println("Adding predefined users")
-    println("DB is stored in: ")
+    printlnK("Adding predefined users")
+    printlnK("DB is stored in: ")
     DatabaseManager.instance.insertUser(predefinedUsers)
-    println()
-    println("Predefined users added")
+    printlnK()
+    printlnK("Predefined users added")
     JobExecutor.instance.run()
 }
 
@@ -21,9 +21,10 @@ fun onStart() {
  * What to execute when closing
  */
 fun onShutdown() {
-    println("Closing system")
+    printlnK("Closing system")
     if (!JobExecutor.instance.isShutdown) {
         JobExecutor.instance.shutdown()
     }
+    LoggerK.instance.flush()
     Thread.sleep(2000)
 }

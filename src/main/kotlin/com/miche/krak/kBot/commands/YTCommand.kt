@@ -17,7 +17,9 @@ import java.io.File
 
 
 /**
- * Help command
+ * YTCommand command.
+ * Download audio from passed link using youtube-dl.
+ * Only m4a best audio is downloaded.
  */
 class YTCommand : CommandInterface, MultiCommandInterface {
 
@@ -43,16 +45,17 @@ class YTCommand : CommandInterface, MultiCommandInterface {
     }
 
     override fun executeAfter(absSender: AbsSender, user: User, chat: Chat, arguments: String, message: Message, data: Any?) {
+        val audioExtension = "m4a"
         val answer = SendMessage()
         answer.chatId = chat.id.toString()
-        val audio = File(getMainFolder() + "/downloads").execute("youtube-dl", "--get-filename", "-x", arguments)
+        val audio = (File(getMainFolder() + "/downloads").execute("youtube-dl", "--get-filename", "-x", arguments)).substringBeforeLast('.').plus(".$audioExtension")
         answer.text = "Downloading file: $audio"
         try {
             absSender.execute(answer)
         } catch (e: TelegramApiException) {
             e.printStackTrace()
         }
-        val result = File(getMainFolder() + "/downloads").execute("youtube-dl", "-x", arguments)
+        val result = File(getMainFolder() + "/downloads").execute("youtube-dl", "-f", "bestaudio[ext=$audioExtension]", arguments)
         answer.text = "Uploading file..."
         try {
             absSender.execute(answer)
@@ -68,6 +71,8 @@ class YTCommand : CommandInterface, MultiCommandInterface {
                 absSender.execute(document)
             } catch (e: TelegramApiException) {
                 e.printStackTrace()
+            } finally {
+                file.delete()
             }
         } else {
             try {
@@ -75,6 +80,8 @@ class YTCommand : CommandInterface, MultiCommandInterface {
                 absSender.execute(answer)
             } catch (e: TelegramApiException) {
                 e.printStackTrace()
+            } finally {
+                file.delete()
             }
         }
     }

@@ -7,6 +7,8 @@ import java.io.File
 import java.io.IOException
 import java.io.InputStreamReader
 import java.net.URLDecoder
+import java.time.LocalDateTime
+import java.time.format.DateTimeFormatter
 import java.util.concurrent.TimeUnit
 
 
@@ -22,6 +24,23 @@ fun getQualifiedUser(user: User) : String {
     }
 }
 
+fun printK(s : Any = "") {
+    print(s)
+    LoggerK.instance.log(s.toString())
+}
+
+fun printlnK(s : Any = "") {
+    println(s)
+    LoggerK.instance.log(s.toString())
+}
+
+fun logK(s : Any = "") {
+    LoggerK.instance.log(s.toString())
+}
+
+/**
+ * Execute script with passed arguments in fixed amount of time
+ */
 fun File.execute(timeoutAmount: Long ,
                  timeoutUnit: TimeUnit,
                  vararg arguments: String): String {
@@ -40,6 +59,13 @@ fun File.execute(vararg arguments: String): String {
     return this.execute(10, TimeUnit.SECONDS, *arguments)
 }
 
+/**
+ * Get current date and time formatted as yyyy-MM-dd_HH-mm-ss
+ */
+fun getCurrentDateTimeStamp(): String {
+    return LocalDateTime.now()
+        .format(DateTimeFormatter.ofPattern("yyyy-MM-dd_HH-mm-ss"))
+}
 
 /**
  * Get parent folder of java\jar file specified.

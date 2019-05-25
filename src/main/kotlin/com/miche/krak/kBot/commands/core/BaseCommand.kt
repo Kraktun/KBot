@@ -8,23 +8,33 @@ import org.telegram.telegrambots.meta.api.objects.Chat
 import org.telegram.telegrambots.meta.api.objects.Message
 import org.telegram.telegrambots.meta.api.objects.User
 import org.telegram.telegrambots.meta.bots.AbsSender
-import java.util.regex.Pattern
 
-class BaseCommand(
+/**
+ * Class that represents a command.
+ * Single commands must extend this class.
+ */
+class BaseCommand (
+    //string that fires the command, without '/'. Must be unique.
     val command : String,
+    //description for the command
     val description : String = "",
+    //list of types of chat where this command is available
     private val targets : List<Target>,
-    //Status is independent from the target in DB: private status may be != group status
-    //Here status depends on the target: if chat is group => status = groupStatus
+    //minimum status the user who sent the command must have to fire a reply
+    //Status is different between gorup and user chats
+    //Here status depends on the target: if chat is group => status = groupStatus, else is the userStatus (from DB)
     private val privacy : Status,
+    //number of arguments after the command necessary to process the command (same message, not multi commands)
     private val argsNum : Int = 0,
-    private val argsPattern : Pattern? = null, //TODO
-    private val filterFun : (Message) -> Boolean = {true}, //function with additional logic to execute before firing the command
-        //only non-intensive (aka non-DB) operations should be done here
+    //function with additional logic to execute before firing the command
+    //only non-intensive (aka non-DB) operations should be done here
+    private val filterFun : (Message) -> Boolean = {true},
+    //implementation of the CommandInterface (aka execute method)
     private val exe : CommandInterface ) {
 
     /**
-     * Fire executable with passed values
+     * Fire execute command of CommandInterface if all filters pass.
+     * Return result of filters.
      */
     fun fire(absSender: AbsSender, user: User, chat: Chat, arguments: List<String>, message: Message) : Boolean {
         //apply filters
@@ -35,7 +45,7 @@ class BaseCommand(
     }
 
     /**
-     * Apply all filters. Return true if everything is ok
+     * Apply all filters. Return true if everything is ok.
      */
     private fun filterAll(user : User, chat : Chat, arguments : List<String>, message: Message) : Boolean {
         return filterFun(message) && filterFrom(user, chat) &&
@@ -45,7 +55,8 @@ class BaseCommand(
     }
 
     /**
-     * Return true if message received comes from a valid chat and a valid user
+     * Return true if message received comes from a valid chat and a valid user.
+     * IN other words if the chat is part of the targets list and the status of the user is equal to or higher than the privacy.
      */
     private fun filterFrom(user : User, chat : Chat) : Boolean {
         var userStatus : Status = Status.NOT_REGISTERED
@@ -61,7 +72,7 @@ class BaseCommand(
     }
 
     /**
-     * Return true if command is formatted correctly
+     * Return true if command is formatted correctly.
      */
     private fun filterFormat(arguments : List<String>) : Boolean {
         //manage pattern (use pattern?.let{})
@@ -72,7 +83,7 @@ class BaseCommand(
 
         /**
          * Filter used for locked groups.
-         * True if message is allowed.
+         * Return true if message is allowed.
          */
         fun filterLock(user: User, chat: Chat): Boolean {
             return !(chat.isGroupChat || chat.isSuperGroupChat) || (
@@ -81,8 +92,8 @@ class BaseCommand(
         }
 
         /**
-         * Filter used for banned users
-         * True if message is allowed.
+         * Filter used for banned users.
+         * Return true if message is allowed.
          */
         fun filterStatus(user: User, chat: Chat): Boolean {
             return DatabaseManager.instance.getUser(user.id)?.status != Status.BANNED &&

@@ -16,7 +16,7 @@ import org.telegram.telegrambots.meta.api.objects.Message
 
 
 /**
- * Start command
+ * Start command: adds the user/group to the DB and adds admins.
  */
 class StartCommand : CommandInterface {
 

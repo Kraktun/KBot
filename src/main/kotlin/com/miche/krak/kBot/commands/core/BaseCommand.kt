@@ -61,10 +61,10 @@ class BaseCommand (
     private fun filterFrom(user : User, chat : Chat) : Boolean {
         var userStatus : Status = Status.NOT_REGISTERED
         val chatValue = if (chat.isGroupChat || chat.isSuperGroupChat) {
-            userStatus = DatabaseManager.instance.getGroupUserStatus(chat.id, user.id)
+            userStatus = DatabaseManager.getGroupUserStatus(chat.id, user.id)
             Target.GROUP
         } else if (chat.isUserChat) {
-            userStatus = DatabaseManager.instance.getUser(user.id)?.status ?: Status.NOT_REGISTERED
+            userStatus = DatabaseManager.getUser(user.id)?.status ?: Status.NOT_REGISTERED
             Target.USER}
         else
             Target.INVALID
@@ -87,8 +87,8 @@ class BaseCommand (
          */
         fun filterLock(user: User, chat: Chat): Boolean {
             return !(chat.isGroupChat || chat.isSuperGroupChat) || (
-                    DatabaseManager.instance.getGroupStatus(chat.id) != GroupStatus.LOCKED ||
-                        DatabaseManager.instance.getGroupUserStatus(chat.id, user.id) >= Status.ADMIN)
+                    DatabaseManager.getGroupStatus(chat.id) != GroupStatus.LOCKED ||
+                        DatabaseManager.getGroupUserStatus(chat.id, user.id) >= Status.ADMIN)
         }
 
         /**
@@ -96,8 +96,8 @@ class BaseCommand (
          * Return true if message is allowed.
          */
         fun filterStatus(user: User, chat: Chat): Boolean {
-            return DatabaseManager.instance.getUser(user.id)?.status != Status.BANNED &&
-                    DatabaseManager.instance.getGroupUserStatus(chat.id, user.id) != Status.BANNED
+            return DatabaseManager.getUser(user.id)?.status != Status.BANNED &&
+                    DatabaseManager.getGroupUserStatus(chat.id, user.id) != Status.BANNED
         }
     }
 }

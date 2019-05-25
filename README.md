@@ -1,14 +1,12 @@
-[![Build Status](https://travis-ci.com/Kraktun/KBot.svg?token=Uor7RP8xsv27XrHhEVTp&branch=master)](https://travis-ci.com/Kraktun/KBot)
 
 ## Info
-Written with [TelegramBots](https://github.com/rubenlagus/TelegramBots) library
-following [TelegramBotsExample](https://github.com/rubenlagus/TelegramBotsExample)
+Written with [TelegramBots](https://github.com/rubenlagus/TelegramBots)      
+and [Exposed](https://github.com/JetBrains/Exposed)   
 
-## TO DO
-The plan is to make the bot modular, so:
-1) Completely rewrite [processNonCommandUpdates()](https://github.com/Kraktun/KBot/tree/master/src/krak/miche/handler/CommandsHandler.java#L101) to make it modular (replace all those switch with static methods)
-2) Change the way commands are stored, making a list of all the commands so if you change one you don't have to find all the occurrences
-3) Make methods in secondary_handlers static
+The ```commands.core``` folder is meant to be used in a single bot (=thread). For concurrent threads on the same bot, every access to the ```var map``` must be synchronized.      
+For concurrent bots, ```CommandProcessor.kt``` and ```MultiCommandsHandler.kt``` must be duplicated and each class used in a single bot.   
+Classes in ```utils``` folder are already synchronized to manage concurrent bots.   
+
 
 ## License
 

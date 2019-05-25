@@ -12,13 +12,27 @@
 
 # Package Files #
 *.jar
+!gradle/wrapper/gradle-wrapper.jar
 *.war
 *.ear
 *.zip
 *.tar.gz
 *.rar
+*.db
+*.bak
 
 # virtual machine crash logs, see http://www.java.com/en/download/help/error_hotspot.xml
 hs_err_pid*
 .idea/*
 target/*
+.gradle/*
+src/main/kotlin/com/miche/krak/kBot/BotConfig.kt
+out/*
+build/classes/*
+build/kotlin/*
+build/tmp/*
+build/resources/*
+build/libs/downloads/*
+build/libs/logs/*
+
+

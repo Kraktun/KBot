@@ -25,7 +25,7 @@ class UnlockCommand : CommandInterface {
     )
 
     override fun execute(absSender: AbsSender, user: User, chat: Chat, arguments: List<String>, message: Message) {
-        DatabaseManager.instance.updateGroupStatus(chat.id, GroupStatus.NORMAL)
+        DatabaseManager.updateGroupStatus(chat.id, GroupStatus.NORMAL)
         val answer = SendMessage()
         answer.chatId = chat.id.toString()
         answer.text = "Group is unlocked. Messages are allowed again"

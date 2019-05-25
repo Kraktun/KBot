@@ -2,10 +2,7 @@ package com.miche.krak.kBot.utils
 
 import com.miche.krak.kBot.bots.MainBot
 import org.telegram.telegrambots.meta.api.objects.User
-import java.io.BufferedReader
 import java.io.File
-import java.io.IOException
-import java.io.InputStreamReader
 import java.net.URLDecoder
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter

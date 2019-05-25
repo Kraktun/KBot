@@ -25,7 +25,7 @@ class LockCommand : CommandInterface {
     )
 
     override fun execute(absSender: AbsSender, user: User, chat: Chat, arguments: List<String>, message: Message) {
-        DatabaseManager.instance.updateGroupStatus(chat.id, GroupStatus.LOCKED)
+        DatabaseManager.updateGroupStatus(chat.id, GroupStatus.LOCKED)
         val answer = SendMessage()
         answer.chatId = chat.id.toString()
         answer.text = "Group is locked. Only admins can send messages"

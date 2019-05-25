@@ -5,7 +5,6 @@ import com.miche.krak.kBot.commands.core.CommandInterface
 import com.miche.krak.kBot.database.DatabaseManager
 import com.miche.krak.kBot.utils.Status
 import com.miche.krak.kBot.utils.Target
-import com.miche.krak.kBot.utils.getQualifiedUser
 import org.telegram.telegrambots.meta.api.methods.groupadministration.GetChatAdministrators
 import org.telegram.telegrambots.meta.api.objects.Chat
 import org.telegram.telegrambots.meta.api.objects.User
@@ -30,17 +29,17 @@ class StartCommand : CommandInterface {
     )
 
     override fun execute(absSender: AbsSender, user: User, chat: Chat, arguments: List<String>, message: Message) {
-        if (chat.isUserChat && DatabaseManager.instance.getUser(user.id) == null) //Add only if not present, or it will overwrite current value
-            DatabaseManager.instance.insertUser(user = user, userStatus = Status.USER)
-        else if (chat.isGroupChat && !DatabaseManager.instance.groupExists(chat.id)) {
+        if (chat.isUserChat && DatabaseManager.getUser(user.id) == null) //Add only if not present, or it will overwrite current value
+            DatabaseManager.insertUser(user = user, userStatus = Status.USER)
+        else if (chat.isGroupChat && !DatabaseManager.groupExists(chat.id)) {
             //If it's a group insert the group and add the user who typed /start as admin
-            if (!DatabaseManager.instance.groupExists(chat.id)) {
-                DatabaseManager.instance.insertGroup(chat.id)
+            if (!DatabaseManager.groupExists(chat.id)) {
+                DatabaseManager.insertGroup(chat.id)
                 val getAdmins = GetChatAdministrators()
                 getAdmins.chatId = chat.id.toString()
                 try {
                     val admins = absSender.execute(getAdmins)
-                    DatabaseManager.instance.addGroupAdmins(groupId = chat.id, admins = admins.map { admin -> admin.user.id })
+                    DatabaseManager.addGroupAdmins(groupId = chat.id, admins = admins.map { admin -> admin.user.id })
                 } catch (e: TelegramApiException) {
                     val error = SendMessage()
                     error.chatId = chat.id.toString()

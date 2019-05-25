@@ -11,9 +11,7 @@ fun onStart() {
     printlnK(TAG, "Starting system")
     //Insert predefined users
     printlnK(TAG, "Adding predefined users")
-    printlnK(TAG, "DB is stored in: ")
-    DatabaseManager.instance.insertUser(predefinedUsers)
-    printlnK("\n$TAG")
+    DatabaseManager.insertUser(predefinedUsers)
     printlnK(TAG, "Predefined users added")
     JobExecutor.run()
 }

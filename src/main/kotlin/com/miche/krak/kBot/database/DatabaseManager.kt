@@ -5,17 +5,16 @@ import com.miche.krak.kBot.objects.UserK
 import com.miche.krak.kBot.utils.GroupStatus
 import com.miche.krak.kBot.utils.Status
 import com.miche.krak.kBot.utils.getMainFolder
+import com.miche.krak.kBot.utils.printlnK
 import org.jetbrains.exposed.sql.*
 import org.jetbrains.exposed.sql.transactions.TransactionManager
 import org.jetbrains.exposed.sql.transactions.transaction
 import org.telegram.telegrambots.meta.api.objects.User
 import java.sql.Connection
 
-class DatabaseManager private constructor() {
+private const val TAG = "DATABASE_MANAGER"
 
-    companion object {
-        val instance by lazy { DatabaseManager() }
-    }
+object DatabaseManager {
 
     init {
         connectDB()
@@ -23,12 +22,13 @@ class DatabaseManager private constructor() {
 
     private fun connectDB() {
         val dbLink = getMainFolder() + "\\KBotDB.db"
-        print(dbLink)
+        printlnK(TAG, "DB is stored in: ")
+        printlnK(TAG, dbLink)
         Database.connect("jdbc:sqlite:$dbLink", "org.sqlite.JDBC")
         TransactionManager.manager.defaultIsolationLevel = Connection.TRANSACTION_SERIALIZABLE // Or Connection.TRANSACTION_READ_UNCOMMITTED
 
         transaction {
-            addLogger(StdOutSqlLogger)
+            addLogger(BotLoggerK)
             SchemaUtils.create(Users, Groups, GroupUsers)
         }
     }

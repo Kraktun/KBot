@@ -3,6 +3,12 @@
 Written with [TelegramBots](https://github.com/rubenlagus/TelegramBots)      
 and [Exposed](https://github.com/JetBrains/Exposed)   
 
+### Build Status   
+#### Dev:   
+[![Build Status](https://travis-ci.com/Kraktun/KBot.svg?token=Uor7RP8xsv27XrHhEVTp&branch=dev)](https://travis-ci.com/Kraktun/KBot)
+#### Master:   
+[![Build Status](https://travis-ci.com/Kraktun/KBot.svg?token=Uor7RP8xsv27XrHhEVTp&branch=master)](https://travis-ci.com/Kraktun/KBot)   
+
 The ```commands.core``` folder is meant to be used in a single bot (=thread). For concurrent threads on the same bot, every access to the ```var map``` must be synchronized.      
 For concurrent bots, ```CommandProcessor.kt``` and ```MultiCommandsHandler.kt``` must be duplicated and each class used in a single bot.   
 Classes in ```utils``` folder are already synchronized to manage concurrent bots.   

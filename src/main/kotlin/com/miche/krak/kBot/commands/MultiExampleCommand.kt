@@ -32,7 +32,7 @@ class MultiExampleCommand : CommandInterface, MultiCommandInterface {
         val answer = SendMessage()
         answer.chatId = chat.id.toString()
         answer.text = "First part"
-        MultiCommandsHandler.instance.insertCommand(userId = user.id, chatId = chat.id, command = this)
+        MultiCommandsHandler.insertCommand(userId = user.id, chatId = chat.id, command = this)
         try {
             absSender.execute(answer)
         } catch (e: TelegramApiException) {
@@ -44,7 +44,7 @@ class MultiExampleCommand : CommandInterface, MultiCommandInterface {
         val answer = SendMessage()
         answer.chatId = chat.id.toString()
         answer.text = "Second part"
-        MultiCommandsHandler.instance.insertCommand(userId = user.id, chatId = chat.id, command = ThirdStep(), data = arguments)
+        MultiCommandsHandler.insertCommand(userId = user.id, chatId = chat.id, command = ThirdStep(), data = arguments)
         try {
             absSender.execute(answer)
         } catch (e: TelegramApiException) {
@@ -54,6 +54,7 @@ class MultiExampleCommand : CommandInterface, MultiCommandInterface {
 
     class ThirdStep : MultiCommandInterface {
         override fun executeAfter(absSender: AbsSender, user: User, chat: Chat, arguments: String, message: Message, data: Any?) {
+            MultiCommandsHandler.deleteCommand(userId = user.id, chatId = chat.id)
             val answer = SendMessage()
             answer.chatId = chat.id.toString()
             answer.text = "Third part, data is $data"

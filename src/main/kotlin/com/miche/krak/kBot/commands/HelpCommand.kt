@@ -31,7 +31,7 @@ class HelpCommand : CommandInterface {
         val answer = SendMessage()
         answer.chatId = chat.id.toString()
         var text = "<b>Here is a list of all the commands</b>:\n"
-        CommandProcessor.instance.getRegisteredCommands().map {
+        CommandProcessor.getRegisteredCommands().map {
             text += "/${it.command} : ${it.description}\n"
         }
         answer.text = text

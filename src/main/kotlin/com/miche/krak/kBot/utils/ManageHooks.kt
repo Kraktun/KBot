@@ -3,28 +3,29 @@ package com.miche.krak.kBot.utils
 import com.miche.krak.kBot.database.DatabaseManager
 import com.miche.krak.kBot.predefinedUsers
 
+private const val TAG = "MANAGE_HOOKS"
 /**
  * What to execute on start
  */
 fun onStart() {
-    printlnK("Starting system")
+    printlnK(TAG, "Starting system")
     //Insert predefined users
-    printlnK("Adding predefined users")
-    printlnK("DB is stored in: ")
+    printlnK(TAG, "Adding predefined users")
+    printlnK(TAG, "DB is stored in: ")
     DatabaseManager.instance.insertUser(predefinedUsers)
-    printlnK()
-    printlnK("Predefined users added")
-    JobExecutor.instance.run()
+    printlnK("\n$TAG")
+    printlnK(TAG, "Predefined users added")
+    JobExecutor.run()
 }
 
 /**
  * What to execute when closing
  */
 fun onShutdown() {
-    printlnK("Closing system")
-    if (!JobExecutor.instance.isShutdown) {
-        JobExecutor.instance.shutdown()
+    printlnK(TAG, "Closing system")
+    if (!JobExecutor.isShutdown) {
+        JobExecutor.shutdown()
     }
-    LoggerK.instance.flush()
+    LoggerK.flush()
     Thread.sleep(2000)
 }

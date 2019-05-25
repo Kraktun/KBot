@@ -24,18 +24,18 @@ fun getQualifiedUser(user: User) : String {
     }
 }
 
-fun printK(s : Any = "") {
-    print(s)
-    LoggerK.instance.log(s.toString())
+fun printK(tag : String, s : Any = "") {
+    print("$tag: $s")
+    LoggerK.log("$tag: $s")
 }
 
-fun printlnK(s : Any = "") {
-    println(s)
-    LoggerK.instance.log(s.toString())
+fun printlnK(tag : String, s : Any = "") {
+    println("$tag: $s")
+    LoggerK.log("$tag: $s")
 }
 
-fun logK(s : Any = "") {
-    LoggerK.instance.log(s.toString())
+fun logK(tag : String, s : Any = "") {
+    LoggerK.log("$tag: $s")
 }
 
 /**

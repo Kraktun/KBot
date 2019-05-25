@@ -43,14 +43,13 @@ class MainBot(options: DefaultBotOptions) : TelegramLongPollingBot(options) {
      * Register Commands
      */
     init {
-        val commandProcessor = CommandProcessor.instance
-        commandProcessor.registerCommand(HelloCommand().engine)
-        commandProcessor.registerCommand(StartCommand().engine)
-        commandProcessor.registerCommand(HelpCommand().engine)
-        commandProcessor.registerCommand(LockCommand().engine)
-        commandProcessor.registerCommand(UnlockCommand().engine)
-        commandProcessor.registerCommand(RestrictCommand().engine)
-        commandProcessor.registerCommand(YTCommand().engine)
+        CommandProcessor.registerCommand(HelloCommand().engine)
+        CommandProcessor.registerCommand(StartCommand().engine)
+        CommandProcessor.registerCommand(HelpCommand().engine)
+        CommandProcessor.registerCommand(LockCommand().engine)
+        CommandProcessor.registerCommand(UnlockCommand().engine)
+        CommandProcessor.registerCommand(RestrictCommand().engine)
+        CommandProcessor.registerCommand(YTCommand().engine)
     }
 
     /**
@@ -58,7 +57,7 @@ class MainBot(options: DefaultBotOptions) : TelegramLongPollingBot(options) {
      */
     override fun onUpdateReceived(update: Update) {
         //check if it's a command and attempt to fire the response
-        if (!CommandProcessor.instance.fireCommand(update, this)) {
+        if (!CommandProcessor.fireCommand(update, this)) {
             //Check if chat is locked or user is banned  and if so delete the message
             if (!BaseCommand.filterLock(update.message.from, update.message.chat) ||
                     !BaseCommand.filterStatus(update.message.from, update.message.chat)) {
@@ -70,7 +69,7 @@ class MainBot(options: DefaultBotOptions) : TelegramLongPollingBot(options) {
                 } catch (e: TelegramApiException) {
                     e.printStackTrace()
                 }
-            } else if (MultiCommandsHandler.instance.fireCommand(update.message, this)){ //check if the message is part of a ask-answer interaction
+            } else if (MultiCommandsHandler.fireCommand(update.message, this)){ //check if the message is part of a ask-answer interaction
                 //Nothing to do here, as the command is fired directly in the 'if'
             } else if (update.message.chat.isUserChat && update.hasMessage() && update.message.hasText()) { //manage normal commands
                 val message = SendMessage()

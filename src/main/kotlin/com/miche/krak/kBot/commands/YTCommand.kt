@@ -36,7 +36,7 @@ class YTCommand : CommandInterface, MultiCommandInterface {
         val answer = SendMessage()
         answer.chatId = chat.id.toString()
         answer.text = "Send the link"
-        MultiCommandsHandler.instance.insertCommand(userId = user.id, chatId = chat.id, command = this)
+        MultiCommandsHandler.insertCommand(userId = user.id, chatId = chat.id, command = this)
         try {
             absSender.execute(answer)
         } catch (e: TelegramApiException) {
@@ -46,6 +46,7 @@ class YTCommand : CommandInterface, MultiCommandInterface {
 
     override fun executeAfter(absSender: AbsSender, user: User, chat: Chat, arguments: String, message: Message, data: Any?) {
         val audioExtension = "m4a"
+        MultiCommandsHandler.deleteCommand(userId = user.id, chatId = chat.id)
         val answer = SendMessage()
         answer.chatId = chat.id.toString()
         val audio = (File(getMainFolder() + "/downloads").execute("youtube-dl", "--get-filename", "-x", arguments)).substringBeforeLast('.').plus(".$audioExtension")

@@ -1,4 +1,4 @@
-package com.miche.krak.kBot.utils
+package com.miche.krak.kBot.objects
 
 /**
  * Chat

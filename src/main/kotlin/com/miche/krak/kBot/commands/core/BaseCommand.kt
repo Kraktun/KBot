@@ -1,9 +1,9 @@
 package com.miche.krak.kBot.commands.core
 
 import com.miche.krak.kBot.database.DatabaseManager
-import com.miche.krak.kBot.utils.GroupStatus
-import com.miche.krak.kBot.utils.Status
-import com.miche.krak.kBot.utils.Target
+import com.miche.krak.kBot.objects.GroupStatus
+import com.miche.krak.kBot.objects.Status
+import com.miche.krak.kBot.objects.Target
 import org.telegram.telegrambots.meta.api.objects.Chat
 import org.telegram.telegrambots.meta.api.objects.Message
 import org.telegram.telegrambots.meta.api.objects.User
@@ -50,8 +50,9 @@ class BaseCommand (
     private fun filterAll(user : User, chat : Chat, arguments : List<String>, message: Message) : Boolean {
         return filterFun(message) && filterFrom(user, chat) &&
                 filterFormat(arguments) &&
-                filterLock(user, chat) &&
-                filterStatus(user, chat)
+                filterLock(user, chat)
+                //filterBans is not necessary as this check is already performed by filterFrom()
+                // (and someone may decide to enable a command for banned users)
     }
 
     /**
@@ -95,7 +96,7 @@ class BaseCommand (
          * Filter used for banned users.
          * Return true if message is allowed.
          */
-        fun filterStatus(user: User, chat: Chat): Boolean {
+        fun filterBans(user: User, chat: Chat): Boolean {
             return DatabaseManager.getUser(user.id)?.status != Status.BANNED &&
                     DatabaseManager.getGroupUserStatus(chat.id, user.id) != Status.BANNED
         }

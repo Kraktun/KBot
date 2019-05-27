@@ -3,8 +3,8 @@ package com.miche.krak.kBot.commands
 import com.miche.krak.kBot.commands.core.BaseCommand
 import com.miche.krak.kBot.commands.core.CommandInterface
 import com.miche.krak.kBot.database.DatabaseManager
-import com.miche.krak.kBot.utils.Status
-import com.miche.krak.kBot.utils.Target
+import com.miche.krak.kBot.objects.Status
+import com.miche.krak.kBot.objects.Target
 import org.telegram.telegrambots.meta.api.methods.groupadministration.GetChatAdministrators
 import org.telegram.telegrambots.meta.api.objects.Chat
 import org.telegram.telegrambots.meta.api.objects.User

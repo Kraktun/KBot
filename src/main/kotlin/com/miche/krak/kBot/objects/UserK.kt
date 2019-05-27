@@ -1,6 +1,6 @@
 package com.miche.krak.kBot.objects
 
-import com.miche.krak.kBot.utils.Status
+import com.miche.krak.kBot.objects.Status
 
 data class UserK (val id : Int, var username : String? = "", var status : Status, var userInfo : String? = "") {
 

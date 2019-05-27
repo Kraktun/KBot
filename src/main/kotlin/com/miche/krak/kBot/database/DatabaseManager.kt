@@ -2,8 +2,8 @@ package com.miche.krak.kBot.database
 
 import com.miche.krak.kBot.objects.GroupK
 import com.miche.krak.kBot.objects.UserK
-import com.miche.krak.kBot.utils.GroupStatus
-import com.miche.krak.kBot.utils.Status
+import com.miche.krak.kBot.objects.GroupStatus
+import com.miche.krak.kBot.objects.Status
 import com.miche.krak.kBot.utils.getMainFolder
 import com.miche.krak.kBot.utils.printlnK
 import org.jetbrains.exposed.sql.*

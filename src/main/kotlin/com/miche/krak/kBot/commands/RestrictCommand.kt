@@ -2,8 +2,8 @@ package com.miche.krak.kBot.commands
 
 import com.miche.krak.kBot.commands.core.BaseCommand
 import com.miche.krak.kBot.commands.core.CommandInterface
-import com.miche.krak.kBot.utils.Status
-import com.miche.krak.kBot.utils.Target
+import com.miche.krak.kBot.objects.Status
+import com.miche.krak.kBot.objects.Target
 import com.miche.krak.kBot.utils.getQualifiedUser
 import org.telegram.telegrambots.meta.api.methods.groupadministration.RestrictChatMember
 import org.telegram.telegrambots.meta.api.objects.Chat
@@ -12,11 +12,11 @@ import org.telegram.telegrambots.meta.bots.AbsSender
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage
 import org.telegram.telegrambots.meta.api.objects.Message
-import kotlin.math.abs
 
 
 /**
- * Restrict command
+ * Restrict command.
+ * Use telegram API to restrict a user in a supergroup.
  */
 class RestrictCommand : CommandInterface {
 

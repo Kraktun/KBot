@@ -9,6 +9,7 @@ private const val TAG = "MANAGE_HOOKS"
  */
 fun onStart() {
     printlnK(TAG, "Starting system")
+    printlnK(TAG, "Current version is: ${com.miche.krak.kBot.Main::class.java.getPackage().implementationVersion}")
     //Insert predefined users
     printlnK(TAG, "Adding predefined users")
     DatabaseManager.insertUser(predefinedUsers)

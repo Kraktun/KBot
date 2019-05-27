@@ -4,8 +4,10 @@ import com.miche.krak.kBot.commands.core.BaseCommand
 import com.miche.krak.kBot.commands.core.CommandInterface
 import com.miche.krak.kBot.commands.core.MultiCommandInterface
 import com.miche.krak.kBot.commands.core.MultiCommandsHandler
-import com.miche.krak.kBot.utils.*
-import com.miche.krak.kBot.utils.Target
+import com.miche.krak.kBot.objects.Status
+import com.miche.krak.kBot.objects.Target
+import com.miche.krak.kBot.utils.executeScript
+import com.miche.krak.kBot.utils.getMainFolder
 import org.telegram.telegrambots.meta.api.methods.send.SendDocument
 import org.telegram.telegrambots.meta.api.objects.Chat
 import org.telegram.telegrambots.meta.api.objects.User
@@ -46,17 +48,17 @@ class YTCommand : CommandInterface, MultiCommandInterface {
 
     override fun executeAfter(absSender: AbsSender, user: User, chat: Chat, arguments: String, message: Message, data: Any?) {
         val audioExtension = "m4a"
-        MultiCommandsHandler.deleteCommand(userId = user.id, chatId = chat.id)
         val answer = SendMessage()
         answer.chatId = chat.id.toString()
-        val audio = (File(getMainFolder() + "/downloads").execute("youtube-dl", "--get-filename", "-x", arguments)).substringBeforeLast('.').plus(".$audioExtension")
+        //Remove url of video from filename
+        val audio = (File(getMainFolder() + "/downloads").executeScript("youtube-dl", "--get-filename", "-x", arguments)).substringBeforeLast('-').plus(".$audioExtension")
         answer.text = "Downloading file: $audio"
         try {
             absSender.execute(answer)
         } catch (e: TelegramApiException) {
             e.printStackTrace()
         }
-        val result = File(getMainFolder() + "/downloads").execute("youtube-dl", "-f", "bestaudio[ext=$audioExtension]", arguments)
+        val result = File(getMainFolder() + "/downloads").executeScript("youtube-dl", "-f", "bestaudio[ext=$audioExtension]", arguments)
         answer.text = "Uploading file..."
         try {
             absSender.execute(answer)

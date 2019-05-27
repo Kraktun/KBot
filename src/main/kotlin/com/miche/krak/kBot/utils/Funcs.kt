@@ -1,6 +1,5 @@
 package com.miche.krak.kBot.utils
 
-import com.miche.krak.kBot.bots.MainBot
 import org.telegram.telegrambots.meta.api.objects.User
 import java.io.File
 import java.net.URLDecoder
@@ -38,9 +37,9 @@ fun logK(tag : String, s : Any = "") {
 /**
  * Execute script with passed arguments in fixed amount of time
  */
-fun File.execute(timeoutAmount: Long ,
-                 timeoutUnit: TimeUnit,
-                 vararg arguments: String): String {
+fun File.executeScript(timeoutAmount: Long,
+                       timeoutUnit: TimeUnit,
+                       vararg arguments: String): String {
     val process = ProcessBuilder(*arguments)
         .directory(this)
         .start()
@@ -52,8 +51,8 @@ fun File.execute(timeoutAmount: Long ,
     return process.inputStream.bufferedReader().readText().substringBeforeLast("\n")
 }
 
-fun File.execute(vararg arguments: String): String {
-    return this.execute(10, TimeUnit.SECONDS, *arguments)
+fun File.executeScript(vararg arguments: String): String {
+    return this.executeScript(10, TimeUnit.SECONDS, *arguments)
 }
 
 /**
@@ -73,7 +72,7 @@ fun getCurrentDateTimeStamp(): String {
  */
 @Throws(Exception::class)
 fun getMainFolder(): String {
-    val kClass = MainBot::class.java
+    val kClass = com.miche.krak.kBot.Main::class.java
     val codeSource = kClass.protectionDomain.codeSource
     val jarFile: File
     if (codeSource.location != null) {

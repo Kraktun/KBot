@@ -9,7 +9,7 @@ import org.telegram.telegrambots.meta.bots.AbsSender
 object MultiCommandsHandler{
 
     /*
-    Map that contains a pair of user + chatId and the last command sent by the user in that chat
+    Map that contains a pair of user + chatId and the next command to execute for the user in that chat + data to pass to the command
      */
     @Volatile private var map = mutableMapOf<Pair<Int, Long>, Pair<MultiCommandInterface, Any?>>()
 
@@ -18,23 +18,24 @@ object MultiCommandsHandler{
      */
     fun fireCommand(message : Message, absSender: AbsSender) : Boolean {
         val temp = map[Pair(message.from.id, message.chatId)]
-            return temp?.first?.executeAfter(absSender,
-                message.from,
-                message.chat,
-                message.text,
-                message,
-                temp.second) != null
+        deleteCommand(message.from.id, message.chatId)
+        return temp?.first?.executeAfter(absSender,
+            message.from,
+            message.chat,
+            message.text,
+            message,
+            temp.second) != null
     }
 
     /**
-     * Insert new command in chatId by userId
+     * Insert new command in chatId by userId. Overwrite if already present.
      */
     fun insertCommand(userId : Int, chatId : Long, command : MultiCommandInterface, data: Any? = null) {
         map[Pair(userId, chatId)] = Pair(command, data)
     }
 
     /**
-     * Last command by userId in chatId has been processed, so delete it.
+     * Delete last command with pair userId and chatId.
      */
     fun deleteCommand(userId : Int, chatId : Long) {
         map.remove(Pair(userId, chatId))

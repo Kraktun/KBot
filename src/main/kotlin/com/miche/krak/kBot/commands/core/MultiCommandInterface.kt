@@ -7,6 +7,7 @@ import org.telegram.telegrambots.meta.bots.AbsSender
 
 /*
 Multiple replies can be stacked, creating a class extending this interface each time
+See MultiExampleCommand for reference.
  */
 interface MultiCommandInterface {
 

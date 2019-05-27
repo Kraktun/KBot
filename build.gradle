@@ -4,7 +4,7 @@ plugins {
 }
 
 group 'com.miche.krak'
-version '0.1.2'
+version '0.1.3'
 
 sourceCompatibility = 1.8
 ext {
@@ -37,7 +37,8 @@ compileTestKotlin {
 
 jar {
     manifest {
-        attributes 'Main-Class': 'com.miche.krak.kBot.MainKt'
+        attributes 'Main-Class': 'com.miche.krak.kBot.MainKt',
+                'Implementation-Version': version
     }
     from { configurations.compile.collect { it.isDirectory() ? it : zipTree(it) } }
 }

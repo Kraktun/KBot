@@ -19,11 +19,10 @@ class BaseCommand (
     //description for the command
     val description : String = "",
     //list of types of chat where this command is available
-    private val targets : List<Target>,
+    private val targets : List<Pair<Target, Status>>,
     //minimum status the user who sent the command must have to fire a reply
     //Status is different between gorup and user chats
     //Here status depends on the target: if chat is group => status = groupStatus, else is the userStatus (from DB)
-    private val privacy : Status,
     //number of arguments after the command necessary to process the command (same message, not multi commands)
     private val argsNum : Int = 0,
     //function with additional logic to execute before firing the command
@@ -69,7 +68,7 @@ class BaseCommand (
             Target.USER}
         else
             Target.INVALID
-        return (userStatus >= privacy && targets.contains(chatValue))
+        return targets.contains(Pair(chatValue, userStatus))
     }
 
     /**

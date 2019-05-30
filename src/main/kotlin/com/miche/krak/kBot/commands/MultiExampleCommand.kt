@@ -22,8 +22,7 @@ class MultiExampleCommand : CommandInterface, MultiCommandInterface {
     val engine = BaseCommand(
         command = "multi",
         description = "Multi",
-        targets = listOf(Target.USER),
-        privacy = Status.DEV,
+        targets = listOf(Pair(Target.USER, Status.DEV)),
         argsNum = 0,
         exe = this
     )

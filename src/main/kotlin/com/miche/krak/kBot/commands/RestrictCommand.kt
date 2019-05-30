@@ -23,8 +23,7 @@ class RestrictCommand : CommandInterface {
     val engine = BaseCommand(
         command = "restrict",
         description = "Restricts a member in a group using telegram apis",
-        targets = listOf(Target.SUPERGROUP),
-        privacy = Status.ADMIN,
+        targets = listOf(Pair(Target.SUPERGROUP, Status.ADMIN)),
         argsNum = 0,
         filterFun = { m : Message ->
             m.isReply

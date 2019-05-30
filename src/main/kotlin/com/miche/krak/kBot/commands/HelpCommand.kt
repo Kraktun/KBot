@@ -22,8 +22,9 @@ class HelpCommand : CommandInterface {
     val engine = BaseCommand(
         command = "help",
         description = "Show a list of commands",
-        targets = listOf(Target.USER, Target.GROUP, Target.SUPERGROUP),
-        privacy = Status.USER,
+        targets = listOf(Pair(Target.USER, Status.USER),
+            Pair(Target.GROUP, Status.NOT_REGISTERED),
+            Pair(Target.SUPERGROUP, Status.NOT_REGISTERED)),
         argsNum = 0,
         exe = this
     )

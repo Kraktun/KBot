@@ -21,8 +21,9 @@ class HelloCommand : CommandInterface {
     val engine = BaseCommand(
         command = "hello",
         description = "Hi",
-        targets = listOf(Target.USER, Target.GROUP, Target.SUPERGROUP),
-        privacy = Status.NOT_REGISTERED,
+        targets = listOf(Pair(Target.USER, Status.USER),
+            Pair(Target.GROUP, Status.NOT_REGISTERED),
+            Pair(Target.SUPERGROUP, Status.NOT_REGISTERED)),
         argsNum = 0,
         exe = this
     )

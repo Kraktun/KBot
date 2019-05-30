@@ -8,6 +8,7 @@ import com.miche.krak.kBot.objects.Status
 import com.miche.krak.kBot.objects.Target
 import com.miche.krak.kBot.utils.executeScript
 import com.miche.krak.kBot.utils.getMainFolder
+import com.miche.krak.kBot.utils.printlnK
 import org.telegram.telegrambots.meta.api.methods.send.SendDocument
 import org.telegram.telegrambots.meta.api.objects.Chat
 import org.telegram.telegrambots.meta.api.objects.User
@@ -51,7 +52,9 @@ class YTCommand : CommandInterface, MultiCommandInterface {
         val answer = SendMessage()
         answer.chatId = chat.id.toString()
         //Remove url of video from filename
+        printlnK("Retrieving filename")
         val audio = (File(getMainFolder() + "/downloads").executeScript("youtube-dl", "--get-filename", "-x", arguments)).substringBeforeLast('-').plus(".$audioExtension")
+        printlnK("Filename is $audio")
         answer.text = "Downloading file: $audio"
         try {
             absSender.execute(answer)
@@ -66,6 +69,7 @@ class YTCommand : CommandInterface, MultiCommandInterface {
             e.printStackTrace()
         }
         val file = File(getMainFolder() + "/downloads/" + audio)
+        printlnK("Uploading file. Size is ${file.length()}")
         if (file.length() > 0) {
             val document = SendDocument()
             document.setChatId(chat.id)
@@ -79,6 +83,7 @@ class YTCommand : CommandInterface, MultiCommandInterface {
             }
         } else {
             try {
+                printlnK("Error: $result\n${file.absolutePath}")
                 answer.text = "An error occurred: \n$result\n\n${file.absolutePath}"
                 absSender.execute(answer)
             } catch (e: TelegramApiException) {

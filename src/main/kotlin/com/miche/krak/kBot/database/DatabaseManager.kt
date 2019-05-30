@@ -210,7 +210,7 @@ object DatabaseManager {
     fun updateGroupStatus(groupId : Long, statusK: GroupStatus) {
         transaction {
             Groups.update ({Groups.id eq groupId}) {
-                    it[Groups.status] = statusK.name
+                    it[status] = statusK.name
             }
         }
     }

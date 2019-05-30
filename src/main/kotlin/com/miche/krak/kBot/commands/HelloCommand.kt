@@ -22,7 +22,7 @@ class HelloCommand : CommandInterface {
         command = "hello",
         description = "Hi",
         targets = listOf(Target.USER, Target.GROUP, Target.SUPERGROUP),
-        privacy = Status.USER,
+        privacy = Status.NOT_REGISTERED,
         argsNum = 0,
         exe = this
     )

@@ -61,34 +61,36 @@ class MainBot(options: DefaultBotOptions) : TelegramLongPollingBot(options) {
         val message = update.message
         val chat = message.chat
         val user = message.from
-        if ((message.isGroupMessage || message.isSuperGroupMessage) &&
-                message.newChatMembers.isNotEmpty()) {
-            //Remove new user if it's banned, otherwise welcome him
-            if (BaseCommand.filterBans(user, chat)) {
-                simpleMessage(this, "Welcome ${getQualifiedUser(user)}", chat)
-            } else {
-                kickUser(this, user, chat)
+        when {
+            ((message.isGroupMessage || message.isSuperGroupMessage) && message.newChatMembers.isNotEmpty()) -> {
+                //Remove new user if it's banned, otherwise welcome him
+                if (BaseCommand.filterBans(user, chat)) {
+                    simpleMessage(this, "Welcome ${getQualifiedUser(user)}", chat)
+                } else {
+                    kickUser(this, user, chat)
+                }
             }
-        } else if (CommandProcessor.fireCommand(update, this)) {
+            CommandProcessor.fireCommand(update, this) -> {}
             //check if it's a command and attempt to fire the response
             //Nothing to do here, as the command is fired directly in the 'if'
-        } else if (!BaseCommand.filterLock(user, chat) ||
-            !BaseCommand.filterBans(user, chat)) {
-            //Check if chat is locked or user is banned  and if so delete the message
-            deleteMessage(this, message)
-        } else if (MultiCommandsHandler.fireCommand(message, this)) {
+            (!BaseCommand.filterLock(user, chat) || !BaseCommand.filterBans(user, chat)) -> {
+                //Check if chat is locked or user is banned  and if so delete the message
+                deleteMessage(this, message)
+            }
+            MultiCommandsHandler.fireCommand(message, this) -> {}
             //Nothing to do here, as the command is fired directly in the 'if'
             //Note that this goes after the check on locks and bans, as the commands in MultiCommandsHandler
             // do not implement a check on bans and locks
-        } else if (chat.isUserChat && update.hasMessage() && message.hasText()) {
-            //manage normal commands
-            val reply = SendMessage()
-                .setChatId(chat.id)
-                .setText("I'm a parrot\n ${message.text}")
-            try {
-                execute(reply)
-            } catch (e: TelegramApiException) {
-                e.printStackTrace()
+            (chat.isUserChat && update.hasMessage() && message.hasText()) -> {
+                //manage normal commands
+                val reply = SendMessage()
+                    .setChatId(chat.id)
+                    .setText("I'm a parrot\n ${message.text}")
+                try {
+                    execute(reply)
+                } catch (e: TelegramApiException) {
+                    e.printStackTrace()
+                }
             }
         }
     }

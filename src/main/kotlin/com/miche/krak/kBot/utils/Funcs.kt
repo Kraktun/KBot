@@ -1,5 +1,9 @@
 package com.miche.krak.kBot.utils
 
+import com.miche.krak.kBot.database.DatabaseManager
+import com.miche.krak.kBot.objects.Status
+import com.miche.krak.kBot.objects.Target
+import org.telegram.telegrambots.meta.api.objects.Chat
 import org.telegram.telegrambots.meta.api.objects.User
 import java.io.File
 import java.net.URLDecoder
@@ -18,6 +22,38 @@ fun getQualifiedUser(user: User) : String {
         user.lastName != null -> "${user.firstName} ${user.lastName}"
         else -> user.firstName
     }
+}
+
+/**
+ * Maps a chat into the corresponding enum
+ */
+fun chatMapper(chat : Chat) : Target {
+    return when {
+        chat.isGroupChat -> Target.GROUP
+        chat.isSuperGroupChat -> Target.SUPERGROUP
+        chat.isUserChat -> Target.USER
+        else -> Target.INVALID
+    }
+}
+
+/**
+ * Returns status of user according to the passed chat
+ */
+fun getDBStatus(user : User, chat : Chat) : Status {
+    return when {
+        chat.isUserChat -> DatabaseManager.getUser(user.id)?.status ?: Status.NOT_REGISTERED
+        chat.isGroupChat || chat.isSuperGroupChat -> DatabaseManager.getGroupUserStatus(groupId = chat.id, userId = user.id)
+        else -> Status.NOT_REGISTERED
+    }
+}
+
+/**
+ * Execute function for collection, defaults to passed value if list is empty
+ */
+inline fun <E: Any, T: Collection<E>> T?.safeEmpty(func : T.() -> Any?, default : Any?): Any? {
+    return if (this?.isNotEmpty() == true) {
+        func(this)
+    } else default
 }
 
 fun printK(tag : String, s : Any = "") {

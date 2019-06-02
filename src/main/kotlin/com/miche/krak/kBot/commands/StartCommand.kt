@@ -33,7 +33,7 @@ class StartCommand : CommandInterface {
         if (chat.isUserChat && DatabaseManager.getUser(user.id) == null) //Add only if not present, or it will overwrite current value
             DatabaseManager.insertUser(user = user, userStatus = Status.USER)
         else if (chat.isGroupChat && !DatabaseManager.groupExists(chat.id)) {
-            //If it's a group insert the group and add the user who typed /start as admin
+            //If it's a group insert the group and add the admins as admin
             if (!DatabaseManager.groupExists(chat.id)) {
                 DatabaseManager.insertGroup(chat.id)
                 val getAdmins = GetChatAdministrators()

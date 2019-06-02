@@ -4,6 +4,7 @@ import com.miche.krak.kBot.database.DatabaseManager
 import com.miche.krak.kBot.objects.GroupStatus
 import com.miche.krak.kBot.objects.Status
 import com.miche.krak.kBot.objects.Target
+import com.miche.krak.kBot.utils.safeEmpty
 import org.telegram.telegrambots.meta.api.objects.Chat
 import org.telegram.telegrambots.meta.api.objects.Message
 import org.telegram.telegrambots.meta.api.objects.User
@@ -19,7 +20,7 @@ class BaseCommand (
     //description for the command
     val description : String = "",
     //list of types of chat where this command is available
-    private val targets : List<Pair<Target, Status>>,
+    val targets : List<Pair<Target, Status>>,
     //minimum status the user who sent the command must have to fire a reply
     //Status is different between gorup and user chats
     //Here status depends on the target: if chat is group => status = groupStatus, else is the userStatus (from DB)
@@ -68,7 +69,11 @@ class BaseCommand (
             Target.USER}
         else
             Target.INVALID
-        return targets.contains(Pair(chatValue, userStatus))
+        return targets.filter {
+            it.first == chatValue
+        }.safeEmpty({
+            this[0].second <= userStatus //[0] as a command can have only one single pair with a unique Target
+        }, false) as Boolean
     }
 
     /**

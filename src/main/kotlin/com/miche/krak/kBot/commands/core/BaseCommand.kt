@@ -4,7 +4,8 @@ import com.miche.krak.kBot.database.DatabaseManager
 import com.miche.krak.kBot.objects.GroupStatus
 import com.miche.krak.kBot.objects.Status
 import com.miche.krak.kBot.objects.Target
-import com.miche.krak.kBot.utils.safeEmpty
+import com.miche.krak.kBot.utils.getDBStatus
+import com.miche.krak.kBot.utils.ifNotEmpty
 import org.telegram.telegrambots.meta.api.objects.Chat
 import org.telegram.telegrambots.meta.api.objects.Message
 import org.telegram.telegrambots.meta.api.objects.User
@@ -15,16 +16,17 @@ import org.telegram.telegrambots.meta.bots.AbsSender
  * Single commands must extend this class.
  */
 class BaseCommand (
-    //string that fires the command, without '/'. Must be unique.
+    //string that fires the command, starting symbol may be anything (e.g. '/', '#'). Must be unique.
     val command : String,
-    //description for the command
+    //description for the command, used when calling /help
     val description : String = "",
-    //list of types of chat where this command is available
-    val targets : List<Pair<Target, Status>>,
-    //minimum status the user who sent the command must have to fire a reply
-    //Status is different between gorup and user chats
+    //List of pairs<chat, status>.
+    //chat is the type of chat where the message was sent
+    //status is the minimum status the user who sent the command must have to fire a reply
+    //Status is different between groups and user chats
     //Here status depends on the target: if chat is group => status = groupStatus, else is the userStatus (from DB)
-    //number of arguments after the command necessary to process the command (same message, not multi commands)
+    val targets : List<Pair<Target, Status>>,
+    //number of arguments after the command (same message) necessary to process the command
     private val argsNum : Int = 0,
     //function with additional logic to execute before firing the command
     //only non-intensive (aka non-DB) operations should be done here
@@ -57,30 +59,27 @@ class BaseCommand (
 
     /**
      * Return true if message received comes from a valid chat and a valid user.
-     * IN other words if the chat is part of the targets list and the status of the user is equal to or higher than the privacy.
+     * In other words if the chat is part of the targets list and the status of the user is equal to or higher than the privacy.
      */
     private fun filterFrom(user : User, chat : Chat) : Boolean {
-        var userStatus : Status = Status.NOT_REGISTERED
-        val chatValue = if (chat.isGroupChat || chat.isSuperGroupChat) {
-            userStatus = DatabaseManager.getGroupUserStatus(chat.id, user.id)
-            Target.GROUP
-        } else if (chat.isUserChat) {
-            userStatus = DatabaseManager.getUser(user.id)?.status ?: Status.NOT_REGISTERED
-            Target.USER}
-        else
-            Target.INVALID
+        val userStatus : Status = getDBStatus(user, chat)
+        val chatValue = when {
+            chat.isGroupChat || chat.isSuperGroupChat -> Target.GROUP
+            chat.isUserChat -> Target.USER
+            else -> Target.INVALID
+        }
         return targets.filter {
             it.first == chatValue
-        }.safeEmpty({
+        }.ifNotEmpty({
             this[0].second <= userStatus //[0] as a command can have only one single pair with a unique Target
-        }, false) as Boolean
+        }, default = false) as Boolean
     }
 
     /**
      * Return true if command is formatted correctly.
      */
     private fun filterFormat(arguments : List<String>) : Boolean {
-        //manage pattern (use pattern?.let{})
+        //in the future will manage patterns (use pattern?.let{})
         return arguments.size >= argsNum
     }
 
@@ -88,7 +87,7 @@ class BaseCommand (
 
         /**
          * Filter used for locked groups.
-         * Return true if message is allowed.
+         * Return true if message is allowed (aka group not locked or status >= admin).
          */
         fun filterLock(user: User, chat: Chat): Boolean {
             return !(chat.isGroupChat || chat.isSuperGroupChat) ||
@@ -98,7 +97,7 @@ class BaseCommand (
 
         /**
          * Filter used for banned users.
-         * Return true if message is allowed.
+         * Return true if message is allowed (aka user not banned).
          */
         fun filterBans(user: User, chat: Chat): Boolean {
             return DatabaseManager.getUser(user.id)?.status != Status.BANNED &&

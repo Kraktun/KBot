@@ -20,7 +20,7 @@ import org.telegram.telegrambots.meta.api.objects.Message
 class StartCommand : CommandInterface {
 
     val engine = BaseCommand(
-        command = "start",
+        command = "/start",
         description = "Start the bot",
         targets = listOf(Pair(Target.USER, Status.NOT_REGISTERED),
             Pair(Target.GROUP, Status.NOT_REGISTERED),

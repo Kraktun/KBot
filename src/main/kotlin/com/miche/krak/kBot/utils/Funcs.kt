@@ -48,26 +48,35 @@ fun getDBStatus(user : User, chat : Chat) : Status {
 }
 
 /**
- * Execute function for collection, defaults to passed value if list is empty
+ * Execute function for a collection, defaults to passed value if list is empty or null.
  */
-inline fun <E: Any, T: Collection<E>> T?.safeEmpty(func : T.() -> Any?, default : Any?): Any? {
-    return if (this?.isNotEmpty() == true) {
+inline fun <E: Any, T: Collection<E>> T?.ifNotEmpty(func : T.() -> Any?, default : Any?): Any? {
+    return if (this != null && this.isNotEmpty()) {
         func(this)
     } else default
 }
 
+/**
+ * Print & log functions
+ */
 fun printK(tag : String, s : Any = "") {
-    print("$tag: $s")
-    LoggerK.log("$tag: $s")
+    val d = LocalDateTime.now()
+        .format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"))
+    print("$d $tag: $s")
+    LoggerK.log("$d $tag: $s")
 }
 
 fun printlnK(tag : String, s : Any = "") {
-    println("$tag: $s")
-    LoggerK.log("$tag: $s")
+    val d = LocalDateTime.now()
+        .format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"))
+    println("$d $tag: $s")
+    LoggerK.log("$d $tag: $s")
 }
 
 fun logK(tag : String, s : Any = "") {
-    LoggerK.log("$tag: $s")
+    val d = LocalDateTime.now()
+        .format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"))
+    LoggerK.log("$d $tag: $s")
 }
 
 /**

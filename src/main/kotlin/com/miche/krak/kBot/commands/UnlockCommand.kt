@@ -20,7 +20,7 @@ import org.telegram.telegrambots.meta.exceptions.TelegramApiException
 class UnlockCommand : CommandInterface {
 
     val engine = BaseCommand(
-        command = "unlock",
+        command = "/unlock",
         description = "Unlock the group",
         targets = listOf(Pair(Target.GROUP, Status.ADMIN),
             Pair(Target.SUPERGROUP, Status.ADMIN)),

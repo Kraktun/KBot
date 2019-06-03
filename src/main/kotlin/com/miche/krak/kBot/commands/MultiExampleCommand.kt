@@ -20,7 +20,7 @@ import org.telegram.telegrambots.meta.api.objects.Message
 class MultiExampleCommand : CommandInterface, MultiCommandInterface {
 
     val engine = BaseCommand(
-        command = "multi",
+        command = "/multi",
         description = "Multi",
         targets = listOf(Pair(Target.USER, Status.DEV)),
         argsNum = 0,
@@ -76,7 +76,5 @@ class MultiExampleCommand : CommandInterface, MultiCommandInterface {
                 e.printStackTrace()
             }
         }
-
     }
-
 }

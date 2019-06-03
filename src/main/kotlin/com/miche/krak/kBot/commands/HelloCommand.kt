@@ -19,7 +19,7 @@ import org.telegram.telegrambots.meta.api.objects.Message
 class HelloCommand : CommandInterface {
 
     val engine = BaseCommand(
-        command = "hello",
+        command = "/hello",
         description = "Hi",
         targets = listOf(Pair(Target.USER, Status.USER),
             Pair(Target.GROUP, Status.NOT_REGISTERED),

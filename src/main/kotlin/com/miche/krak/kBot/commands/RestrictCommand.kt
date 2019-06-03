@@ -21,7 +21,7 @@ import org.telegram.telegrambots.meta.api.objects.Message
 class RestrictCommand : CommandInterface {
 
     val engine = BaseCommand(
-        command = "restrict",
+        command = "/restrict",
         description = "Restricts a member in a group using telegram apis",
         targets = listOf(Pair(Target.SUPERGROUP, Status.ADMIN)),
         argsNum = 0,

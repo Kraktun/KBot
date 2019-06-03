@@ -14,7 +14,8 @@ object MultiCommandsHandler{
     @Volatile private var map = mutableMapOf<Pair<Int, Long>, Pair<MultiCommandInterface, Any?>>()
 
     /**
-     * Get last command sent in chatId by userId, null if not found
+     * Execute next command for pair user + chat.
+     * False if no command is found.
      */
     fun fireCommand(message : Message, absSender: AbsSender) : Boolean {
         val temp = map[Pair(message.from.id, message.chatId)]
@@ -36,6 +37,7 @@ object MultiCommandsHandler{
 
     /**
      * Delete last command with pair userId and chatId.
+     * A command is automatically deleted after execution.
      */
     fun deleteCommand(userId : Int, chatId : Long) {
         map.remove(Pair(userId, chatId))

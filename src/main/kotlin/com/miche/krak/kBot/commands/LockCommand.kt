@@ -22,7 +22,7 @@ import org.telegram.telegrambots.meta.exceptions.TelegramApiException
 class LockCommand : CommandInterface {
 
     val engine = BaseCommand(
-        command = "lock",
+        command = "/lock",
         description = "Lock the group: only admins can send messages",
         targets = listOf(Pair(Target.GROUP, Status.ADMIN),
             Pair(Target.SUPERGROUP, Status.ADMIN)),

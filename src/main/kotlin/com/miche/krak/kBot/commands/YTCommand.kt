@@ -17,6 +17,7 @@ import org.telegram.telegrambots.meta.exceptions.TelegramApiException
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage
 import org.telegram.telegrambots.meta.api.objects.Message
 import java.io.File
+import java.util.concurrent.TimeUnit
 
 
 /**
@@ -24,10 +25,12 @@ import java.io.File
  * Download audio from passed link using youtube-dl.
  * Only m4a best audio is downloaded.
  */
+private const val TAG = "YTCOMMAND"
+
 class YTCommand : CommandInterface, MultiCommandInterface {
 
     val engine = BaseCommand(
-        command = "yt",
+        command = "/yt",
         description = "Download audio from passed link using youtube-dl",
         targets = listOf(Pair(Target.USER, Status.DEV)),
         argsNum = 0,
@@ -51,16 +54,16 @@ class YTCommand : CommandInterface, MultiCommandInterface {
         val answer = SendMessage()
         answer.chatId = chat.id.toString()
         //Remove url of video from filename
-        printlnK("Retrieving filename")
-        val audio = (File(getMainFolder() + "/downloads").executeScript("youtube-dl", "--get-filename", "-x", arguments)).substringBeforeLast('-').plus(".$audioExtension")
-        printlnK("Filename is $audio")
+        printlnK(TAG, "Retrieving filename")
+        val audio = (File(getMainFolder() + "/downloads").executeScript("youtube-dl", "--get-filename", "-x", arguments)).substringBeforeLast('.').plus(".$audioExtension")
+        printlnK(TAG, "Filename is $audio")
         answer.text = "Downloading file: $audio"
         try {
             absSender.execute(answer)
         } catch (e: TelegramApiException) {
             e.printStackTrace()
         }
-        val result = File(getMainFolder() + "/downloads").executeScript("youtube-dl", "-f", "bestaudio[ext=$audioExtension]", arguments)
+        val result = File(getMainFolder() + "/downloads").executeScript(30, TimeUnit.SECONDS, "youtube-dl", "-f", "bestaudio[ext=$audioExtension]", arguments)
         answer.text = "Uploading file..."
         try {
             absSender.execute(answer)
@@ -68,7 +71,7 @@ class YTCommand : CommandInterface, MultiCommandInterface {
             e.printStackTrace()
         }
         val file = File(getMainFolder() + "/downloads/" + audio)
-        printlnK("Uploading file. Size is ${file.length()}")
+        printlnK(TAG, "Uploading file. Size is ${file.length()}")
         if (file.length() > 0) {
             val document = SendDocument()
             document.setChatId(chat.id)
@@ -82,7 +85,7 @@ class YTCommand : CommandInterface, MultiCommandInterface {
             }
         } else {
             try {
-                printlnK("Error: $result\n${file.absolutePath}")
+                printlnK(TAG, "Error: $result\n${file.absolutePath}")
                 answer.text = "An error occurred: \n$result\n\n${file.absolutePath}"
                 absSender.execute(answer)
             } catch (e: TelegramApiException) {
@@ -92,5 +95,4 @@ class YTCommand : CommandInterface, MultiCommandInterface {
             }
         }
     }
-
 }

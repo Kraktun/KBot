@@ -34,8 +34,7 @@ object CommandProcessor {
     fun fireCommand(update : Update, absSender: AbsSender) : Boolean{
         val commandInput = update.message.text.plus(" ") //Add space at the end, for single-word commands
             .substringBefore(" ") //take first word
-            .substring(1) //remove pre-pended '/'
-            .plus("@$botName") //fixes unrecognized commands in groups
+            .plus("@$botName") //fixes commands in groups, where command can be in the form command@botName
             .substringBefore("@$botName")
         return map[commandInput]?.fire(absSender,
             update.message.from,
@@ -43,7 +42,7 @@ object CommandProcessor {
             update.message.text.substringAfter(" ") //take args from second word (first is the command)
                 .split(" "), //put each word in the list
             update.message
-        ) == true //when key is not present, map[]? equals null
+        ) == true //when key is not present, map[]? equals null, so return is false
     }
 
     /**

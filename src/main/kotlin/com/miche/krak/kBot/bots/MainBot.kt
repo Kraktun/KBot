@@ -49,6 +49,7 @@ class MainBot(options: DefaultBotOptions) : TelegramLongPollingBot(options) {
         CommandProcessor.registerCommand(UnlockCommand().engine)
         CommandProcessor.registerCommand(RestrictCommand().engine)
         CommandProcessor.registerCommand(YTCommand().engine)
+        CommandProcessor.registerCommand(BanCommand().engine)
     }
 
     /**

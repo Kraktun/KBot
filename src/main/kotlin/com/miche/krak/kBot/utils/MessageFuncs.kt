@@ -9,6 +9,8 @@ import org.telegram.telegrambots.meta.api.objects.User
 import org.telegram.telegrambots.meta.bots.AbsSender
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException
 
+private const val TAG = "MESSAGEFUNCS"
+
 fun deleteMessage(absSender: AbsSender, m : Message) {
     val message = DeleteMessage()
         .setChatId(m.chatId)
@@ -16,6 +18,7 @@ fun deleteMessage(absSender: AbsSender, m : Message) {
     try {
         absSender.execute(message)
     } catch (e: TelegramApiException) {
+        logK(TAG, e)
         e.printStackTrace()
     }
 }
@@ -27,6 +30,7 @@ fun simpleMessage(absSender: AbsSender, s : String, c : Chat) {
     try {
         absSender.execute(message)
     } catch (e: TelegramApiException) {
+        logK(TAG, e)
         e.printStackTrace()
     }
 }
@@ -38,6 +42,7 @@ fun kickUser(absSender: AbsSender, u : User, c : Chat) {
     try {
         absSender.execute(message)
     } catch (e: TelegramApiException) {
+        logK(TAG, e)
         e.printStackTrace()
     }
 }

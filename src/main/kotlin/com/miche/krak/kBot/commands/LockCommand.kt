@@ -6,12 +6,11 @@ import com.miche.krak.kBot.database.DatabaseManager
 import com.miche.krak.kBot.objects.GroupStatus
 import com.miche.krak.kBot.objects.Status
 import com.miche.krak.kBot.objects.Target
-import org.telegram.telegrambots.meta.api.methods.send.SendMessage
+import com.miche.krak.kBot.utils.simpleMessage
 import org.telegram.telegrambots.meta.api.objects.Chat
 import org.telegram.telegrambots.meta.api.objects.Message
 import org.telegram.telegrambots.meta.api.objects.User
 import org.telegram.telegrambots.meta.bots.AbsSender
-import org.telegram.telegrambots.meta.exceptions.TelegramApiException
 
 /**
  * Command to lock a group:
@@ -31,14 +30,7 @@ class LockCommand : CommandInterface {
     )
 
     override fun execute(absSender: AbsSender, user: User, chat: Chat, arguments: List<String>, message: Message) {
-        DatabaseManager.updateGroupStatus(chat.id, GroupStatus.LOCKED)
-        val answer = SendMessage()
-        answer.chatId = chat.id.toString()
-        answer.text = "Group is locked. Only admins can send messages"
-        try {
-            absSender.execute(answer)
-        } catch (e: TelegramApiException) {
-            e.printStackTrace()
-        }
+        DatabaseManager.updateGroup(chat.id, GroupStatus.LOCKED)
+        simpleMessage(absSender = absSender, s = "Group is locked. Only admins can send messages", c = chat)
     }
 }

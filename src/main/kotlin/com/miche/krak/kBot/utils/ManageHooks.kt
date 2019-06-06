@@ -12,7 +12,7 @@ fun onStart() {
     printlnK(TAG, "Current version is: ${com.miche.krak.kBot.Main::class.java.getPackage().implementationVersion}")
     //Insert predefined users
     printlnK(TAG, "Adding predefined users")
-    DatabaseManager.insertUser(predefinedUsers)
+    DatabaseManager.addUser(predefinedUsers)
     printlnK(TAG, "Predefined users added")
     JobExecutor.run()
 }

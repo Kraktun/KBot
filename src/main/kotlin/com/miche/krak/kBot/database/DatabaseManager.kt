@@ -22,8 +22,7 @@ object DatabaseManager {
 
     private fun connectDB() {
         val dbLink = getMainFolder() + "\\KBotDB.db"
-        printlnK(TAG, "DB is stored in: ")
-        printlnK(TAG, dbLink)
+        printlnK(TAG, "DB is stored in: $dbLink")
         Database.connect("jdbc:sqlite:$dbLink", "org.sqlite.JDBC")
         TransactionManager.manager.defaultIsolationLevel = Connection.TRANSACTION_SERIALIZABLE // Or Connection.TRANSACTION_READ_UNCOMMITTED
 
@@ -33,10 +32,14 @@ object DatabaseManager {
         }
     }
 
+    /*
+    USER MANAGEMENT
+     */
+
     /**
      * Insert single user in DB
      */
-    fun insertUser(user : User, userStatus : Status, info : String? = null) {
+    fun addUser(user : User, userStatus : Status, info : String? = null) {
         transaction {
             Users.insert {
                 it[id] = user.id
@@ -48,9 +51,9 @@ object DatabaseManager {
     }
 
     /**
-     * Insert list of users in DB
+     * Insert list of users in DB. If already present, update its status.
      */
-    fun insertUser(list : List<UserK>) {
+    fun addUser(list : List<UserK>) {
         try {
             transaction {
                 Users.batchInsert(list) { user ->
@@ -63,14 +66,18 @@ object DatabaseManager {
         } catch (e: Exception) { //if a user in the list is already present, add one at a time
             transaction {
                 for (user in list) {
-                    try {
+                    try { //Does not use addUser, so that we use a single transaction
                         Users.insert {
                             it[id] = user.id
                             it[username] = user.username
                             it[status] = user.status.name
                             it[statusInfo] = user.userInfo
                         }
-                    } catch (ee : Exception) {}
+                    } catch (ee : Exception) { //If user is already present, update its status
+                        Users.update ({Users.id eq user.id}){
+                            it[status] = user.status.name
+                        }
+                    }
                 }
             }
         }
@@ -93,6 +100,10 @@ object DatabaseManager {
         return userK
     }
 
+    /*
+    GROUP MANAGEMENT
+     */
+
     /**
      * Return true if group exists inside the DB
      */
@@ -107,11 +118,11 @@ object DatabaseManager {
     /**
      * Insert group in DB
      */
-    fun insertGroup(idd: Long) {
+    fun addGroup(idd: Long) {
         transaction {
             Groups.insert {
                 it[id] = idd
-                it[status] = GroupStatus.NORMAL.toString()
+                it[status] = GroupStatus.NORMAL.name
             }
         }
     }
@@ -136,21 +147,40 @@ object DatabaseManager {
     }
 
     /**
+     * Update status of a group
+     */
+    fun updateGroup(groupId : Long, newStatus: GroupStatus) {
+        transaction {
+            Groups.update ({Groups.id eq groupId}) {
+                it[status] = newStatus.name
+            }
+        }
+    }
+
+    /*
+    GROUP USER MANAGEMENT
+     */
+
+    /**
      * Add user to group with defined status
      */
     fun addGroupUser(groupId : Long, userId : Int, statusK : Status) {
         transaction {
-            GroupUsers.insert {
-                it[group] = groupId
-                it[user] = userId
-                it[status] = statusK.name
+            try {
+                GroupUsers.insert {
+                    it[group] = groupId
+                    it[user] = userId
+                    it[status] = statusK.name
+                }
+            } catch (e: Exception) {
+                updateGroupUser(groupId, userId, statusK)
             }
         }
     }
 
     /**
      * Add admins to group
-     * Exceptions are captured
+     * If already present, update status
      */
     fun addGroupAdmins(groupId : Long, admins : List<Int>) {
         try {
@@ -158,19 +188,23 @@ object DatabaseManager {
                 GroupUsers.batchInsert(admins) { userId ->
                     this[GroupUsers.group] = groupId
                     this[GroupUsers.user] = userId
-                    this[GroupUsers.status] = Status.ADMIN.toString()
+                    this[GroupUsers.status] = Status.ADMIN.name
                 }
             }
         } catch (e: Exception) { //if a user in the list is already present, add one at a time
             transaction {
-                for (userId in admins) {
+                for (userId in admins) { //Does not use addGroupUser, so that we use a single transaction
                     try {
                         GroupUsers.insert {
                             it[group] = groupId
                             it[user] = userId
-                            it[status] = Status.ADMIN.toString()
+                            it[status] = Status.ADMIN.name
                         }
-                    } catch (ee : Exception) {}
+                    } catch (ee : Exception) {
+                        GroupUsers.update({GroupUsers.group eq groupId and (GroupUsers.user eq userId)}) {
+                            it[status] = Status.ADMIN.name
+                        }
+                    }
                 }
             }
         }
@@ -191,26 +225,12 @@ object DatabaseManager {
     }
 
     /**
-     * Get status of group
+     * Update status for user in group
      */
-    fun getGroupStatus(groupId : Long) : GroupStatus {
-        var statusK : GroupStatus = GroupStatus.NORMAL
+    fun updateGroupUser(groupId: Long, userId: Int, newStatus : Status) {
         transaction {
-            Groups.select {Groups.id eq groupId}
-                .map {
-                    statusK = GroupStatus.valueOf(it[Groups.status].toUpperCase())
-                }
-        }
-        return statusK
-    }
-
-    /**
-     * Update status of a group
-     */
-    fun updateGroupStatus(groupId : Long, statusK: GroupStatus) {
-        transaction {
-            Groups.update ({Groups.id eq groupId}) {
-                    it[status] = statusK.name
+            GroupUsers.update({GroupUsers.group eq groupId and (GroupUsers.user eq userId)}) {
+                it[status] = newStatus.name
             }
         }
     }

@@ -21,7 +21,7 @@ class StartCommand : CommandInterface {
 
     val engine = BaseCommand(
         command = "/start",
-        description = "Start the bot",
+        description = "Start the bot. If used in a group, add/reset admins.",
         targets = listOf(Pair(Target.USER, Status.NOT_REGISTERED),
             Pair(Target.GROUP, Status.NOT_REGISTERED),
             Pair(Target.SUPERGROUP, Status.NOT_REGISTERED)),
@@ -32,19 +32,22 @@ class StartCommand : CommandInterface {
     override fun execute(absSender: AbsSender, user: User, chat: Chat, arguments: List<String>, message: Message) {
         if (chat.isUserChat && DatabaseManager.getUser(user.id) == null) //Add only if not present, or it will overwrite current value
             DatabaseManager.addUser(user = user, userStatus = Status.USER)
-        else if (chat.isGroupChat && !DatabaseManager.groupExists(chat.id)) {
+        else if (chat.isGroupChat || chat.isSuperGroupChat) {
             //If it's a group insert the group and add the admins as admin
             if (!DatabaseManager.groupExists(chat.id)) {
                 DatabaseManager.addGroup(chat.id)
-                val getAdmins = GetChatAdministrators()
-                getAdmins.chatId = chat.id.toString()
-                try {
-                    val admins = absSender.execute(getAdmins)
-                    DatabaseManager.addGroupAdmins(groupId = chat.id, admins = admins.map { admin -> admin.user.id })
-                } catch (e: TelegramApiException) {
-                    simpleMessage(absSender, "An error occurred: ${e.message}", chat)
-                    e.printStackTrace()
-                }
+            } else {
+                //Reset old admins
+                DatabaseManager.updateGroupUsersStatus(groupId = chat.id, oldStatus = Status.ADMIN, newStatus = Status.NOT_REGISTERED)
+            }
+            val getAdmins = GetChatAdministrators()
+            getAdmins.chatId = chat.id.toString()
+            try {
+                val admins = absSender.execute(getAdmins)
+                DatabaseManager.addGroupUsers(groupId = chat.id, usersId = admins.map { admin -> admin.user.id }, statusK = Status.ADMIN)
+            } catch (e: TelegramApiException) {
+                simpleMessage(absSender, "An error occurred: ${e.message}", chat)
+                e.printStackTrace()
             }
         }
         simpleMessage(absSender, "Welcome to me", chat)

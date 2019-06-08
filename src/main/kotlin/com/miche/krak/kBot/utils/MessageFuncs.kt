@@ -1,5 +1,6 @@
 package com.miche.krak.kBot.utils
 
+import org.telegram.telegrambots.meta.api.methods.BotApiMethod
 import org.telegram.telegrambots.meta.api.methods.groupadministration.KickChatMember
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage
 import org.telegram.telegrambots.meta.api.methods.updatingmessages.DeleteMessage
@@ -35,12 +36,26 @@ fun simpleMessage(absSender: AbsSender, s : String, c : Chat) {
     }
 }
 
-fun kickUser(absSender: AbsSender, u : User, c : Chat) {
-    val message = KickChatMember()
+/**
+ * Kick a user from a chat and optionally ban him for a limited (if date >= 0)  or unlimited (if date = 0) amount of time
+ */
+fun kickUser(absSender: AbsSender, u : User, c : Chat, date : Int = -1) {
+    var message = KickChatMember()
         .setChatId(c.id)
         .setUserId(u.id)
+    if (date >= 0)
+        message = message.setUntilDate(date)
     try {
         absSender.execute(message)
+    } catch (e: TelegramApiException) {
+        logK(TAG, e)
+        e.printStackTrace()
+    }
+}
+
+fun executeMethod(absSender: AbsSender, m : BotApiMethod<Boolean>) {
+    try {
+        absSender.execute(m)
     } catch (e: TelegramApiException) {
         logK(TAG, e)
         e.printStackTrace()

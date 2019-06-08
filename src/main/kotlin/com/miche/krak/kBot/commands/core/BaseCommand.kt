@@ -31,6 +31,8 @@ class BaseCommand (
     //function with additional logic to execute before firing the command
     //only non-intensive (aka non-DB) operations should be done here
     private val filterFun : (Message) -> Boolean = {true},
+    //Function to execute when a filter (including filterFun) fails and returns false
+    private val onError : (AbsSender, List<String>, Message) -> Unit = { _, _, _ -> },
     //implementation of the CommandInterface (aka execute method)
     private val exe : CommandInterface ) {
 
@@ -43,7 +45,10 @@ class BaseCommand (
         return if (filterAll(user, chat, arguments, message)) {
             exe.execute(absSender, user, chat, arguments, message)
             true
-        } else false
+        } else {
+            onError(absSender, arguments, message)
+            false
+        }
     }
 
     /**

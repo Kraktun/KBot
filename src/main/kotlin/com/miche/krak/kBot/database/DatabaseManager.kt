@@ -179,30 +179,30 @@ object DatabaseManager {
     }
 
     /**
-     * Add admins to group
+     * Add users to group with defined status
      * If already present, update status
      */
-    fun addGroupAdmins(groupId : Long, admins : List<Int>) {
+    fun addGroupUsers(groupId : Long, usersId : List<Int>, statusK : Status) {
         try {
             transaction {
-                GroupUsers.batchInsert(admins) { userId ->
+                GroupUsers.batchInsert(usersId) { userId ->
                     this[GroupUsers.group] = groupId
                     this[GroupUsers.user] = userId
-                    this[GroupUsers.status] = Status.ADMIN.name
+                    this[GroupUsers.status] = statusK.name
                 }
             }
         } catch (e: Exception) { //if a user in the list is already present, add one at a time
             transaction {
-                for (userId in admins) { //Does not use addGroupUser, so that we use a single transaction
+                for (userId in usersId) { //Does not use addGroupUser, so that we use a single transaction
                     try {
                         GroupUsers.insert {
                             it[group] = groupId
                             it[user] = userId
-                            it[status] = Status.ADMIN.name
+                            it[status] = statusK.name
                         }
                     } catch (ee : Exception) {
                         GroupUsers.update({GroupUsers.group eq groupId and (GroupUsers.user eq userId)}) {
-                            it[status] = Status.ADMIN.name
+                            it[status] = statusK.name
                         }
                     }
                 }
@@ -230,6 +230,17 @@ object DatabaseManager {
     fun updateGroupUser(groupId: Long, userId: Int, newStatus : Status) {
         transaction {
             GroupUsers.update({GroupUsers.group eq groupId and (GroupUsers.user eq userId)}) {
+                it[status] = newStatus.name
+            }
+        }
+    }
+
+    /**
+     * Update status of users in a group whose status match oldStatus
+     */
+    fun updateGroupUsersStatus(groupId: Long, oldStatus : Status, newStatus: Status) {
+        transaction {
+            GroupUsers.update({GroupUsers.group eq groupId and (GroupUsers.status eq oldStatus.name)}) {
                 it[status] = newStatus.name
             }
         }

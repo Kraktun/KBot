@@ -14,7 +14,7 @@ import org.telegram.telegrambots.meta.api.objects.User
 import org.telegram.telegrambots.meta.bots.AbsSender
 
 /**
- * Kicks the user from a group without banning him
+ * Kicks the user from a group without banning him. Available only in supergroups.
  */
 class KickCommand : CommandInterface {
 
@@ -37,8 +37,12 @@ class KickCommand : CommandInterface {
 
 
     override fun execute(absSender: AbsSender, user: User, chat: Chat, arguments: List<String>, message: Message) {
-        DatabaseManager.addGroupUser(groupId = chat.id, userId = message.replyToMessage.from.id, statusK = Status.BANNED)
+        if (chat.isGroupChat && DatabaseManager.getGroupUserStatus(chat.id, message.replyToMessage.from.id) == Status.ADMIN) {
+            simpleMessage(absSender, "Admins can be removed only by the creator", chat)
+            return
+        }
+        //DatabaseManager.addGroupUser(groupId = chat.id, userId = message.replyToMessage.from.id, statusK = Status.BANNED)
         kickUser(absSender = absSender, u = message.replyToMessage.from, c = chat)
-        simpleMessage(absSender = absSender, s = "Kicked user ${getQualifiedUser(user)}", c = chat)
+        simpleMessage(absSender = absSender, s = "Kicked user ${getQualifiedUser(message.replyToMessage.from)}", c = chat)
     }
 }

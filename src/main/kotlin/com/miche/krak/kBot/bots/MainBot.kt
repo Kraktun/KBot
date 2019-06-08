@@ -42,7 +42,7 @@ class MainBot(options: DefaultBotOptions) : TelegramLongPollingBot(options) {
      * Register Commands
      */
     init {
-        CommandProcessor.registerCommand(TestCommand().engine)
+        //CommandProcessor.registerCommand(TestCommand().engine)
         CommandProcessor.registerCommand(HelloCommand().engine)
         CommandProcessor.registerCommand(StartCommand().engine)
         CommandProcessor.registerCommand(HelpCommand().engine)
@@ -67,7 +67,12 @@ class MainBot(options: DefaultBotOptions) : TelegramLongPollingBot(options) {
             //Remove new user if it's banned, otherwise welcome him
             ((message.isGroupMessage || message.isSuperGroupMessage) && message.newChatMembers.isNotEmpty()) -> {
                 if (BaseCommand.filterBans(user, chat)) {
-                    simpleMessage(this, "Welcome ${getQualifiedUser(user)}", chat)
+                    val welcomeU = message.newChatMembers.map {
+                        getQualifiedUser(it)
+                    }.reduce { acc, sing ->
+                        "$acc $sing,"
+                    }
+                    simpleMessage(this, "Welcome $welcomeU", chat)
                 } else {
                     kickUser(this, user, chat)
                 }

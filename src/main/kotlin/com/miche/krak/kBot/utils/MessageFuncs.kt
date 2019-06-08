@@ -9,6 +9,7 @@ import org.telegram.telegrambots.meta.api.objects.Message
 import org.telegram.telegrambots.meta.api.objects.User
 import org.telegram.telegrambots.meta.bots.AbsSender
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException
+import java.time.Instant
 
 private const val TAG = "MESSAGEFUNCS"
 
@@ -44,7 +45,7 @@ fun kickUser(absSender: AbsSender, u : User, c : Chat, date : Int = -1) {
         .setChatId(c.id)
         .setUserId(u.id)
     if (date >= 0)
-        message = message.setUntilDate(date)
+        message = message.setUntilDate(Instant.now().plusSeconds(date.toLong()))
     try {
         absSender.execute(message)
     } catch (e: TelegramApiException) {

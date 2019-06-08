@@ -38,6 +38,10 @@ class BanCommand : CommandInterface {
     )
 
     override fun execute(absSender: AbsSender, user: User, chat: Chat, arguments: List<String>, message: Message) {
+        if (chat.isGroupChat && DatabaseManager.getGroupUserStatus(chat.id, message.replyToMessage.from.id) == Status.ADMIN) {
+            simpleMessage(absSender, "Admins can be removed only by the creator", chat)
+            return
+        }
         //DB will be re-added when I'll figure out how to manage temporary bans.
         //DatabaseManager.addGroupUser(groupId = chat.id, userId = message.replyToMessage.from.id, statusK = Status.BANNED)
         val date = arguments.ifNotEmpty({
@@ -45,6 +49,6 @@ class BanCommand : CommandInterface {
             , 0) as Int
         kickUser(absSender = absSender, u = message.replyToMessage.from, c = chat, date = date)
         val until = if (date > 0) "for ${arguments[0]} hours." else "forever."
-        simpleMessage(absSender = absSender, s = "Banned user ${getQualifiedUser(user)} $until", c = chat)
+        simpleMessage(absSender = absSender, s = "Banned user ${getQualifiedUser(message.replyToMessage.from)} $until", c = chat)
     }
 }

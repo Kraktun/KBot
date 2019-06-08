@@ -38,7 +38,7 @@ class StartCommand : CommandInterface {
                 DatabaseManager.addGroup(chat.id)
             } else {
                 //Reset old admins
-                DatabaseManager.updateGroupUsersStatus(groupId = chat.id, oldStatus = Status.ADMIN, newStatus = Status.NOT_REGISTERED)
+                DatabaseManager.updateGroupUsersStatus(groupId = chat.id, oldStatus = Status.ADMIN, newStatus = Status.USER)
             }
             val getAdmins = GetChatAdministrators()
             getAdmins.chatId = chat.id.toString()

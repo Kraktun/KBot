@@ -4,7 +4,6 @@ import com.miche.krak.kBot.commands.core.BaseCommand
 import com.miche.krak.kBot.commands.core.CommandInterface
 import com.miche.krak.kBot.objects.Status
 import com.miche.krak.kBot.objects.Target
-import com.miche.krak.kBot.utils.getQualifiedUser
 import com.miche.krak.kBot.utils.logK
 import com.miche.krak.kBot.utils.simpleMessage
 import org.telegram.telegrambots.meta.api.methods.groupadministration.UnbanChatMember
@@ -22,9 +21,8 @@ class UnbanCommand : CommandInterface {
 
     val engine = BaseCommand(
         command = "/unban",
-        description = "Lifts ban from a user. Usage: /ban + [ID]",
+        description = "Lifts ban from a user. Usage: /unban + [ID]",
         targets = listOf(
-            Pair(Target.GROUP, Status.ADMIN),
             Pair(Target.SUPERGROUP, Status.ADMIN)),
         argsNum = 1,
         filterFun = {
@@ -47,11 +45,11 @@ class UnbanCommand : CommandInterface {
             .setUserId(arguments[0].toInt())
         try {
             absSender.execute(method)
+            simpleMessage(absSender = absSender, s = "Unbanned user ${arguments[0].toInt()}", c = chat)
         } catch (e : TelegramApiException) {
             logK("UNBANCOMMAND", e)
             e.printStackTrace()
             simpleMessage(absSender = absSender, s = "Error unbanning user", c = chat)
         }
-        simpleMessage(absSender = absSender, s = "Unbanned user ${getQualifiedUser(user)}", c = chat)
     }
 }

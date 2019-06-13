@@ -23,7 +23,6 @@ class MultiExampleCommand : CommandInterface, MultiCommandInterface {
         command = "/multi",
         description = "Multi",
         targets = listOf(Pair(Target.USER, Status.DEV)),
-        argsNum = 0,
         exe = this
     )
 

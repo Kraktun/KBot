@@ -1,7 +1,9 @@
 package com.miche.krak.kBot.commands
 
 import com.miche.krak.kBot.commands.core.BaseCommand
+import com.miche.krak.kBot.commands.core.ChatOptions
 import com.miche.krak.kBot.commands.core.CommandInterface
+import com.miche.krak.kBot.commands.core.FilterResult
 import com.miche.krak.kBot.database.DatabaseManager
 import com.miche.krak.kBot.objects.Status
 import com.miche.krak.kBot.objects.Target
@@ -26,12 +28,12 @@ class BanCommand : CommandInterface {
         targets = listOf(
             Pair(Target.GROUP, Status.ADMIN),
             Pair(Target.SUPERGROUP, Status.ADMIN)),
-        argsNum = 0,
         filterFun = { m : Message ->
             m.isReply
         },
-        onError = { absSender, _,  m ->
-            if ((m.chat.isSuperGroupChat || m.chat.isGroupChat) && DatabaseManager.getGroupUserStatus(m.chatId, m.from.id) < Status.ADMIN)
+        chatOptions = mutableListOf(ChatOptions.BOT_IS_ADMIN, ChatOptions.OPTION_ALL_USER_ADMIN_DISABLED),
+        onError = { absSender, _,  m, result ->
+            if (result == FilterResult.INVALID_STATUS)
                 simpleMessage(absSender = absSender, s = "Yeah, as if you could...", c = m.chat)
         },
         exe = this

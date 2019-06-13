@@ -4,6 +4,7 @@ import com.miche.krak.kBot.*
 import com.miche.krak.kBot.commands.*
 import com.miche.krak.kBot.commands.core.CommandProcessor
 import com.miche.krak.kBot.commands.core.BaseCommand
+import com.miche.krak.kBot.commands.core.FilterResult
 import com.miche.krak.kBot.commands.core.MultiCommandsHandler
 import com.miche.krak.kBot.utils.*
 import org.telegram.telegrambots.bots.DefaultBotOptions
@@ -17,18 +18,11 @@ import org.telegram.telegrambots.meta.api.methods.send.SendMessage
  */
 class MainBot(options: DefaultBotOptions) : TelegramLongPollingBot(options) {
 
-    /*
-     * Same as getBotUsername(), must be explicit so that the bot can process commands in groups in the form /hello@botName
-     */
-    companion object {
-        const val botName = TEST_NAME
-    }
-
     /**
      * Return username of the bot
      */
     override fun getBotUsername(): String? {
-        return botName
+        return TEST_NAME
     }
 
     /**
@@ -80,7 +74,7 @@ class MainBot(options: DefaultBotOptions) : TelegramLongPollingBot(options) {
 
             //Check if it's a command and attempt to fire the response
             //Nothing to do in the function here, as the command is fired directly in the 'if'
-            CommandProcessor.fireCommand(update, this) -> {}
+            CommandProcessor.fireCommand(update, this) != FilterResult.NOT_COMMAND-> {}
 
             //Check if chat is locked or user is banned  and if so delete the message
             (!BaseCommand.filterLock(user, chat) || !BaseCommand.filterBans(user, chat)) -> {

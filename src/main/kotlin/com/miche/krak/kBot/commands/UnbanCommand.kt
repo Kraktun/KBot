@@ -1,6 +1,7 @@
 package com.miche.krak.kBot.commands
 
 import com.miche.krak.kBot.commands.core.BaseCommand
+import com.miche.krak.kBot.commands.core.ChatOptions
 import com.miche.krak.kBot.commands.core.CommandInterface
 import com.miche.krak.kBot.objects.Status
 import com.miche.krak.kBot.objects.Target
@@ -32,7 +33,8 @@ class UnbanCommand : CommandInterface {
                 true
             } catch (e : Exception) {false}
         },
-        onError = { absSender, _, message ->
+        chatOptions = mutableListOf(ChatOptions.BOT_IS_ADMIN),
+        onError = { absSender, _, message, _ ->
             simpleMessage(absSender, "Invalid data", message.chat)
         },
         exe = this

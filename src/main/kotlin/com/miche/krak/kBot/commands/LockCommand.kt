@@ -1,6 +1,7 @@
 package com.miche.krak.kBot.commands
 
 import com.miche.krak.kBot.commands.core.BaseCommand
+import com.miche.krak.kBot.commands.core.ChatOptions
 import com.miche.krak.kBot.commands.core.CommandInterface
 import com.miche.krak.kBot.database.DatabaseManager
 import com.miche.krak.kBot.objects.GroupStatus
@@ -25,7 +26,7 @@ class LockCommand : CommandInterface {
         description = "Lock the group: only admins can send messages",
         targets = listOf(Pair(Target.GROUP, Status.ADMIN),
             Pair(Target.SUPERGROUP, Status.ADMIN)),
-        argsNum = 0,
+        chatOptions = mutableListOf(ChatOptions.BOT_IS_ADMIN),
         exe = this
     )
 

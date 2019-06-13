@@ -17,7 +17,6 @@ class TestCommand : CommandInterface {
         targets = listOf(
             Pair(Target.GROUP, Status.ADMIN),
             Pair(Target.SUPERGROUP, Status.ADMIN)),
-        argsNum = 0,
         exe = this
     )
 

@@ -33,7 +33,6 @@ class YTCommand : CommandInterface, MultiCommandInterface {
         command = "/yt",
         description = "Download audio from passed link using youtube-dl",
         targets = listOf(Pair(Target.USER, Status.DEV)),
-        argsNum = 0,
         exe = this
     )
 

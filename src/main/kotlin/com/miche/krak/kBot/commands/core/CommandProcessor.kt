@@ -1,8 +1,8 @@
 package com.miche.krak.kBot.commands.core
 
-import com.miche.krak.kBot.bots.MainBot.Companion.botName
 import org.telegram.telegrambots.meta.api.objects.Update
 import org.telegram.telegrambots.meta.bots.AbsSender
+import org.telegram.telegrambots.meta.generics.LongPollingBot
 
 /**
  * Process commands from bot, locating the correct command to call
@@ -29,9 +29,11 @@ object CommandProcessor {
 
     /**
      * Execute command if it's found.
-     * Return false if no command is found for parsed update.
+     * Return NOT_COMMAND if no command is found for parsed update.
+     * Results are propagated to the calling class even if now it is useless
      */
-    fun fireCommand(update : Update, absSender: AbsSender) : Boolean{
+    fun fireCommand(update : Update, absSender: AbsSender) : FilterResult {
+        val botName = (absSender as LongPollingBot).botUsername
         val commandInput = update.message.text.plus(" ") //Add space at the end, for single-word commands
             .substringBefore(" ") //take first word
             .plus("@$botName") //fixes commands in groups, where command can be in the form command@botName
@@ -42,7 +44,7 @@ object CommandProcessor {
             update.message.text.substringAfter(" ") //take args from second word (first is the command)
                 .split(" "), //put each word in the list
             update.message
-        ) == true //when key is not present, map[]? equals null, so return is false
+        ) ?: FilterResult.NOT_COMMAND //when key is not present, map[]? equals null, so return is NOT_COMMAND
     }
 
     /**

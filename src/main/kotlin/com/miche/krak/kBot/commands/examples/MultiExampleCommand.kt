@@ -1,4 +1,4 @@
-package com.miche.krak.kBot.commands
+package com.miche.krak.kBot.commands.examples
 
 import com.miche.krak.kBot.commands.core.BaseCommand
 import com.miche.krak.kBot.commands.core.CommandInterface
@@ -6,11 +6,10 @@ import com.miche.krak.kBot.commands.core.MultiCommandInterface
 import com.miche.krak.kBot.commands.core.MultiCommandsHandler
 import com.miche.krak.kBot.objects.Status
 import com.miche.krak.kBot.objects.Target
+import com.miche.krak.kBot.utils.simpleMessage
 import org.telegram.telegrambots.meta.api.objects.Chat
 import org.telegram.telegrambots.meta.api.objects.User
 import org.telegram.telegrambots.meta.bots.AbsSender
-import org.telegram.telegrambots.meta.exceptions.TelegramApiException
-import org.telegram.telegrambots.meta.api.methods.send.SendMessage
 import org.telegram.telegrambots.meta.api.objects.Message
 
 
@@ -30,15 +29,8 @@ class MultiExampleCommand : CommandInterface, MultiCommandInterface {
      * Executed when command is first sent.
      */
     override fun execute(absSender: AbsSender, user: User, chat: Chat, arguments: List<String>, message: Message) {
-        val answer = SendMessage()
-        answer.chatId = chat.id.toString()
-        answer.text = "First part"
-        MultiCommandsHandler.insertCommand(userId = user.id, chatId = chat.id, command = this)
-        try {
-            absSender.execute(answer)
-        } catch (e: TelegramApiException) {
-            e.printStackTrace()
-        }
+        MultiCommandsHandler.insertCommand(user = user.id, chat = chat.id, command = this)
+        simpleMessage(absSender, "First part", chat)
     }
 
     /**
@@ -47,15 +39,8 @@ class MultiExampleCommand : CommandInterface, MultiCommandInterface {
      * @data is usually empty here
      */
     override fun executeAfter(absSender: AbsSender, user: User, chat: Chat, arguments: String, message: Message, data: Any?) {
-        val answer = SendMessage()
-        answer.chatId = chat.id.toString()
-        answer.text = "Second part"
-        MultiCommandsHandler.insertCommand(userId = user.id, chatId = chat.id, command = ThirdStep(), data = arguments)
-        try {
-            absSender.execute(answer)
-        } catch (e: TelegramApiException) {
-            e.printStackTrace()
-        }
+        MultiCommandsHandler.insertCommand(user = user.id, chat = chat.id, command = ThirdStep(), data = arguments)
+        simpleMessage(absSender, "Second part", chat)
     }
 
     /**
@@ -65,15 +50,8 @@ class MultiExampleCommand : CommandInterface, MultiCommandInterface {
      */
     class ThirdStep : MultiCommandInterface {
         override fun executeAfter(absSender: AbsSender, user: User, chat: Chat, arguments: String, message: Message, data: Any?) {
-            MultiCommandsHandler.deleteCommand(userId = user.id, chatId = chat.id)
-            val answer = SendMessage()
-            answer.chatId = chat.id.toString()
-            answer.text = "Third part, data is $data, \nnew data is $arguments"
-            try {
-                absSender.execute(answer)
-            } catch (e: TelegramApiException) {
-                e.printStackTrace()
-            }
+            MultiCommandsHandler.deleteCommand(user = user.id, chat = chat.id)
+            simpleMessage(absSender, "Third part, data is $data, \nnew data is $arguments", chat)
         }
     }
 }

@@ -4,12 +4,14 @@ import com.miche.krak.kBot.utils.printlnK
 import org.quartz.InterruptableJob
 import org.quartz.JobExecutionContext
 import org.quartz.JobExecutionException
+import org.telegram.telegrambots.meta.api.objects.Chat
 import org.telegram.telegrambots.meta.api.objects.Message
+import org.telegram.telegrambots.meta.api.objects.User
 import org.telegram.telegrambots.meta.bots.AbsSender
 import java.time.Instant
 
 /**
- * Handles multi-input commands (commands that need more messages)
+ * Handles multi-input commands (commands that need more messages). ForceReply is not enough for me.
  */
 
 const val TAG = "MULTICOMMANDS_HANDLER"
@@ -20,7 +22,7 @@ object MultiCommandsHandler {
     Map that contains a pair of user + chatId and the next command to execute for the user in that chat + data to pass to the command
      */
     @Volatile private var map = mutableMapOf<Pair<Int, Long>, MultiBaseCommand>()
-    private const val maxCommandTime = 30L //seconds
+    private const val maxCommandTime : Long = 30L //seconds. After this time has passed the user must resend the activation command.
 
     /**
      * Execute next command for pair user + chat.
@@ -31,7 +33,7 @@ object MultiCommandsHandler {
         synchronized(this) {
             temp = map[Pair(message.from.id, message.chatId)]
         }
-        if (temp != null) deleteCommand(message.from.id, message.chatId)
+        if (temp != null) deleteCommand(message.from, message.chat)
         return temp?.multiInterface?.executeAfter(absSender,
             message.from,
             message.chat,
@@ -41,24 +43,38 @@ object MultiCommandsHandler {
     }
 
     /**
-     * Insert new command in chatId by userId. Overwrite if already present.
+     * Insert new command in chat by user. Overwrite if already present.
      */
-    fun insertCommand(userId : Int, chatId : Long, command : MultiCommandInterface, data: Any? = null) {
-        printlnK(TAG, "Received command ($userId + $chatId)")
+    fun insertCommand(user : Int, chat : Long, command : MultiCommandInterface, data: Any? = null) {
+        printlnK(TAG, "Received command ($user + $chat)")
         synchronized(this) {
-            map[Pair(userId, chatId)] = MultiBaseCommand(command, data)
+            map[Pair(user, chat)] = MultiBaseCommand(command, data)
         }
     }
 
     /**
-     * Delete last command with pair userId and chatId.
+     * Same as above, different signature
+     */
+    fun insertCommand(user : User, chat : Chat, command : MultiCommandInterface, data: Any? = null) {
+        insertCommand(user.id, chat.id, command, data)
+    }
+
+    /**
+     * Delete last command with pair user and chat.
      * A command is automatically deleted after execution.
      */
-    fun deleteCommand(userId : Int, chatId : Long) {
-        printlnK(TAG, "Deleting command ($userId + $chatId)")
+    fun deleteCommand(user : Int, chat : Long) {
+        printlnK(TAG, "Deleting command ($user + $chat)")
         synchronized(this) {
-            map.remove(Pair(userId, chatId))
+            map.remove(Pair(user, chat))
         }
+    }
+
+    /**
+     * Same as above, different signature
+     */
+    fun deleteCommand(user : User, chat : Chat) {
+        deleteCommand(user.id, chat.id)
     }
 
     /**

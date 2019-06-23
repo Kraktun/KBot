@@ -37,7 +37,7 @@ class YTCommand : CommandInterface, MultiCommandInterface {
     )
 
     override fun execute(absSender: AbsSender, user: User, chat: Chat, arguments: List<String>, message: Message) {
-        MultiCommandsHandler.insertCommand(userId = user.id, chatId = chat.id, command = this)
+        MultiCommandsHandler.insertCommand(user = user.id, chat = chat.id, command = this)
         simpleMessage(absSender, "Send the link", chat)
     }
 

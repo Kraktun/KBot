@@ -3,12 +3,30 @@
 Written with [TelegramBots](https://github.com/rubenlagus/TelegramBots)      
 and [Exposed](https://github.com/JetBrains/Exposed)   
 
+
 ### Build Status   
 #### Dev:   
 [![Build Status](https://travis-ci.com/Kraktun/KBot.svg?token=Uor7RP8xsv27XrHhEVTp&branch=dev)](https://travis-ci.com/Kraktun/KBot)
 #### Master:   
 [![Build Status](https://travis-ci.com/Kraktun/KBot.svg?token=Uor7RP8xsv27XrHhEVTp&branch=master)](https://travis-ci.com/Kraktun/KBot)   
 
+
+## Features   
+Filter commands received by the bot according to the chat and the status of the user.   
+Add optional filters (e.g. accept a command only if it's a reply).   
+Receive feedback when command is rejected and execute a function.   
+Manage multi-reply commands (ask-answer model) with a timer.   
+Boot-shutdown hooks.   
+
+## How To   
+[1] Add/edit a command in ```commands```: implement ```CommandInterface.kt``` and create an instance of ```BaseCommand.kt```.   
+[1.1] You can check ```example``` package for a list of templates.   
+[2] Register your new command in ```MainBot.kt```.   
+[3] For deeper customizations, change the method ```onUpdateReceived``` in ```MainBot.kt```.   
+[4] Change whatever you want...   
+
+
+## Notes   
 The ```commands.core``` folder is meant to be used in a single bot (=thread). For concurrent threads on the same bot, every access to the ```var map``` must be synchronized.      
 For concurrent bots, ```CommandProcessor.kt``` and ```MultiCommandsHandler.kt``` must be duplicated and each class used in a single bot.   
 Classes in ```utils``` folder are already synchronized to manage concurrent bots.   

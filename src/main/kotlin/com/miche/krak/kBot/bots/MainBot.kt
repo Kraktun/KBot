@@ -6,7 +6,7 @@ import com.miche.krak.kBot.commands.core.CommandProcessor
 import com.miche.krak.kBot.commands.core.BaseCommand
 import com.miche.krak.kBot.commands.core.FilterResult
 import com.miche.krak.kBot.commands.core.MultiCommandsHandler
-import com.miche.krak.kBot.commands.examples.KeyboardExampleCommand
+import com.miche.krak.kBot.commands.examples.*
 import com.miche.krak.kBot.utils.*
 import org.telegram.telegrambots.bots.DefaultBotOptions
 import org.telegram.telegrambots.bots.TelegramLongPollingBot
@@ -49,7 +49,7 @@ class MainBot(options: DefaultBotOptions) : TelegramLongPollingBot(options) {
         CommandProcessor.registerCommand(KickCommand().engine)
         CommandProcessor.registerCommand(UnbanCommand().engine)
         //CommandProcessor.registerCommand(MultiExampleCommand().engine)
-        CommandProcessor.registerCommand(KeyboardExampleCommand().engine)
+        //CommandProcessor.registerCommand(KeyboardExampleCommand().engine)
     }
 
     /**

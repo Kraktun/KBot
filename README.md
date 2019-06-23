@@ -19,11 +19,11 @@ Manage multi-reply commands (ask-answer model) with a timer.
 Boot-shutdown hooks.   
 
 ## How To   
-[1] Add/edit a command in ```commands```: implement ```CommandInterface.kt``` and create an instance of ```BaseCommand.kt```.   
-[1.1] You can check ```example``` package for a list of templates.   
-[2] Register your new command in ```MainBot.kt```.   
-[3] For deeper customizations, change the method ```onUpdateReceived``` in ```MainBot.kt```.   
-[4] Change whatever you want...   
+* Add/edit a command in ```commands```: implement ```CommandInterface.kt``` and create an instance of ```BaseCommand.kt```.   
+   * You can check ```example``` package for a list of templates.   
+* Register your new command in ```MainBot.kt```.   
+* For deeper customizations, change the method ```onUpdateReceived``` in ```MainBot.kt```.   
+* Change whatever you want...   
 
 
 ## Notes   

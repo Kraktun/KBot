@@ -19,6 +19,10 @@ import org.telegram.telegrambots.meta.api.methods.send.SendMessage
  */
 class MainBot(options: DefaultBotOptions) : TelegramLongPollingBot(options) {
 
+    companion object {
+        lateinit var instance : TelegramLongPollingBot
+    }
+
     /**
      * Return username of the bot
      */
@@ -50,6 +54,8 @@ class MainBot(options: DefaultBotOptions) : TelegramLongPollingBot(options) {
         CommandProcessor.registerCommand(UnbanCommand().engine)
         //CommandProcessor.registerCommand(MultiExampleCommand().engine)
         //CommandProcessor.registerCommand(KeyboardExampleCommand().engine)
+        //CommandProcessor.registerCommand(TrackCommand().engine)
+        instance = this
     }
 
     /**
@@ -70,26 +76,26 @@ class MainBot(options: DefaultBotOptions) : TelegramLongPollingBot(options) {
                     }.reduce { acc, sing ->
                         "$acc $sing,"
                     }
-                    simpleMessage(this, "Welcome $welcomeU", chat)
+                    simpleMessage(instance, "Welcome $welcomeU", chat)
                 } else {
-                    kickUser(this, user, chat)
+                    kickUser(instance, user, chat)
                 }
             }
 
             //Check if it's a command and attempt to fire the response
             //Nothing to do in the function here, as the command is fired directly in the 'if'
-            CommandProcessor.fireCommand(update, this) != FilterResult.NOT_COMMAND-> {}
+            CommandProcessor.fireCommand(update, instance) != FilterResult.NOT_COMMAND-> {}
 
             //Check if chat is locked or user is banned  and if so delete the message
             (!BaseCommand.filterLock(user, chat) || !BaseCommand.filterBans(user, chat)) -> {
-                deleteMessage(this, message)
+                deleteMessage(instance, message)
             }
 
             //Check if it's a ask-answer interaction
             //Nothing to do here, as the command is fired directly in the 'if'
             //Note that this goes after the check on locks and bans, as the commands in MultiCommandsHandler
             // do not implement a check on bans and locks
-            MultiCommandsHandler.fireCommand(message, this) -> { }
+            MultiCommandsHandler.fireCommand(message, instance) -> { }
 
             //manage normal messages
             (chat.isUserChat && update.hasMessage() && message.hasText()) -> {

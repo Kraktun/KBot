@@ -10,6 +10,7 @@ import org.telegram.telegrambots.meta.api.objects.User
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.ReplyKeyboard
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.ReplyKeyboardMarkup
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.ReplyKeyboardRemove
+import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.KeyboardRow
 import org.telegram.telegrambots.meta.bots.AbsSender
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException
 import java.time.Instant
@@ -34,6 +35,16 @@ fun simpleMessage(absSender: AbsSender, s : String, c : Chat) {
 }
 
 /**
+ * Send a simple message
+ */
+fun simpleMessage(absSender: AbsSender, s : String, c : Long) {
+    val message = SendMessage()
+        .setChatId(c)
+        .setText(s)
+    executeMethod(absSender, message)
+}
+
+/**
  * Kick a user from a chat and optionally ban him for a limited (if date >= 0)  or unlimited (if date = 0) amount of time
  */
 fun kickUser(absSender: AbsSender, u : User, c : Chat, date : Int = -1) {
@@ -50,6 +61,17 @@ fun kickUser(absSender: AbsSender, u : User, c : Chat, date : Int = -1) {
  */
 fun sendKeyboard(absSender: AbsSender, c: Chat, s: String, keyboard : ReplyKeyboardMarkup) {
     insertKeyboard(absSender, c, s, keyboard)
+}
+
+fun sendSimpleListKeyboard(absSender: AbsSender, c: Chat, s: String, list : List<Any>) {
+    val key = ReplyKeyboardMarkup()
+    key.keyboard.addAll(list.map {
+        val row = KeyboardRow()
+        row.add(it.toString())
+        row
+    })
+    key.resizeKeyboard = true
+    insertKeyboard(absSender, c, s, key)
 }
 
 /**

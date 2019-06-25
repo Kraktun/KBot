@@ -1,6 +1,5 @@
 package com.miche.krak.kBot.commands.core
 
-import com.miche.krak.kBot.utils.printlnK
 import org.quartz.InterruptableJob
 import org.quartz.JobExecutionContext
 import org.quartz.JobExecutionException
@@ -22,7 +21,7 @@ object MultiCommandsHandler {
     Map that contains a pair of user + chatId and the next command to execute for the user in that chat + data to pass to the command
      */
     @Volatile private var map = mutableMapOf<Pair<Int, Long>, MultiBaseCommand>()
-    private const val maxCommandTime : Long = 30L //seconds. After this time has passed the user must resend the activation command.
+    private const val maxCommandTime : Long = 60L //seconds. After this time has passed the user must resend the activation command.
 
     /**
      * Execute next command for pair user + chat.
@@ -46,7 +45,7 @@ object MultiCommandsHandler {
      * Insert new command in chat by user. Overwrite if already present.
      */
     fun insertCommand(user : Int, chat : Long, command : MultiCommandInterface, data: Any? = null) {
-        printlnK(TAG, "Received command ($user + $chat)")
+        //printlnK(TAG, "Received command ($user + $chat)")
         synchronized(this) {
             map[Pair(user, chat)] = MultiBaseCommand(command, data)
         }
@@ -64,7 +63,7 @@ object MultiCommandsHandler {
      * A command is automatically deleted after execution.
      */
     fun deleteCommand(user : Int, chat : Long) {
-        printlnK(TAG, "Deleting command ($user + $chat)")
+        //printlnK(TAG, "Deleting command ($user + $chat)")
         synchronized(this) {
             map.remove(Pair(user, chat))
         }
@@ -105,7 +104,7 @@ object MultiCommandsHandler {
                     it.value.time.plusSeconds(maxCommandTime).isBefore(now)
                 }.forEach {
                     deleteUnsynch(it.key.first, it.key.second)
-                    printlnK(TAG, "Cleaned command ${it.key}")
+                    //printlnK(TAG, "Cleaned command ${it.key}")
                 }
             }
         }

@@ -1,9 +1,6 @@
 package com.miche.krak.kBot.database
 
-import com.miche.krak.kBot.objects.GroupK
-import com.miche.krak.kBot.objects.UserK
-import com.miche.krak.kBot.objects.GroupStatus
-import com.miche.krak.kBot.objects.Status
+import com.miche.krak.kBot.objects.*
 import com.miche.krak.kBot.utils.getMainFolder
 import com.miche.krak.kBot.utils.printlnK
 import org.jetbrains.exposed.sql.*
@@ -28,7 +25,7 @@ object DatabaseManager {
 
         transaction {
             addLogger(BotLoggerK)
-            SchemaUtils.create(Users, Groups, GroupUsers)
+            SchemaUtils.create(Users, Groups, GroupUsers, TrackedObjects)
         }
     }
 
@@ -243,6 +240,51 @@ object DatabaseManager {
             GroupUsers.update({GroupUsers.group eq groupId and (GroupUsers.status eq oldStatus.name)}) {
                 it[status] = newStatus.name
             }
+        }
+    }
+
+    /*
+    OBJECT TRACKING MANAGEMENT
+     */
+
+    fun addTrackedObject(userIdK : Int, objectIdK : String, storeK : String, domainK : String, targetPriceK : Float,
+                         forceSellerK : Boolean = false, forceShippingK : Boolean = false) {
+        transaction {
+            try {
+                TrackedObjects.insert {
+                    it[userId] = userIdK
+                    it[objectId] = objectIdK
+                    it[store] = storeK
+                    it[domain] = domainK
+                    it[targetPrice] = targetPriceK
+                    it[forceSeller] = forceSellerK
+                    it[forceShipping] = forceShippingK
+                }
+            } catch (e: Exception) {
+                updateTrackedObject(userIdK, objectIdK, storeK, domainK, targetPriceK, forceSellerK, forceShippingK)
+            }
+        }
+    }
+
+    fun updateTrackedObject(userIdK : Int, objectIdK : String, storeK : String, domainK : String, targetPriceK : Float,
+                         forceSellerK : Boolean = false, forceShippingK : Boolean = false) {
+        transaction {
+            TrackedObjects.update({TrackedObjects.userId eq userIdK and (TrackedObjects.objectId eq objectIdK) and
+                        (TrackedObjects.store eq storeK) and (TrackedObjects.domain eq domainK)}) {
+                it[targetPrice] = targetPriceK
+                it[forceSeller] = forceSellerK
+                it[forceShipping] = forceShippingK
+            }
+        }
+    }
+
+    fun getAllTrackedObjects() : List<TrackedObject> {
+        return transaction {
+            TrackedObjects.selectAll().map {
+                TrackedObject(user = it[TrackedObjects.userId], objectId = it[TrackedObjects.objectId],
+                store = it[TrackedObjects.store], domain = it[TrackedObjects.domain], targetPrice = it[TrackedObjects.targetPrice],
+                forceSellerK = it[TrackedObjects.forceSeller], forceShippingK = it[TrackedObjects.forceShipping])
+            }.toList()
         }
     }
 }

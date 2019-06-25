@@ -26,6 +26,16 @@ object GroupUsers : Table() {
 }
 
 
+object TrackedObjects : Table() {
+    val userId = reference("id", Users.id, onDelete = ReferenceOption.CASCADE).primaryKey(0)
+    val objectId = text("objectId").primaryKey(1)
+    val store = text("store").primaryKey(2)
+    val domain = text("domain").primaryKey(3)
+    val targetPrice = float("targetPrice")
+    val forceSeller = bool("forceSeller").default(false)
+    val forceShipping = bool("forceShipping").default(false)
+}
+
 
 
 

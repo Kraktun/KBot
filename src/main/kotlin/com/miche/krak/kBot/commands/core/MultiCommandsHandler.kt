@@ -1,5 +1,6 @@
 package com.miche.krak.kBot.commands.core
 
+import com.miche.krak.kBot.jobs.JobInfo
 import org.quartz.InterruptableJob
 import org.quartz.JobExecutionContext
 import org.quartz.JobExecutionException
@@ -88,10 +89,11 @@ object MultiCommandsHandler {
     class CleanerJob : InterruptableJob {
 
         companion object {
-            const val name : String = "MULTICOMMANDCLEANER"
-            const val interval : Int = 10 //seconds
-            const val trigger : String = "MULTICOMMANDCLEANER_TRIGGER"
-            const val group : String = "cleaners"
+            val jobInfo = JobInfo(
+                name  = "MULTICOMMANDCLEANER",
+                interval  = 15, //seconds
+                trigger  = "MULTICOMMANDCLEANER_TRIGGER",
+                group  = "jobs")
         }
 
         private val TAG = "MULTI_COMMAND_CLEANER"

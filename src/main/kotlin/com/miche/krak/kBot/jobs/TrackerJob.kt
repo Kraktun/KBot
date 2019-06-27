@@ -11,10 +11,11 @@ import org.quartz.JobExecutionException
 class TrackerJob : InterruptableJob {
 
     companion object {
-        const val name : String = "TRACKER_JOB"
-        const val interval : Int = 3600 //seconds
-        const val trigger : String = "TRACKER_JOB_TRIGGER"
-        const val group : String = "jobs"
+        val jobInfo = JobInfo(
+          name  = "TRACKER_JOB",
+          interval  = 3600, //seconds
+          trigger  = "TRACKER_JOB_TRIGGER",
+          group  = "jobs")
     }
 
     private val TAG = "TRACKER_JOB"

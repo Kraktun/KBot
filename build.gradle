@@ -4,7 +4,7 @@ plugins {
 }
 
 group 'com.miche.krak'
-version '0.2.1'
+version '0.2.2'
 
 sourceCompatibility = 1.8
 ext {
@@ -27,6 +27,7 @@ dependencies {
     compile group: 'org.jsoup', name: 'jsoup', version: '1.12.1'
     compile 'org.jetbrains.exposed:exposed:0.15.1'
     compile 'org.slf4j:slf4j-log4j12:1.7.26'
+    implementation 'org.jetbrains.kotlinx:kotlinx-coroutines-core:1.3.0-M2'
 }
 
 compileKotlin {

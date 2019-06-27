@@ -11,6 +11,8 @@ import com.miche.krak.kBot.objects.Target
 import com.miche.krak.kBot.utils.removeKeyboard
 import com.miche.krak.kBot.utils.sendSimpleListKeyboard
 import com.miche.krak.kBot.utils.simpleMessage
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.launch
 import org.telegram.telegrambots.meta.api.objects.Chat
 import org.telegram.telegrambots.meta.api.objects.Message
 import org.telegram.telegrambots.meta.api.objects.User
@@ -96,9 +98,17 @@ class TrackCommand : CommandInterface {
                 simpleMessage(absSender, "Wrong code. Retry.", chat)
                 MultiCommandsHandler.insertCommand(user, chat, ManageAmazonArticles())
             } else {
-                val priceList = getPrices(domain, articleId)
-                simpleMessage(absSender, priceList.toString(), chat)
-                DatabaseManager.addTrackedObject(userIdK = user.id, objectIdK = articleId, storeK = acceptedStores[0], targetPriceK = targetPrice, domainK = domain)
+                GlobalScope.launch {
+                    val priceList = getPrices(domain, articleId)
+                    simpleMessage(absSender, priceList.toString(), chat)
+                    DatabaseManager.addTrackedObject(
+                        userIdK = user.id,
+                        objectIdK = articleId,
+                        storeK = acceptedStores[0],
+                        targetPriceK = targetPrice,
+                        domainK = domain
+                    )
+                }
             }
         }
     }

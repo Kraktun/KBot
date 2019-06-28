@@ -4,7 +4,7 @@ import com.miche.krak.kBot.bots.MainBot
 import com.miche.krak.kBot.commands.TrackCommand
 import com.miche.krak.kBot.database.DatabaseManager
 import com.miche.krak.kBot.utils.printlnK
-import com.miche.krak.kBot.utils.simpleMessage
+import com.miche.krak.kBot.utils.simpleHTMLMessage
 import org.quartz.InterruptableJob
 import org.quartz.JobExecutionContext
 
@@ -28,7 +28,7 @@ class TrackerJob : InterruptableJob {
             val bestPrice = if (list.isNotEmpty()) list.first() else null
             if (bestPrice == null) printlnK(TAG, "Got a null object for domain ${obj.domain}, id ${obj.objectId}")
             else if (bestPrice.totalPrice() <= obj.targetPrice) {
-                simpleMessage(MainBot.instance, "ONE OBJECT HAS REACHED THE TARGET PRICE:\n$bestPrice", obj.user.toLong())
+                simpleHTMLMessage(MainBot.instance, "THE OBJECT <b>${obj.name}</b> HAS REACHED THE TARGET PRICE:\n$bestPrice", obj.user.toLong())
                 DatabaseManager.removeTrackedObject(obj)
             }
             Thread.sleep(WAIT_TIME * 1000)

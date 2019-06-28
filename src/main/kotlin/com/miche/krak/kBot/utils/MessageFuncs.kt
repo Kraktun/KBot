@@ -37,10 +37,32 @@ fun simpleMessage(absSender: AbsSender, s : String, c : Chat) {
 /**
  * Send a simple message
  */
+fun simpleHTMLMessage(absSender: AbsSender, s : String, c : Chat) {
+    val message = SendMessage()
+        .setChatId(c.id)
+        .setText(s)
+        .enableHtml(true)
+    executeMethod(absSender, message)
+}
+
+/**
+ * Send a simple message
+ */
 fun simpleMessage(absSender: AbsSender, s : String, c : Long) {
     val message = SendMessage()
         .setChatId(c)
         .setText(s)
+    executeMethod(absSender, message)
+}
+
+/**
+ * Send a simple message
+ */
+fun simpleHTMLMessage(absSender: AbsSender, s : String, c : Long) {
+    val message = SendMessage()
+        .setChatId(c)
+        .setText(s)
+        .enableHtml(true)
     executeMethod(absSender, message)
 }
 

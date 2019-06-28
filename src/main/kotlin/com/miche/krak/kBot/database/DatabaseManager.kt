@@ -249,11 +249,12 @@ object DatabaseManager {
     /**
      * Add tracked object to DB, update if already present
      */
-    fun addTrackedObject(userIdK : Int, objectIdK : String, storeK : String, domainK : String, targetPriceK : Float,
+    fun addTrackedObject(nameK : String, userIdK : Int, objectIdK : String, storeK : String, domainK : String, targetPriceK : Float,
                          forceSellerK : Boolean = false, forceShippingK : Boolean = false) {
         transaction {
             try {
                 TrackedObjects.insert {
+                    it[name] = nameK
                     it[userId] = userIdK
                     it[objectId] = objectIdK
                     it[store] = storeK
@@ -263,19 +264,34 @@ object DatabaseManager {
                     it[forceShipping] = forceShippingK
                 }
             } catch (e: Exception) {
-                updateTrackedObject(userIdK, objectIdK, storeK, domainK, targetPriceK, forceSellerK, forceShippingK)
+                updateTrackedObject(nameK, userIdK, objectIdK, storeK, domainK, targetPriceK, forceSellerK, forceShippingK)
             }
         }
     }
 
     /**
+     * Add tracked object to DB, update if already present
+     */
+    fun addTrackedObject(trackedObj: TrackedObject) {
+        addTrackedObject(
+            nameK = trackedObj.name,
+            userIdK = trackedObj.user,
+            objectIdK = trackedObj.objectId,
+            storeK = trackedObj.store,
+            targetPriceK = trackedObj.targetPrice,
+            domainK = trackedObj.domain
+        )
+    }
+
+    /**
      * Update tracked object
      */
-    fun updateTrackedObject(userIdK : Int, objectIdK : String, storeK : String, domainK : String, targetPriceK : Float,
+    fun updateTrackedObject(nameK : String, userIdK : Int, objectIdK : String, storeK : String, domainK : String, targetPriceK : Float,
                          forceSellerK : Boolean = false, forceShippingK : Boolean = false) {
         transaction {
             TrackedObjects.update({TrackedObjects.userId eq userIdK and (TrackedObjects.objectId eq objectIdK) and
                         (TrackedObjects.store eq storeK) and (TrackedObjects.domain eq domainK)}) {
+                it[name] = nameK
                 it[targetPrice] = targetPriceK
                 it[forceSeller] = forceSellerK
                 it[forceShipping] = forceShippingK
@@ -289,7 +305,7 @@ object DatabaseManager {
     fun getAllTrackedObjects() : List<TrackedObject> {
         return transaction {
             TrackedObjects.selectAll().map {
-                TrackedObject(user = it[TrackedObjects.userId], objectId = it[TrackedObjects.objectId],
+                TrackedObject(name = it[TrackedObjects.name], user = it[TrackedObjects.userId], objectId = it[TrackedObjects.objectId],
                 store = it[TrackedObjects.store], domain = it[TrackedObjects.domain], targetPrice = it[TrackedObjects.targetPrice],
                 forceSellerK = it[TrackedObjects.forceSeller], forceShippingK = it[TrackedObjects.forceShipping])
             }.toList()

@@ -8,6 +8,7 @@ import com.miche.krak.kBot.database.DatabaseManager
 import com.miche.krak.kBot.objects.TrackedObjectContainer
 import com.miche.krak.kBot.objects.Status
 import com.miche.krak.kBot.objects.Target
+import com.miche.krak.kBot.objects.TrackedObject
 import com.miche.krak.kBot.utils.parsePrice
 import com.miche.krak.kBot.utils.removeKeyboard
 import com.miche.krak.kBot.utils.sendSimpleListKeyboard
@@ -25,7 +26,6 @@ private const val TAG = "TRACK_COMMAND"
 /**
  * This is only for testing purposes and must not be used for other reasons.
  * Use the API if you need a tracking command.
- * TODO Use a TrackObject rather than passing single values between commands
  */
 class TrackCommand : CommandInterface {
 
@@ -52,14 +52,17 @@ class TrackCommand : CommandInterface {
      */
     private inner class ManageStore : MultiCommandInterface {
         override fun executeAfter(absSender: AbsSender, user: User, chat: Chat, arguments: String, message: Message, data: Any?) {
+            val trackedObject = TrackedObject.getEmpty()
+            trackedObject.user = user.id
             if (!acceptedStores.contains(arguments)) {
                 simpleMessage(absSender, "Invalid store. Retry.", chat)
                 MultiCommandsHandler.insertCommand(user, chat, ManageAmazonDomains())
             }
             when (arguments) {
                 acceptedStores[0] -> {
+                    trackedObject.store = arguments
                     sendSimpleListKeyboard(absSender, chat, "Choose the domain.", acceptedAmazonDomains)
-                    MultiCommandsHandler.insertCommand(user, chat, ManageAmazonDomains(), arguments)
+                    MultiCommandsHandler.insertCommand(user, chat, ManageAmazonDomains(), trackedObject)
                 }
             }
         }
@@ -73,14 +76,16 @@ class TrackCommand : CommandInterface {
             if (!acceptedAmazonDomains.contains(arguments)) {
                 simpleMessage(absSender, "Invalid code. Retry.", chat)
                 MultiCommandsHandler.insertCommand(user, chat, ManageAmazonDomains())
+            } else {
+                removeKeyboard(absSender, chat, "Send the ID of the item.")
+                (data as TrackedObject).domain = arguments
+                MultiCommandsHandler.insertCommand(user, chat, ManageAmazonArticle(), data)
             }
-            removeKeyboard(absSender, chat, "Send the ID of the item.")
-            MultiCommandsHandler.insertCommand(user, chat, ManageAmazonArticle(), arguments)
         }
     }
 
     /**
-     * Fourth part: check id and ask target price
+     * Fourth part: check id, send current prices and ask target price
      */
     private inner class ManageAmazonArticle : MultiCommandInterface {
         override fun executeAfter(absSender: AbsSender, user: User, chat: Chat, arguments: String, message: Message, data: Any?) {
@@ -89,37 +94,47 @@ class TrackCommand : CommandInterface {
                 simpleMessage(absSender, "Wrong code. Retry.", chat)
                 MultiCommandsHandler.insertCommand(user, chat, ManageAmazonArticle(), data)
             } else {
-                simpleMessage(absSender, "Send the target price.", chat)
-                MultiCommandsHandler.insertCommand(user, chat, ManageAmazonPrice(), Pair((data as String), articleId))
+                (data as TrackedObject).objectId = arguments
+                GlobalScope.launch {
+                    simpleMessage(absSender, "Retrieving current prices for domain ${data.domain} and id ${data.objectId}", chat)
+                    val priceList = getAmazonPrice(data.domain, data.objectId)
+                    simpleMessage(absSender, priceList.toString(), chat)
+                    simpleMessage(absSender, "Send the target price.", chat)
+                    MultiCommandsHandler.insertCommand(user, chat, ManageAmazonPrice(), data)
+                }
             }
         }
-
     }
 
     /**
-     * Fifth part: check price and insert in db
+     * Fifth part: set target price and ask name
      */
     private inner class ManageAmazonPrice : MultiCommandInterface {
         override fun executeAfter(absSender: AbsSender, user: User, chat: Chat, arguments: String, message: Message, data: Any?) {
-            val domain = (data as Pair<*, *>).first as String
-            val articleId = data.second as String
             val priceD = parsePrice(arguments) ?: 0f
             if (priceD <= 0f) {
-                simpleMessage(absSender, "Wrong number. Retry. Use format x,xxx.xx", chat)
+                simpleMessage(absSender, "Wrong number. Retry.", chat)
                 MultiCommandsHandler.insertCommand(user, chat, ManageAmazonPrice(), data)
             } else {
-                GlobalScope.launch {
-                    simpleMessage(absSender, "Retrieving current prices for domain $domain and id $articleId", chat)
-                    val priceList = getAmazonPrice(domain, articleId)
-                    simpleMessage(absSender, priceList.toString(), chat)
-                    DatabaseManager.addTrackedObject(
-                        userIdK = user.id,
-                        objectIdK = articleId,
-                        storeK = acceptedStores[0],
-                        targetPriceK = priceD,
-                        domainK = domain
-                    )
-                }
+                (data as TrackedObject).targetPrice = priceD
+                simpleMessage(absSender, "Send the name for this object.", chat)
+                MultiCommandsHandler.insertCommand(user, chat, ManageObjectName(), data)
+            }
+        }
+    }
+
+    /**
+     * Sixth part: set name and save in DB
+     */
+    private inner class ManageObjectName : MultiCommandInterface {
+        override fun executeAfter(absSender: AbsSender, user: User, chat: Chat, arguments: String, message: Message, data: Any?) {
+            if (arguments.isEmpty()) {
+                simpleMessage(absSender, "Name can't be empty", chat)
+                MultiCommandsHandler.insertCommand(user, chat, ManageObjectName(), data)
+            } else {
+                (data as TrackedObject).name = arguments
+                DatabaseManager.addTrackedObject(data)
+                simpleMessage(absSender, "Object saved.", chat)
             }
         }
     }

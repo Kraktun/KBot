@@ -27,6 +27,7 @@ object GroupUsers : Table() {
 
 
 object TrackedObjects : Table() {
+    val name = text("name")
     val userId = reference("id", Users.id, onDelete = ReferenceOption.CASCADE).primaryKey(0)
     val objectId = text("objectId").primaryKey(1)
     val store = text("store").primaryKey(2)

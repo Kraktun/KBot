@@ -1,4 +1,11 @@
 package com.miche.krak.kBot.objects
 
-class TrackedObject (val user : Int, val objectId : String, val store : String, val domain : String,
-                     val targetPrice : Float, forceSellerK : Boolean = false, forceShippingK : Boolean = false)
+class TrackedObject (var name : String, var user : Int, var objectId : String, var store : String, var domain : String,
+                     var targetPrice : Float, var forceSellerK : Boolean = false, var forceShippingK : Boolean = false) {
+
+    companion object {
+        fun getEmpty(): TrackedObject {
+            return TrackedObject("", 0, "", "", "", 0f)
+        }
+    }
+}

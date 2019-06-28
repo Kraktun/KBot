@@ -8,7 +8,6 @@ import org.quartz.JobBuilder.newJob
 import org.quartz.SchedulerException
 import org.quartz.impl.StdSchedulerFactory
 import org.quartz.SimpleScheduleBuilder.simpleSchedule
-import org.quartz.Scheduler
 import org.quartz.TriggerBuilder.newTrigger
 
 /**
@@ -16,10 +15,10 @@ import org.quartz.TriggerBuilder.newTrigger
  */
 object JobExecutor {
 
-    private var scheduler: Scheduler = StdSchedulerFactory().scheduler
-    private var sleepTime : Long = 100
-    var isShutdown : Boolean = scheduler.isShutdown
-    val jobs = mapOf<Class<out Job>, JobInfo>(MultiCommandsHandler.CleanerJob::class.java to MultiCommandsHandler.CleanerJob.jobInfo, TrackerJob::class.java to TrackerJob.jobInfo)
+    private val scheduler = StdSchedulerFactory().scheduler
+    private const val sleepTime = 100L
+    @Volatile var isShutdown = scheduler.isShutdown
+    private val jobs = mapOf<Class<out Job>, JobInfo>(MultiCommandsHandler.CleanerJob::class.java to MultiCommandsHandler.CleanerJob.jobInfo, TrackerJob::class.java to TrackerJob.jobInfo)
 
     /**
      * Starts threads
@@ -39,7 +38,6 @@ object JobExecutor {
      * @return false if an error occurred, true otherwise
      */
     fun shutdown(): Boolean {
-        preShutdown()
         return try {
             Thread.sleep(sleepTime)
             scheduler.shutdown(true)
@@ -54,12 +52,10 @@ object JobExecutor {
 
     /**
      * Starts thread and run it every interval
-     * @throws Exception if an error occurred
      */
-    @Throws(Exception::class)
     private fun multiScheduler() {
-        jobs.forEach { job, info ->
-            val trackerJob = newJob(job)
+        jobs.forEach { (job, info) ->
+            val appendedJob = newJob(job)
                 .withIdentity(info.name, info.group)
                 .build()
             // Trigger the job to run now, and then every n seconds
@@ -71,17 +67,10 @@ object JobExecutor {
                         .withIntervalInSeconds(info.interval)
                         .repeatForever()
                 )
-                .forJob(trackerJob)
+                .forJob(appendedJob)
                 .build()
             // Tell quartz to schedule the job using our trigger
-            scheduler.scheduleJob(trackerJob, trigger)
+            scheduler.scheduleJob(appendedJob, trigger)
         }
-    }
-
-    /**
-     * Interrupts
-     */
-    private fun preShutdown() {
-
     }
 }

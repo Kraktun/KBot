@@ -3,10 +3,10 @@ package com.miche.krak.kBot.jobs
 import com.miche.krak.kBot.bots.MainBot
 import com.miche.krak.kBot.commands.TrackCommand
 import com.miche.krak.kBot.database.DatabaseManager
+import com.miche.krak.kBot.utils.printlnK
 import com.miche.krak.kBot.utils.simpleMessage
 import org.quartz.InterruptableJob
 import org.quartz.JobExecutionContext
-import org.quartz.JobExecutionException
 
 class TrackerJob : InterruptableJob {
 
@@ -21,15 +21,18 @@ class TrackerJob : InterruptableJob {
     private val TAG = "TRACKER_JOB"
     private val WAIT_TIME = 15L //seconds
 
-    @Throws(JobExecutionException::class)
     override fun execute(context: JobExecutionContext) {
+        printlnK(TAG, "Retrieving articles")
         DatabaseManager.getAllTrackedObjects().forEach { obj ->
-            val bestPrice = TrackCommand.getPrices(domain = obj.domain, articleId = obj.objectId).first()
-            if (bestPrice.totalPrice() <= obj.targetPrice)
+            val list = TrackCommand.getAmazonPrice(domain = obj.domain, articleId = obj.objectId)
+            val bestPrice = if (list.isNotEmpty()) list.first() else null
+            if (bestPrice == null) printlnK(TAG, "Got a null object for domain ${obj.domain}, id ${obj.objectId}")
+            else if (bestPrice.totalPrice() <= obj.targetPrice) {
                 simpleMessage(MainBot.instance, "ONE OBJECT HAS REACHED THE TARGET PRICE:\n$bestPrice", obj.user.toLong())
+                DatabaseManager.removeTrackedObject(obj)
+            }
             Thread.sleep(WAIT_TIME * 1000)
         }
-
     }
 
     override fun interrupt() {

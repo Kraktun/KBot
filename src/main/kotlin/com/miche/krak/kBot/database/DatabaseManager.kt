@@ -246,7 +246,9 @@ object DatabaseManager {
     /*
     OBJECT TRACKING MANAGEMENT
      */
-
+    /**
+     * Add tracked object to DB, update if already present
+     */
     fun addTrackedObject(userIdK : Int, objectIdK : String, storeK : String, domainK : String, targetPriceK : Float,
                          forceSellerK : Boolean = false, forceShippingK : Boolean = false) {
         transaction {
@@ -266,6 +268,9 @@ object DatabaseManager {
         }
     }
 
+    /**
+     * Update tracked object
+     */
     fun updateTrackedObject(userIdK : Int, objectIdK : String, storeK : String, domainK : String, targetPriceK : Float,
                          forceSellerK : Boolean = false, forceShippingK : Boolean = false) {
         transaction {
@@ -278,6 +283,9 @@ object DatabaseManager {
         }
     }
 
+    /**
+     * Get all tracked objects
+     */
     fun getAllTrackedObjects() : List<TrackedObject> {
         return transaction {
             TrackedObjects.selectAll().map {
@@ -285,6 +293,16 @@ object DatabaseManager {
                 store = it[TrackedObjects.store], domain = it[TrackedObjects.domain], targetPrice = it[TrackedObjects.targetPrice],
                 forceSellerK = it[TrackedObjects.forceSeller], forceShippingK = it[TrackedObjects.forceShipping])
             }.toList()
+        }
+    }
+
+    /**
+     * Remove a tracked object
+     */
+    fun removeTrackedObject(trackedObj : TrackedObject) {
+        transaction {
+            TrackedObjects.deleteWhere { TrackedObjects.userId eq trackedObj.user and (TrackedObjects.objectId eq trackedObj.objectId) and
+                    (TrackedObjects.store eq trackedObj.store) and (TrackedObjects.domain eq trackedObj.domain)}
         }
     }
 }

@@ -2,10 +2,7 @@ package com.miche.krak.kBot.bots
 
 import com.miche.krak.kBot.*
 import com.miche.krak.kBot.commands.*
-import com.miche.krak.kBot.commands.core.CommandProcessor
-import com.miche.krak.kBot.commands.core.BaseCommand
-import com.miche.krak.kBot.commands.core.FilterResult
-import com.miche.krak.kBot.commands.core.MultiCommandsHandler
+import com.miche.krak.kBot.commands.core.*
 import com.miche.krak.kBot.commands.examples.*
 import com.miche.krak.kBot.utils.*
 import org.telegram.telegrambots.bots.DefaultBotOptions
@@ -13,6 +10,7 @@ import org.telegram.telegrambots.bots.TelegramLongPollingBot
 import org.telegram.telegrambots.meta.api.objects.Update
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage
+import org.telegram.telegrambots.meta.api.objects.Message
 
 /**
  * Main class: register the commands and process non-command updates
@@ -54,7 +52,7 @@ class MainBot(options: DefaultBotOptions) : TelegramLongPollingBot(options) {
         CommandProcessor.registerCommand(UnbanCommand().engine)
         //CommandProcessor.registerCommand(MultiExampleCommand().engine)
         //CommandProcessor.registerCommand(KeyboardExampleCommand().engine)
-        //CommandProcessor.registerCommand(TrackCommand().engine)
+        CommandProcessor.registerCommand(TrackCommand().engine)
         instance = this
     }
 
@@ -62,6 +60,10 @@ class MainBot(options: DefaultBotOptions) : TelegramLongPollingBot(options) {
      * On update: fire commands if it's a recognized command or is part of a ask-answer command, else manage in a different way
      */
     override fun onUpdateReceived(update: Update) {
+        if (update.hasCallbackQuery()) {
+            CallbackProcessor.fireCallback(absSender = this, callback = update.callbackQuery)
+            return
+        }
         val message = update.message
         val chat = message.chat
         val user = message.from
@@ -82,10 +84,6 @@ class MainBot(options: DefaultBotOptions) : TelegramLongPollingBot(options) {
                 }
             }
 
-            //Check if it's a command and attempt to fire the response
-            //Nothing to do in the function here, as the command is fired directly in the 'if'
-            CommandProcessor.fireCommand(update, instance) != FilterResult.NOT_COMMAND-> {}
-
             //Check if chat is locked or user is banned  and if so delete the message
             (!BaseCommand.filterLock(user, chat) || !BaseCommand.filterBans(user, chat)) -> {
                 deleteMessage(instance, message)
@@ -96,6 +94,11 @@ class MainBot(options: DefaultBotOptions) : TelegramLongPollingBot(options) {
             //Note that this goes after the check on locks and bans, as the commands in MultiCommandsHandler
             // do not implement a check on bans and locks
             MultiCommandsHandler.fireCommand(message, instance) -> { }
+
+            //Check if it's a command and attempt to fire the response
+            //Nothing to do in the function here, as the command is fired directly in the 'if'.
+            //This goes after multiCommandsHandler as you may need to use a command in a multiCommand interaction
+            CommandProcessor.fireCommand(update, instance) != FilterResult.NOT_COMMAND-> {}
 
             //manage normal messages
             (chat.isUserChat && update.hasMessage() && message.hasText()) -> {

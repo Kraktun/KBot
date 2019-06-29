@@ -81,7 +81,7 @@ fun kickUser(absSender: AbsSender, u : User, c : Chat, date : Int = -1) {
 /**
  * Send a custom keyboard for the user to choose
  */
-fun sendKeyboard(absSender: AbsSender, c: Chat, s: String, keyboard : ReplyKeyboardMarkup) {
+fun sendKeyboard(absSender: AbsSender, c: Chat, s: String, keyboard : ReplyKeyboard) {
     insertKeyboard(absSender, c, s, keyboard)
 }
 

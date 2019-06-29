@@ -3,6 +3,7 @@ package com.miche.krak.kBot.database
 import org.jetbrains.exposed.sql.*
 
 // https://www.kotlinresources.com/library/exposed/
+// DSL
 
 object Users : Table() {
     val id = integer("id").primaryKey()
@@ -28,7 +29,7 @@ object GroupUsers : Table() {
 
 object TrackedObjects : Table() {
     val name = text("name")
-    val userId = reference("id", Users.id, onDelete = ReferenceOption.CASCADE).primaryKey(0)
+    val userId = reference("userId", Users.id, onDelete = ReferenceOption.CASCADE).primaryKey(0)
     val objectId = text("objectId").primaryKey(1)
     val store = text("store").primaryKey(2)
     val domain = text("domain").primaryKey(3)

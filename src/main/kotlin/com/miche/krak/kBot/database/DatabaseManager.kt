@@ -26,6 +26,7 @@ object DatabaseManager {
         transaction {
             addLogger(BotLoggerK)
             SchemaUtils.create(Users, Groups, GroupUsers, TrackedObjects)
+            SchemaUtils.createMissingTablesAndColumns(TrackedObjects)
         }
     }
 
@@ -279,7 +280,9 @@ object DatabaseManager {
             objectIdK = trackedObj.objectId,
             storeK = trackedObj.store,
             targetPriceK = trackedObj.targetPrice,
-            domainK = trackedObj.domain
+            domainK = trackedObj.domain,
+            forceShippingK = trackedObj.forceShippingK,
+            forceSellerK = trackedObj.forceSellerK
         )
     }
 

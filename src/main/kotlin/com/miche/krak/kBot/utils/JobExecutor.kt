@@ -2,6 +2,7 @@ package com.miche.krak.kBot.utils
 
 import com.miche.krak.kBot.commands.core.MultiCommandsHandler
 import com.miche.krak.kBot.jobs.JobInfo
+import com.miche.krak.kBot.jobs.LoggerJob
 import com.miche.krak.kBot.jobs.TrackerJob
 import org.quartz.Job
 import org.quartz.JobBuilder.newJob
@@ -19,7 +20,9 @@ object JobExecutor {
     private val scheduler = StdSchedulerFactory().scheduler
     private const val sleepTime = 100L //millis
     @Volatile var isShutdown = scheduler.isShutdown
-    private val jobs = mapOf<Class<out Job>, JobInfo>(MultiCommandsHandler.CleanerJob::class.java to MultiCommandsHandler.CleanerJob.jobInfo, TrackerJob::class.java to TrackerJob.jobInfo)
+    private val jobs = mapOf<Class<out Job>, JobInfo>(MultiCommandsHandler.CleanerJob::class.java to MultiCommandsHandler.CleanerJob.jobInfo,
+        TrackerJob::class.java to TrackerJob.jobInfo,
+        LoggerJob::class.java to LoggerJob.jobInfo)
 
     /**
      * Starts threads

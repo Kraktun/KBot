@@ -18,7 +18,7 @@ object DatabaseManager {
     }
 
     private fun connectDB() {
-        val dbLink = getMainFolder() + "\\KBotDB.db"
+        val dbLink = getMainFolder() + "/KBotDB.db"
         printlnK(TAG, "DB is stored in: $dbLink")
         Database.connect("jdbc:sqlite:$dbLink", "org.sqlite.JDBC")
         TransactionManager.manager.defaultIsolationLevel = Connection.TRANSACTION_SERIALIZABLE // Or Connection.TRANSACTION_READ_UNCOMMITTED

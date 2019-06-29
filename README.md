@@ -10,9 +10,9 @@ Libraries used:
 
 ### Build Status   
 #### Dev:   
-[![Build Status](https://travis-ci.com/Kraktun/KBot.svg?token=Uor7RP8xsv27XrHhEVTp&branch=dev)](https://travis-ci.com/Kraktun/KBot)
+[![Build Status](https://travis-ci.com/Kraktun/KBot.svg?branch=dev)](https://travis-ci.com/Kraktun/KBot)
 #### Master:   
-[![Build Status](https://travis-ci.com/Kraktun/KBot.svg?token=Uor7RP8xsv27XrHhEVTp&branch=master)](https://travis-ci.com/Kraktun/KBot)   
+[![Build Status](https://travis-ci.com/Kraktun/KBot.svg?branch=master)](https://travis-ci.com/Kraktun/KBot)   
 
 
 ## Latest release   

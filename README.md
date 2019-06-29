@@ -1,7 +1,12 @@
-
 ## Info
-Written with [TelegramBots](https://github.com/rubenlagus/TelegramBots)      
-and [Exposed](https://github.com/JetBrains/Exposed)   
+Libraries used:   
+[TelegramBots](https://github.com/rubenlagus/TelegramBots)   
+[SQLite-jdbc](https://github.com/xerial/sqlite-jdbc)   
+[Quartz](https://github.com/quartz-scheduler/quartz)   
+[JSoup](https://github.com/jhy/jsoup)   
+[Exposed](https://github.com/JetBrains/Exposed)   
+[Coroutines](https://github.com/Kotlin/kotlinx.coroutines)  
+
 
 ### Build Status   
 #### Dev:   
@@ -9,12 +14,35 @@ and [Exposed](https://github.com/JetBrains/Exposed)
 #### Master:   
 [![Build Status](https://travis-ci.com/Kraktun/KBot.svg?token=Uor7RP8xsv27XrHhEVTp&branch=master)](https://travis-ci.com/Kraktun/KBot)   
 
+
+## Latest release   
+[![GitHub release](https://img.shields.io/github/release/Kraktun/KBot.svg?)](https://github.com/Kraktun/KBot/releases/latest)   
+
+
+## Features   
+Filter commands received by the bot according to the chat and the status of the user.   
+Add optional filters (e.g. accept a command only if it's a reply).   
+Receive feedback when command is rejected and execute a function.   
+Manage multi-reply commands (ask-answer model) with a timer.   
+Boot-shutdown hooks.   
+
+## How To   
+* Add/edit a command in ```commands```: implement ```CommandInterface.kt``` and create an instance of ```BaseCommand.kt```.   
+   * You can check ```example``` package for a list of templates.   
+* Register your new command in ```MainBot.kt```.   
+* For deeper customizations, change the method ```onUpdateReceived``` in ```MainBot.kt```.   
+* Change whatever you want...   
+
+
+## Notes   
 The ```commands.core``` folder is meant to be used in a single bot (=thread). For concurrent threads on the same bot, every access to the ```var map``` must be synchronized.      
 For concurrent bots, ```CommandProcessor.kt``` and ```MultiCommandsHandler.kt``` must be duplicated and each class used in a single bot.   
 Classes in ```utils``` folder are already synchronized to manage concurrent bots.   
 
 
 ## License
+
+![GitHub](https://img.shields.io/github/license/Kraktun/KBot.svg)   
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.

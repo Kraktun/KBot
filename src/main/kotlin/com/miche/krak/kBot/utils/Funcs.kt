@@ -10,6 +10,7 @@ import java.net.URLDecoder
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
 import java.util.concurrent.TimeUnit
+import java.util.regex.Pattern
 
 
 /**
@@ -110,6 +111,21 @@ fun File.executeScript(vararg arguments: String): String {
 fun getCurrentDateTimeStamp(): String {
     return LocalDateTime.now()
         .format(DateTimeFormatter.ofPattern("yyyy-MM-dd_HH-mm-ss"))
+}
+
+/**
+ * Tries to parse a string to get a price, Null if nothing found or an error occurred.
+ * Will be changed later.
+ */
+fun parsePrice(price : String) : Float? {
+    var mod = price.replace(",",".")
+    if (!mod.contains("."))
+        mod = "$mod.00" //simple fix for most common price mismatch
+    mod = mod.substringBeforeLast(".").replace(".", "") + "." + mod.substringAfterLast(".") //remove , or . for thousands etc.
+    val p = Pattern.compile("(\\d{1,9})*(?:[.,]\\d{2})")
+    val m = p.matcher(mod)
+    return if (m.find()) m.group().toFloat() else null
+
 }
 
 /**

@@ -1,9 +1,6 @@
 package com.miche.krak.kBot.database
 
-import com.miche.krak.kBot.objects.GroupK
-import com.miche.krak.kBot.objects.UserK
-import com.miche.krak.kBot.objects.GroupStatus
-import com.miche.krak.kBot.objects.Status
+import com.miche.krak.kBot.objects.*
 import com.miche.krak.kBot.utils.getMainFolder
 import com.miche.krak.kBot.utils.printlnK
 import org.jetbrains.exposed.sql.*
@@ -21,14 +18,15 @@ object DatabaseManager {
     }
 
     private fun connectDB() {
-        val dbLink = getMainFolder() + "\\KBotDB.db"
+        val dbLink = getMainFolder() + "/KBotDB.db"
         printlnK(TAG, "DB is stored in: $dbLink")
         Database.connect("jdbc:sqlite:$dbLink", "org.sqlite.JDBC")
         TransactionManager.manager.defaultIsolationLevel = Connection.TRANSACTION_SERIALIZABLE // Or Connection.TRANSACTION_READ_UNCOMMITTED
 
         transaction {
             addLogger(BotLoggerK)
-            SchemaUtils.create(Users, Groups, GroupUsers)
+            SchemaUtils.create(Users, Groups, GroupUsers, TrackedObjects)
+            SchemaUtils.createMissingTablesAndColumns(TrackedObjects)
         }
     }
 
@@ -243,6 +241,87 @@ object DatabaseManager {
             GroupUsers.update({GroupUsers.group eq groupId and (GroupUsers.status eq oldStatus.name)}) {
                 it[status] = newStatus.name
             }
+        }
+    }
+
+    /*
+    OBJECT TRACKING MANAGEMENT
+     */
+    /**
+     * Add tracked object to DB, update if already present
+     */
+    fun addTrackedObject(nameK : String, userIdK : Int, objectIdK : String, storeK : String, domainK : String, targetPriceK : Float,
+                         forceSellerK : Boolean = false, forceShippingK : Boolean = false) {
+        transaction {
+            try {
+                TrackedObjects.insert {
+                    it[name] = nameK
+                    it[userId] = userIdK
+                    it[objectId] = objectIdK
+                    it[store] = storeK
+                    it[domain] = domainK
+                    it[targetPrice] = targetPriceK
+                    it[forceSeller] = forceSellerK
+                    it[forceShipping] = forceShippingK
+                }
+            } catch (e: Exception) {
+                updateTrackedObject(nameK, userIdK, objectIdK, storeK, domainK, targetPriceK, forceSellerK, forceShippingK)
+            }
+        }
+    }
+
+    /**
+     * Add tracked object to DB, update if already present
+     */
+    fun addTrackedObject(trackedObj: TrackedObject) {
+        addTrackedObject(
+            nameK = trackedObj.name,
+            userIdK = trackedObj.user,
+            objectIdK = trackedObj.objectId,
+            storeK = trackedObj.store,
+            targetPriceK = trackedObj.targetPrice,
+            domainK = trackedObj.domain,
+            forceShippingK = trackedObj.forceShippingK,
+            forceSellerK = trackedObj.forceSellerK
+        )
+    }
+
+    /**
+     * Update tracked object
+     */
+    fun updateTrackedObject(nameK : String, userIdK : Int, objectIdK : String, storeK : String, domainK : String, targetPriceK : Float,
+                         forceSellerK : Boolean = false, forceShippingK : Boolean = false) {
+        transaction {
+            TrackedObjects.update({TrackedObjects.userId eq userIdK and (TrackedObjects.objectId eq objectIdK) and
+                        (TrackedObjects.store eq storeK) and (TrackedObjects.domain eq domainK)}) {
+                it[name] = nameK
+                it[targetPrice] = targetPriceK
+                it[forceSeller] = forceSellerK
+                it[forceShipping] = forceShippingK
+            }
+        }
+    }
+
+    /**
+     * Get all tracked objects
+     */
+    fun getAllTrackedObjects() : List<TrackedObject> {
+        return transaction {
+            TrackedObjects.selectAll().map {
+                TrackedObject(name = it[TrackedObjects.name], user = it[TrackedObjects.userId], objectId = it[TrackedObjects.objectId],
+                store = it[TrackedObjects.store], domain = it[TrackedObjects.domain], targetPrice = it[TrackedObjects.targetPrice],
+                forceSellerK = it[TrackedObjects.forceSeller], forceShippingK = it[TrackedObjects.forceShipping])
+            }.toList()
+        }
+    }
+
+    /**
+     * Remove a tracked object
+     */
+    fun removeTrackedObject(trackedObj : TrackedObject) {
+        transaction {
+            TrackedObjects.deleteWhere { TrackedObjects.userId eq trackedObj.user and (TrackedObjects.objectId eq trackedObj.objectId) and
+                    (TrackedObjects.store eq trackedObj.store) and (TrackedObjects.domain eq trackedObj.domain)}
         }
     }
 }

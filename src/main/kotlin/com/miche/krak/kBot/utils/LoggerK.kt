@@ -1,5 +1,7 @@
 package com.miche.krak.kBot.utils
 
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.launch
 import java.io.File
 import java.io.FileOutputStream
 import java.io.IOException
@@ -18,18 +20,20 @@ object LoggerK {
     }
 
     fun flush() {
-        Thread().run {
+        GlobalScope.launch {
             synchronized(this) {
-                val outStream = FileOutputStream(fileHolder, true)
-                val buffW = OutputStreamWriter(outStream, "UTF-8")
-                try {
-                    buffW.write(textHolder.toString())
-                    textHolder = StringBuilder()
-                } catch (e : IOException) {
-                    e.printStackTrace()
-                } finally {
-                    buffW.close()
-                    outStream.close()
+                if (textHolder.isNotEmpty()) {
+                    val outStream = FileOutputStream(fileHolder, true)
+                    val buffW = OutputStreamWriter(outStream, "UTF-8")
+                    try {
+                        buffW.write(textHolder.toString())
+                        textHolder = StringBuilder()
+                    } catch (e: IOException) {
+                        e.printStackTrace()
+                    } finally {
+                        buffW.close()
+                        outStream.close()
+                    }
                 }
             }
         }

@@ -1,7 +1,11 @@
-
 ## Info
-Written with [TelegramBots](https://github.com/rubenlagus/TelegramBots)      
-and [Exposed](https://github.com/JetBrains/Exposed)   
+Libraries used:   
+[![TelegramBots](https://maven-badges.herokuapp.com/maven-central/org.telegram/telegrambots/badge.svg)](https://github.com/rubenlagus/TelegramBots)   
+[![SQLite-jdbc](https://maven-badges.herokuapp.com/maven-central/org.xerial/sqlite-jdbc/badge.svg)](https://github.com/xerial/sqlite-jdbc)   
+[![Quartz](https://maven-badges.herokuapp.com/maven-central/org.quartz-scheduler/quartz/badge.svg)](https://github.com/quartz-scheduler/quartz)   
+[![JSoup](https://maven-badges.herokuapp.com/maven-central/org.jsoup/jsoup/badge.svg)](https://github.com/jhy/jsoup)   
+[![Exposed](https://api.bintray.com/packages/kotlin/exposed/exposed/images/download.svg)](https://github.com/JetBrains/Exposed)   
+[![Coroutines](https://maven-badges.herokuapp.com/maven-central/org.jetbrains.kotlinx/kotlinx-coroutines-core/badge.svg)](https://github.com/Kotlin/kotlinx.coroutines)  
 
 
 ### Build Status   
@@ -9,6 +13,10 @@ and [Exposed](https://github.com/JetBrains/Exposed)
 [![Build Status](https://travis-ci.com/Kraktun/KBot.svg?token=Uor7RP8xsv27XrHhEVTp&branch=dev)](https://travis-ci.com/Kraktun/KBot)
 #### Master:   
 [![Build Status](https://travis-ci.com/Kraktun/KBot.svg?token=Uor7RP8xsv27XrHhEVTp&branch=master)](https://travis-ci.com/Kraktun/KBot)   
+
+
+## Latest release   
+[![GitHub release](https://img.shields.io/github/release/Kraktun/KBot.svg?)](https://github.com/Kraktun/KBot/releases/latest)   
 
 
 ## Features   
@@ -33,6 +41,8 @@ Classes in ```utils``` folder are already synchronized to manage concurrent bots
 
 
 ## License
+
+![GitHub](https://img.shields.io/github/license/Kraktun/KBot.svg)   
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.

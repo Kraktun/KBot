@@ -1,11 +1,11 @@
 ## Info
 Libraries used:   
-[![TelegramBots](https://maven-badges.herokuapp.com/maven-central/org.telegram/telegrambots/badge.svg)](https://github.com/rubenlagus/TelegramBots)   
-[![SQLite-jdbc](https://maven-badges.herokuapp.com/maven-central/org.xerial/sqlite-jdbc/badge.svg)](https://github.com/xerial/sqlite-jdbc)   
-[![Quartz](https://maven-badges.herokuapp.com/maven-central/org.quartz-scheduler/quartz/badge.svg)](https://github.com/quartz-scheduler/quartz)   
-[![JSoup](https://maven-badges.herokuapp.com/maven-central/org.jsoup/jsoup/badge.svg)](https://github.com/jhy/jsoup)   
-[![Exposed](https://api.bintray.com/packages/kotlin/exposed/exposed/images/download.svg)](https://github.com/JetBrains/Exposed)   
-[![Coroutines](https://maven-badges.herokuapp.com/maven-central/org.jetbrains.kotlinx/kotlinx-coroutines-core/badge.svg)](https://github.com/Kotlin/kotlinx.coroutines)  
+[TelegramBots](https://github.com/rubenlagus/TelegramBots)   
+[SQLite-jdbc](https://github.com/xerial/sqlite-jdbc)   
+[Quartz](https://github.com/quartz-scheduler/quartz)   
+[JSoup](https://github.com/jhy/jsoup)   
+[Exposed](https://github.com/JetBrains/Exposed)   
+[Coroutines](https://github.com/Kotlin/kotlinx.coroutines)  
 
 
 ### Build Status   

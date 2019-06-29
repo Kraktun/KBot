@@ -9,6 +9,7 @@ import org.quartz.SchedulerException
 import org.quartz.impl.StdSchedulerFactory
 import org.quartz.SimpleScheduleBuilder.simpleSchedule
 import org.quartz.TriggerBuilder.newTrigger
+import java.util.*
 
 /**
  * Executes jobs in set intervals
@@ -16,7 +17,7 @@ import org.quartz.TriggerBuilder.newTrigger
 object JobExecutor {
 
     private val scheduler = StdSchedulerFactory().scheduler
-    private const val sleepTime = 100L
+    private const val sleepTime = 100L //millis
     @Volatile var isShutdown = scheduler.isShutdown
     private val jobs = mapOf<Class<out Job>, JobInfo>(MultiCommandsHandler.CleanerJob::class.java to MultiCommandsHandler.CleanerJob.jobInfo, TrackerJob::class.java to TrackerJob.jobInfo)
 
@@ -59,9 +60,11 @@ object JobExecutor {
                 .withIdentity(info.name, info.group)
                 .build()
             // Trigger the job to run now, and then every n seconds
+            val startingTime = Calendar.getInstance()
+            startingTime.add(Calendar.SECOND, info.delay)
             val trigger = newTrigger()
                 .withIdentity(info.trigger, info.group)
-                .startNow()
+                .startAt(startingTime.time)
                 .withSchedule(
                     simpleSchedule()
                         .withIntervalInSeconds(info.interval)

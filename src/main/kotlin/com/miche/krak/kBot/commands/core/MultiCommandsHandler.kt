@@ -93,7 +93,8 @@ object MultiCommandsHandler {
                 name  = "MULTICOMMANDCLEANER",
                 interval  = 15, //seconds
                 trigger  = "MULTICOMMANDCLEANER_TRIGGER",
-                group  = "jobs")
+                group  = "jobs",
+                delay = 10)
         }
 
         private val TAG = "MULTI_COMMAND_CLEANER"

@@ -7,6 +7,7 @@ import com.miche.krak.kBot.utils.printlnK
 import com.miche.krak.kBot.utils.simpleHTMLMessage
 import org.quartz.InterruptableJob
 import org.quartz.JobExecutionContext
+import org.telegram.telegrambots.meta.bots.AbsSender
 
 class TrackerJob : InterruptableJob {
 
@@ -15,7 +16,9 @@ class TrackerJob : InterruptableJob {
           name  = "TRACKER_JOB",
           interval  = 3600, //seconds
           trigger  = "TRACKER_JOB_TRIGGER",
-          group  = "jobs")
+          group  = "jobs",
+          delay = 120,
+          botList = listOf(MainBot.instance))
     }
 
     private val TAG = "TRACKER_JOB"
@@ -25,16 +28,16 @@ class TrackerJob : InterruptableJob {
         printlnK(TAG, "Retrieving articles")
         DatabaseManager.getAllTrackedObjects().forEach { obj ->
             when (obj.store) {
-                    AmazonService().getName() -> {
-                        val list = AmazonService.getAmazonPrice(domain = obj.domain, articleId = obj.objectId)
-                        val bestPrice = if (list.isNotEmpty()) list.first() else null
-                        if (bestPrice == null) printlnK(TAG, "Got a null object for domain ${obj.domain}, id ${obj.objectId}")
-                        else if (bestPrice.totalPrice() <= obj.targetPrice) {
-                            simpleHTMLMessage(MainBot.instance, "THE OBJECT <b>${obj.name}</b> HAS REACHED THE TARGET PRICE:\n$bestPrice", obj.user.toLong())
-                            DatabaseManager.removeTrackedObject(obj)
+                AmazonService().getName() -> {
+                    val bestPrice = AmazonService.filterPrices(obj)
+                    if (bestPrice != null && bestPrice.totalPrice() <= obj.targetPrice) {
+                        jobInfo.botList.forEach {
+                            simpleHTMLMessage(it as AbsSender, "The object <b>${obj.name}</b> has reached the target price (${obj.targetPrice}):\n$bestPrice", obj.user.toLong())
                         }
-                        Thread.sleep(WAIT_TIME * 1000)
+                        DatabaseManager.removeTrackedObject(obj)
                     }
+                    Thread.sleep(WAIT_TIME * 1000)
+                }
             }
         }
     }

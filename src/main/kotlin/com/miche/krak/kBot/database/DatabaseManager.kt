@@ -140,8 +140,22 @@ object DatabaseManager {
                 }
         }
         if (users.size > 0)
-            groupK = GroupK(id = groupId, users = users)
+            groupK = GroupK(id = groupId, users = users, status = getGroupStatus(groupId))
         return groupK
+    }
+
+    /**
+     * Get group status
+     */
+    fun getGroupStatus(groupId : Long) : GroupStatus {
+        var statusK = GroupStatus.NORMAL
+        transaction {
+            Groups.select {Groups.id eq groupId}
+                .map {
+                    statusK = GroupStatus.valueOf(it[Groups.status].toUpperCase())
+                }
+        }
+        return statusK
     }
 
     /**

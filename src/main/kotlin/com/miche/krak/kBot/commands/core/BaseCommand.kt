@@ -148,7 +148,7 @@ class BaseCommand (
          */
         fun filterLock(user: User, chat: Chat): Boolean {
             return !(chat.isGroupChat || chat.isSuperGroupChat) ||
-                    DatabaseManager.getGroup(chat.id)?.status != GroupStatus.LOCKED ||
+                    DatabaseManager.getGroupStatus(chat.id) != GroupStatus.LOCKED ||
                         DatabaseManager.getGroupUserStatus(chat.id, user.id) >= Status.ADMIN
         }
 

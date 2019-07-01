@@ -1,6 +1,5 @@
 package com.miche.krak.kBot.trackingServices
 
-import com.miche.krak.kBot.bots.MainBot
 import com.miche.krak.kBot.commands.core.callbacks.CallbackHolder
 import com.miche.krak.kBot.commands.core.callbacks.CallbackProcessor
 import com.miche.krak.kBot.commands.core.MultiCommandInterface
@@ -59,8 +58,7 @@ class AmazonService : TrackingInterface {
      */
     private inner class ManageArticle : MultiCommandInterface {
         override fun executeAfter(absSender: AbsSender, user: User, chat: Chat, arguments: String, message: Message, data: Any?) {
-            val articleId = arguments
-            if (articleId.length != 10) {
+            if (arguments.length != 10) {
                 simpleMessage(absSender, "Wrong code. Retry.", chat)
                 MultiCommandsHandler.insertCommand(user, chat, ManageArticle())
             } else {
@@ -76,7 +74,8 @@ class AmazonService : TrackingInterface {
                     CallbackProcessor.insertCallback(shippedByAmazon)
                     val keyboard = InlineKeyboardMarkup()
                     keyboard.keyboard.add(listOf(soldByAmazon.getButton(), shippedByAmazon.getButton()))
-                    sendKeyboard(absSender, chat, "Choose the options you need from below.\n\nWhen you are ready send the target price.", keyboard)
+                    sendKeyboard(absSender, chat, "Choose the options you need from below.", keyboard)
+                    simpleMessage(absSender, "When you are ready send the target price in the form XXX.XX", chat)
                     MultiCommandsHandler.insertCommand(user, chat, ManagePrice(), listOf(soldByAmazon.getId(), shippedByAmazon.getId())) //Send as data the id of the callbacks, to remove them later
                 }
             }
@@ -235,6 +234,10 @@ class AmazonService : TrackingInterface {
             })
         }
 
+        /**
+         * Get prices for object and filter results according to chosen options.
+         * Return best price if at least one passes all filters, null otherwise.
+         */
         fun filterPrices(obj : TrackedObject) : TrackedObjectContainer ? {
             var list = getPrice(domain = obj.domain, articleId = obj.objectId)
             // filter if only sold by amazon

@@ -25,7 +25,7 @@ class TrackerJob : InterruptableJob {
     private val WAIT_TIME = 15L //seconds
 
     override fun execute(context: JobExecutionContext) {
-        printlnK(TAG, "Retrieving articles")
+        //printlnK(TAG, "Retrieving articles")
         DatabaseManager.getAllTrackedObjects().forEach { obj ->
             when (obj.store) {
                 AmazonService().getName() -> {

@@ -115,7 +115,7 @@ fun getCurrentDateTimeStamp(): String {
 
 /**
  * Tries to parse a string to get a price, Null if nothing found or an error occurred.
- * Will be changed later.
+ * Will be changed later: as now it's quite broken.
  */
 fun parsePrice(price : String) : Float? {
     var mod = price.replace(",",".")

@@ -37,7 +37,7 @@ object DatabaseManager {
     /**
      * Insert single user in DB
      */
-    fun addUser(user : User, userStatus : Status, info : String? = null) {
+    fun addUser(user: User, userStatus: Status, info: String? = null) {
         transaction {
             Users.insert {
                 it[id] = user.id
@@ -51,7 +51,7 @@ object DatabaseManager {
     /**
      * Insert list of users in DB. If already present, update its status.
      */
-    fun addUser(list : List<UserK>) {
+    fun addUser(list: List<UserK>) {
         try {
             transaction {
                 Users.batchInsert(list) { user ->
@@ -61,18 +61,18 @@ object DatabaseManager {
                     this[Users.statusInfo] = user.userInfo
                 }
             }
-        } catch (e: Exception) { //if a user in the list is already present, add one at a time
+        } catch (e: Exception) { // if a user in the list is already present, add one at a time
             transaction {
                 for (user in list) {
-                    try { //Does not use addUser, so that we use a single transaction
+                    try { // Does not use addUser, so that we use a single transaction
                         Users.insert {
                             it[id] = user.id
                             it[username] = user.username
                             it[status] = user.status.name
                             it[statusInfo] = user.userInfo
                         }
-                    } catch (ee : Exception) { //If user is already present, update its status
-                        Users.update ({Users.id eq user.id}){
+                    } catch (ee: Exception) { // If user is already present, update its status
+                        Users.update({ Users.id eq user.id }) {
                             it[status] = user.status.name
                         }
                     }
@@ -84,16 +84,16 @@ object DatabaseManager {
     /**
      * Get user from DB
      */
-    fun getUser(userId : Int) : UserK? {
-        var userK : UserK? = null
+    fun getUser(userId: Int): UserK? {
+        var userK: UserK? = null
         transaction {
-            Users.select {Users.id eq userId}
+            Users.select { Users.id eq userId }
                 .map {
                     userK = UserK(id = userId,
                         status = Status.valueOf(it[Users.status].toUpperCase()),
                         username = it[Users.username],
                         userInfo = it[Users.statusInfo])
-                     }
+                    }
         }
         return userK
     }
@@ -105,10 +105,10 @@ object DatabaseManager {
     /**
      * Return true if group exists inside the DB
      */
-    fun groupExists(groupId: Long) : Boolean {
+    fun groupExists(groupId: Long): Boolean {
         var result = false
         transaction {
-            result = Groups.select {Groups.id eq groupId}.count() > 0
+            result = Groups.select { Groups.id eq groupId }.count() > 0
         }
         return result
     }
@@ -128,11 +128,11 @@ object DatabaseManager {
     /**
      * Get group and all the members with a custom status
      */
-    fun getGroup(groupId : Long) : GroupK? {
-        var groupK : GroupK? = null
-        val users : ArrayList<UserK> = arrayListOf()
+    fun getGroup(groupId: Long): GroupK? {
+        var groupK: GroupK? = null
+        val users: ArrayList<UserK> = arrayListOf()
         transaction {
-            GroupUsers.select {GroupUsers.group eq groupId}
+            GroupUsers.select { GroupUsers.group eq groupId }
                 .forEach {
                     users.add(UserK(id = it[GroupUsers.user],
                         status = Status.valueOf(it[GroupUsers.status].toUpperCase()))
@@ -147,10 +147,10 @@ object DatabaseManager {
     /**
      * Get group status
      */
-    fun getGroupStatus(groupId : Long) : GroupStatus {
+    fun getGroupStatus(groupId: Long): GroupStatus {
         var statusK = GroupStatus.NORMAL
         transaction {
-            Groups.select {Groups.id eq groupId}
+            Groups.select { Groups.id eq groupId }
                 .map {
                     statusK = GroupStatus.valueOf(it[Groups.status].toUpperCase())
                 }
@@ -161,9 +161,9 @@ object DatabaseManager {
     /**
      * Update status of a group
      */
-    fun updateGroup(groupId : Long, newStatus: GroupStatus) {
+    fun updateGroup(groupId: Long, newStatus: GroupStatus) {
         transaction {
-            Groups.update ({Groups.id eq groupId}) {
+            Groups.update({ Groups.id eq groupId }) {
                 it[status] = newStatus.name
             }
         }
@@ -176,7 +176,7 @@ object DatabaseManager {
     /**
      * Add user to group with defined status
      */
-    fun addGroupUser(groupId : Long, userId : Int, statusK : Status) {
+    fun addGroupUser(groupId: Long, userId: Int, statusK: Status) {
         transaction {
             try {
                 GroupUsers.insert {
@@ -194,7 +194,7 @@ object DatabaseManager {
      * Add users to group with defined status
      * If already present, update status
      */
-    fun addGroupUsers(groupId : Long, usersId : List<Int>, statusK : Status) {
+    fun addGroupUsers(groupId: Long, usersId: List<Int>, statusK: Status) {
         try {
             transaction {
                 GroupUsers.batchInsert(usersId) { userId ->
@@ -203,17 +203,17 @@ object DatabaseManager {
                     this[GroupUsers.status] = statusK.name
                 }
             }
-        } catch (e: Exception) { //if a user in the list is already present, add one at a time
+        } catch (e: Exception) { // if a user in the list is already present, add one at a time
             transaction {
-                for (userId in usersId) { //Does not use addGroupUser, so that we use a single transaction
+                for (userId in usersId) { // Does not use addGroupUser, so that we use a single transaction
                     try {
                         GroupUsers.insert {
                             it[group] = groupId
                             it[user] = userId
                             it[status] = statusK.name
                         }
-                    } catch (ee : Exception) {
-                        GroupUsers.update({GroupUsers.group eq groupId and (GroupUsers.user eq userId)}) {
+                    } catch (ee: Exception) {
+                        GroupUsers.update({ GroupUsers.group eq groupId and (GroupUsers.user eq userId) }) {
                             it[status] = statusK.name
                         }
                     }
@@ -225,10 +225,10 @@ object DatabaseManager {
     /**
      * Get user status in a group
      */
-    fun getGroupUserStatus(groupId : Long, userId : Int) : Status {
-        var statusK : Status = Status.NOT_REGISTERED
+    fun getGroupUserStatus(groupId: Long, userId: Int): Status {
+        var statusK: Status = Status.NOT_REGISTERED
         transaction {
-            GroupUsers.select {GroupUsers.group eq groupId and (GroupUsers.user eq userId)}
+            GroupUsers.select { GroupUsers.group eq groupId and (GroupUsers.user eq userId) }
                 .map {
                     statusK = Status.valueOf(it[GroupUsers.status].toUpperCase())
                 }
@@ -239,9 +239,9 @@ object DatabaseManager {
     /**
      * Update status for user in group
      */
-    fun updateGroupUser(groupId: Long, userId: Int, newStatus : Status) {
+    fun updateGroupUser(groupId: Long, userId: Int, newStatus: Status) {
         transaction {
-            GroupUsers.update({GroupUsers.group eq groupId and (GroupUsers.user eq userId)}) {
+            GroupUsers.update({ GroupUsers.group eq groupId and (GroupUsers.user eq userId) }) {
                 it[status] = newStatus.name
             }
         }
@@ -250,9 +250,9 @@ object DatabaseManager {
     /**
      * Update status of users in a group whose status match oldStatus
      */
-    fun updateGroupUsersStatus(groupId: Long, oldStatus : Status, newStatus: Status) {
+    fun updateGroupUsersStatus(groupId: Long, oldStatus: Status, newStatus: Status) {
         transaction {
-            GroupUsers.update({GroupUsers.group eq groupId and (GroupUsers.status eq oldStatus.name)}) {
+            GroupUsers.update({ GroupUsers.group eq groupId and (GroupUsers.status eq oldStatus.name) }) {
                 it[status] = newStatus.name
             }
         }
@@ -264,8 +264,16 @@ object DatabaseManager {
     /**
      * Add tracked object to DB, update if already present
      */
-    fun addTrackedObject(nameK : String, userIdK : Int, objectIdK : String, storeK : String, domainK : String, targetPriceK : Float,
-                         forceSellerK : Boolean = false, forceShippingK : Boolean = false) {
+    fun addTrackedObject(
+        nameK: String,
+        userIdK: Int,
+        objectIdK: String,
+        storeK: String,
+        domainK: String,
+        targetPriceK: Float,
+        forceSellerK: Boolean = false,
+        forceShippingK: Boolean = false
+    ) {
         transaction {
             try {
                 TrackedObjects.insert {
@@ -303,11 +311,19 @@ object DatabaseManager {
     /**
      * Update tracked object
      */
-    fun updateTrackedObject(nameK : String, userIdK : Int, objectIdK : String, storeK : String, domainK : String, targetPriceK : Float,
-                         forceSellerK : Boolean = false, forceShippingK : Boolean = false) {
+    fun updateTrackedObject(
+        nameK: String,
+        userIdK: Int,
+        objectIdK: String,
+        storeK: String,
+        domainK: String,
+        targetPriceK: Float,
+        forceSellerK: Boolean = false,
+        forceShippingK: Boolean = false
+    ) {
         transaction {
-            TrackedObjects.update({TrackedObjects.userId eq userIdK and (TrackedObjects.objectId eq objectIdK) and
-                        (TrackedObjects.store eq storeK) and (TrackedObjects.domain eq domainK)}) {
+            TrackedObjects.update({ TrackedObjects.userId eq userIdK and (TrackedObjects.objectId eq objectIdK) and
+                        (TrackedObjects.store eq storeK) and (TrackedObjects.domain eq domainK) }) {
                 it[name] = nameK
                 it[targetPrice] = targetPriceK
                 it[forceSeller] = forceSellerK
@@ -319,7 +335,7 @@ object DatabaseManager {
     /**
      * Get all tracked objects
      */
-    fun getAllTrackedObjects() : List<TrackedObject> {
+    fun getAllTrackedObjects(): List<TrackedObject> {
         return transaction {
             TrackedObjects.selectAll().map {
                 TrackedObject(name = it[TrackedObjects.name], user = it[TrackedObjects.userId], objectId = it[TrackedObjects.objectId],
@@ -332,10 +348,10 @@ object DatabaseManager {
     /**
      * Remove a tracked object
      */
-    fun removeTrackedObject(trackedObj : TrackedObject) {
+    fun removeTrackedObject(trackedObj: TrackedObject) {
         transaction {
             TrackedObjects.deleteWhere { TrackedObjects.userId eq trackedObj.user and (TrackedObjects.objectId eq trackedObj.objectId) and
-                    (TrackedObjects.store eq trackedObj.store) and (TrackedObjects.domain eq trackedObj.domain)}
+                    (TrackedObjects.store eq trackedObj.store) and (TrackedObjects.domain eq trackedObj.domain) }
         }
     }
 }

@@ -7,13 +7,12 @@ import java.io.FileOutputStream
 import java.io.IOException
 import java.io.OutputStreamWriter
 
-
 object LoggerK {
 
     private val fileHolder = File(getMainFolder().plus("/logs/log_").plus(getCurrentDateTimeStamp()).plus(".log"))
     @Volatile private var textHolder = StringBuilder()
 
-    fun log(s : String) {
+    fun log(s: String) {
         synchronized(this) {
             textHolder.append(s + "\n")
         }

@@ -22,7 +22,7 @@ import org.telegram.telegrambots.meta.bots.AbsSender
 
 class AmazonService : TrackingInterface {
 
-    private val acceptedAmazonDomains = listOf("co.jp", "fr", "de", "it", "nl", "es", "co.uk", "ca", "com").sorted() //not all the domains as they'd be too many
+    private val acceptedAmazonDomains = listOf("co.jp", "fr", "de", "it", "nl", "es", "co.uk", "ca", "com").sorted() // not all the domains as they'd be too many
     private val trackedObject = TrackedObject.getEmpty()
     private val TAG = "AMAZON_SERVICE"
 
@@ -67,7 +67,7 @@ class AmazonService : TrackingInterface {
                     simpleMessage(absSender, "Retrieving current prices for domain ${trackedObject.domain} and id ${trackedObject.objectId}", chat)
                     val priceList = getPrice(trackedObject.domain, trackedObject.objectId)
                     simpleMessage(absSender, priceList.toString(), chat)
-                    //Send options to enable forced seller or shipment
+                    // Send options to enable forced seller or shipment
                     val soldByAmazon = ManageSoldByAmazon()
                     val shippedByAmazon = ManageShippedByAmazon()
                     CallbackProcessor.insertCallback(soldByAmazon)
@@ -76,7 +76,7 @@ class AmazonService : TrackingInterface {
                     keyboard.keyboard.add(listOf(soldByAmazon.getButton(), shippedByAmazon.getButton()))
                     sendKeyboard(absSender, chat, "Choose the options you need from below.", keyboard)
                     simpleMessage(absSender, "When you are ready send the target price in the form XXX.XX", chat)
-                    MultiCommandsHandler.insertCommand(user, chat, ManagePrice(), listOf(soldByAmazon.getId(), shippedByAmazon.getId())) //Send as data the id of the callbacks, to remove them later
+                    MultiCommandsHandler.insertCommand(user, chat, ManagePrice(), listOf(soldByAmazon.getId(), shippedByAmazon.getId())) // Send as data the id of the callbacks, to remove them later
                 }
             }
         }
@@ -98,7 +98,7 @@ class AmazonService : TrackingInterface {
             return "AmazonService_soldByAmazon_toggle"
         }
 
-        override fun processCallback(absSender: AbsSender, callback : CallbackQuery) {
+        override fun processCallback(absSender: AbsSender, callback: CallbackQuery) {
             trackedObject.forceSellerK = !trackedObject.forceSellerK
             printlnK(TAG, "Received callback ${getId()}")
             val answer = AnswerCallbackQuery()
@@ -129,7 +129,7 @@ class AmazonService : TrackingInterface {
             return "AmazonService_shippedByAmazon_toggle"
         }
 
-        override fun processCallback(absSender: AbsSender, callback : CallbackQuery) {
+        override fun processCallback(absSender: AbsSender, callback: CallbackQuery) {
             trackedObject.forceShippingK = !trackedObject.forceShippingK
             printlnK(TAG, "Received callback ${getId()}")
             val answer = AnswerCallbackQuery()
@@ -190,13 +190,13 @@ class AmazonService : TrackingInterface {
          * maxDepth is the number of attempts to search for maxIndex elements before giving up (if there are 3 listings, but maxIndex is 5, maxDepth becomes the new limit to the loop)
          * Be aware that sometimes if some listings are removed\used their child count is still there, but they don't count to maxIndex, so maxDepth may be a limit before maxIndex even when there are > maxIndex listings
          */
-        fun getPrice(domain: String, articleId: String, maxIndex : Int = 5, maxDepth : Int = 20): List<TrackedObjectContainer> {
+        fun getPrice(domain: String, articleId: String, maxIndex: Int = 5, maxDepth: Int = 20): List<TrackedObjectContainer> {
             val list = mutableListOf<TrackedObjectContainer>()
             val doc =
-                Jsoup.connect("https://www.amazon.$domain/gp/offer-listing/$articleId/ref=olp_f_used?ie=UTF8&f_new=true") //only where status = new
+                Jsoup.connect("https://www.amazon.$domain/gp/offer-listing/$articleId/ref=olp_f_used?ie=UTF8&f_new=true") // only where status = new
                     .userAgent("Chrome/75.0.3770").get()
             var child = 1
-            while (list.size < maxIndex && child < maxDepth) { //child constrict if there are less than maxIndex prices
+            while (list.size < maxIndex && child < maxDepth) { // child constrict if there are less than maxIndex prices
                 val price =
                     doc.select("#olpOfferList > div > div > div:nth-child($child) > div.a-column.a-span2.olpPriceColumn > span.a-size-large.a-color-price.olpOfferPrice.a-text-bold")
                         .first()?.text()
@@ -210,10 +210,10 @@ class AmazonService : TrackingInterface {
                             ?: ""
                     if (seller.isEmpty())
                         if (doc.select("#olpOfferList > div > div > div:nth-child($child) > div.a-column.a-span2.olpSellerColumn > h3 > img").isNotEmpty())
-                            seller = amazonSellerTag //as Amazon uses an image, when we can't find any text, suppose it's amazon
+                            seller = amazonSellerTag // as Amazon uses an image, when we can't find any text, suppose it's amazon
                     val shippedByAmazon =
                         doc.select("#olpOfferList > div > div > div:nth-child($child) > div.a-column.a-span2.olpPriceColumn > span.supersaver > i")
-                            .isNotEmpty() //if present is the "prime" logo
+                            .isNotEmpty() // if present is the "prime" logo
                     list.add(
                         TrackedObjectContainer(
                             price = price,
@@ -238,7 +238,7 @@ class AmazonService : TrackingInterface {
          * Get prices for object and filter results according to chosen options.
          * Return best price if at least one passes all filters, null otherwise.
          */
-        fun filterPrices(obj : TrackedObject) : TrackedObjectContainer ? {
+        fun filterPrices(obj: TrackedObject): TrackedObjectContainer ? {
             var list = getPrice(domain = obj.domain, articleId = obj.objectId)
             // filter if only sold by amazon
             if (obj.forceSellerK) list = list.filter { it.seller == AmazonService.amazonSellerTag }

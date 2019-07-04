@@ -10,13 +10,13 @@ import org.telegram.telegrambots.meta.api.objects.User
 import org.telegram.telegrambots.meta.bots.AbsSender
 import org.telegram.telegrambots.meta.api.objects.Message
 
-
 /**
  * Simple command
  */
-class SimpleExampleCommand : CommandInterface { //Implement CommandInterface (execute method)
+class SimpleExampleCommand : CommandInterface { // Implement CommandInterface (execute method)
 
-    val engine = BaseCommand( //create an instance of baseCommand. See core.BaseCommand for a complete description.
+    // create an instance of baseCommand. See core.BaseCommand for a complete description.
+    val engine = BaseCommand(
         command = "/simple",
         description = "This is the description",
         targets = listOf(Pair(Target.USER, Status.USER),

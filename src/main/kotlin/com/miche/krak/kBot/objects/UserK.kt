@@ -1,10 +1,8 @@
 package com.miche.krak.kBot.objects
 
-import com.miche.krak.kBot.objects.Status
+data class UserK(val id: Int, var username: String? = "", var status: Status, var userInfo: String? = "") {
 
-data class UserK (val id : Int, var username : String? = "", var status : Status, var userInfo : String? = "") {
-
-    override fun equals(other : Any?) : Boolean {
+    override fun equals(other: Any?): Boolean {
         return other is UserK && id == other.id
     }
 }

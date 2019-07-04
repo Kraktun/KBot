@@ -8,10 +8,10 @@ class LoggerJob : InterruptableJob {
 
     companion object {
         val jobInfo = JobInfo(
-            name  = "LOGGER_JOB",
-            interval  = 120, //seconds
-            trigger  = "LOGGER_JOB_TRIGGER",
-            group  = "jobs",
+            name = "LOGGER_JOB",
+            interval = 120, // seconds
+            trigger = "LOGGER_JOB_TRIGGER",
+            group = "jobs",
             delay = 120)
     }
 
@@ -20,6 +20,5 @@ class LoggerJob : InterruptableJob {
     }
 
     override fun interrupt() {
-
     }
 }

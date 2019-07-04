@@ -1,6 +1,7 @@
 plugins {
     id 'java'
     id 'org.jetbrains.kotlin.jvm' version '1.3.21'
+    id "org.jlleitschuh.gradle.ktlint" version "8.1.0"
 }
 
 group 'com.miche.krak'
@@ -48,4 +49,9 @@ jar {
                 'Implementation-Version': version
     }
     from { configurations.compile.collect { it.isDirectory() ? it : zipTree(it) } }
+}
+
+ktlint {
+    debug = true
+    verbose = true
 }

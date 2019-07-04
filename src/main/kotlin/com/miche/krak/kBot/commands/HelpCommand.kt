@@ -15,7 +15,6 @@ import org.telegram.telegrambots.meta.exceptions.TelegramApiException
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage
 import org.telegram.telegrambots.meta.api.objects.Message
 
-
 /**
  * Help command.
  * List all commands registered.
@@ -38,9 +37,9 @@ class HelpCommand : CommandInterface {
         CommandProcessor.getRegisteredCommands().filter {
             it.targets.filter { m ->
                 m.first == chatMapper(chat)
-            }.ifNotEmpty ({
-                this[0].second <= getDBStatus(user, chat) //[0] as a command can have only one single pair with a unique Target
-        }, default = false) as Boolean}.map {
+            }.ifNotEmpty({
+                this[0].second <= getDBStatus(user, chat) // [0] as a command can have only one single pair with a unique Target
+        }, default = false) as Boolean }.map {
             text += "${it.command} : ${it.description}\n"
         }
         answer.text = text

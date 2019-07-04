@@ -26,7 +26,6 @@ object GroupUsers : Table() {
     val status = text("status")
 }
 
-
 object TrackedObjects : Table() {
     val name = text("name")
     val userId = reference("userId", Users.id, onDelete = ReferenceOption.CASCADE).primaryKey(0)
@@ -37,8 +36,3 @@ object TrackedObjects : Table() {
     val forceSeller = bool("forceSeller").default(false)
     val forceShipping = bool("forceShipping").default(false)
 }
-
-
-
-
-

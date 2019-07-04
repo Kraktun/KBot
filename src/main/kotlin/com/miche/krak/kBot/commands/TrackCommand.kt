@@ -36,7 +36,7 @@ class TrackCommand : CommandInterface {
      * First part: ask store
      */
     override fun execute(absSender: AbsSender, user: User, chat: Chat, arguments: List<String>, message: Message) {
-        sendSimpleListKeyboard(absSender, chat, "Choose the store.", acceptedStores.map {it.getName()}.toList())
+        sendSimpleListKeyboard(absSender, chat, "Choose the store.", acceptedStores.map { it.getName() }.toList())
         MultiCommandsHandler.insertCommand(user, chat, ManageStore())
     }
 
@@ -45,7 +45,7 @@ class TrackCommand : CommandInterface {
      */
     private inner class ManageStore : MultiCommandInterface {
         override fun executeAfter(absSender: AbsSender, user: User, chat: Chat, arguments: String, message: Message, data: Any?) {
-            val store = acceptedStores.find { it.getName() == arguments}
+            val store = acceptedStores.find { it.getName() == arguments }
             val storeId = if (store == null) -1 else acceptedStores.indexOf(store)
             if (storeId < 0) {
                 simpleMessage(absSender, "Invalid store. Retry.", chat)

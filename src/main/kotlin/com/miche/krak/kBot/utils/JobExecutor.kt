@@ -18,7 +18,7 @@ import java.util.*
 object JobExecutor {
 
     private val scheduler = StdSchedulerFactory().scheduler
-    private const val sleepTime = 100L //millis
+    private const val sleepTime = 100L // millis
     @Volatile var isShutdown = scheduler.isShutdown
     private val jobs = mapOf<Class<out Job>, JobInfo>(MultiCommandsHandler.CleanerJob::class.java to MultiCommandsHandler.CleanerJob.jobInfo,
         TrackerJob::class.java to TrackerJob.jobInfo,
@@ -51,7 +51,6 @@ object JobExecutor {
         } catch (e: InterruptedException) {
             false
         }
-
     }
 
     /**

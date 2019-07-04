@@ -11,7 +11,6 @@ import org.telegram.telegrambots.meta.api.objects.User
 import org.telegram.telegrambots.meta.bots.AbsSender
 import org.telegram.telegrambots.meta.api.objects.Message
 
-
 /**
  * Simple hello command
  */

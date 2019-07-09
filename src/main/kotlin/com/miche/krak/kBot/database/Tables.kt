@@ -18,7 +18,7 @@ object Groups : Table() {
 }
 
 /*
-A user in a group does not need to have started the bot in a private chat
+A user in a group does not need to start the bot in a private chat
  */
 object GroupUsers : Table() {
     val group = reference("group", Groups.id, onDelete = ReferenceOption.CASCADE).primaryKey(0)
@@ -31,8 +31,7 @@ object TrackedObjects : Table() {
     val userId = reference("userId", Users.id, onDelete = ReferenceOption.CASCADE).primaryKey(0)
     val objectId = text("objectId").primaryKey(1)
     val store = text("store").primaryKey(2)
-    val domain = text("domain").primaryKey(3)
+    val extraKey = text("extraKey").primaryKey(3).default("") // extra key if necessary
     val targetPrice = float("targetPrice")
-    val forceSeller = bool("forceSeller").default(false)
-    val forceShipping = bool("forceShipping").default(false)
+    val data = text("data") // Encoding and decoding must be done in calling classes (aka tracking services\jobs)
 }

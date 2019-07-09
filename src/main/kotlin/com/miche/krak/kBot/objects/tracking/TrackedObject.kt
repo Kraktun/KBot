@@ -1,17 +1,16 @@
-package com.miche.krak.kBot.objects
+package com.miche.krak.kBot.objects.tracking
 
 /**
- * Object containing a request for an article
+ * Object containing a request for an article.
  */
 class TrackedObject(
     var name: String,
     var user: Int,
     var objectId: String,
     var store: String,
-    var domain: String,
+    var extraKey: String,
     var targetPrice: Float,
-    var forceSellerK: Boolean = false,
-    var forceShippingK: Boolean = false
+    var data: String = "" // Encoded data (JSON)
 ) {
 
     companion object {

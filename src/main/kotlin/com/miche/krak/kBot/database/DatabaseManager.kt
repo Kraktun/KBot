@@ -1,6 +1,7 @@
 package com.miche.krak.kBot.database
 
 import com.miche.krak.kBot.objects.*
+import com.miche.krak.kBot.objects.tracking.TrackedObject
 import com.miche.krak.kBot.utils.getMainFolder
 import com.miche.krak.kBot.utils.printlnK
 import org.jetbrains.exposed.sql.*
@@ -269,10 +270,9 @@ object DatabaseManager {
         userIdK: Int,
         objectIdK: String,
         storeK: String,
-        domainK: String,
+        extraKeyK: String,
         targetPriceK: Float,
-        forceSellerK: Boolean = false,
-        forceShippingK: Boolean = false
+        dataK: String = ""
     ) {
         transaction {
             try {
@@ -281,13 +281,12 @@ object DatabaseManager {
                     it[userId] = userIdK
                     it[objectId] = objectIdK
                     it[store] = storeK
-                    it[domain] = domainK
+                    it[extraKey] = extraKeyK
                     it[targetPrice] = targetPriceK
-                    it[forceSeller] = forceSellerK
-                    it[forceShipping] = forceShippingK
+                    it[data] = dataK
                 }
             } catch (e: Exception) {
-                updateTrackedObject(nameK, userIdK, objectIdK, storeK, domainK, targetPriceK, forceSellerK, forceShippingK)
+                updateTrackedObject(nameK, userIdK, objectIdK, storeK, extraKeyK, targetPriceK, dataK)
             }
         }
     }
@@ -302,9 +301,8 @@ object DatabaseManager {
             objectIdK = trackedObj.objectId,
             storeK = trackedObj.store,
             targetPriceK = trackedObj.targetPrice,
-            domainK = trackedObj.domain,
-            forceShippingK = trackedObj.forceShippingK,
-            forceSellerK = trackedObj.forceSellerK
+            extraKeyK = trackedObj.extraKey,
+            dataK = trackedObj.data
         )
     }
 
@@ -316,18 +314,16 @@ object DatabaseManager {
         userIdK: Int,
         objectIdK: String,
         storeK: String,
-        domainK: String,
+        extraKeyK: String,
         targetPriceK: Float,
-        forceSellerK: Boolean = false,
-        forceShippingK: Boolean = false
+        dataK: String = ""
     ) {
         transaction {
             TrackedObjects.update({ TrackedObjects.userId eq userIdK and (TrackedObjects.objectId eq objectIdK) and
-                        (TrackedObjects.store eq storeK) and (TrackedObjects.domain eq domainK) }) {
+                        (TrackedObjects.store eq storeK) and (TrackedObjects.extraKey eq extraKeyK) }) {
                 it[name] = nameK
                 it[targetPrice] = targetPriceK
-                it[forceSeller] = forceSellerK
-                it[forceShipping] = forceShippingK
+                it[data] = dataK
             }
         }
     }
@@ -338,9 +334,11 @@ object DatabaseManager {
     fun getAllTrackedObjects(): List<TrackedObject> {
         return transaction {
             TrackedObjects.selectAll().map {
-                TrackedObject(name = it[TrackedObjects.name], user = it[TrackedObjects.userId], objectId = it[TrackedObjects.objectId],
-                store = it[TrackedObjects.store], domain = it[TrackedObjects.domain], targetPrice = it[TrackedObjects.targetPrice],
-                forceSellerK = it[TrackedObjects.forceSeller], forceShippingK = it[TrackedObjects.forceShipping])
+                TrackedObject(
+                    name = it[TrackedObjects.name], user = it[TrackedObjects.userId], objectId = it[TrackedObjects.objectId],
+                    store = it[TrackedObjects.store], extraKey = it[TrackedObjects.extraKey], targetPrice = it[TrackedObjects.targetPrice],
+                    data = it[TrackedObjects.data]
+                )
             }.toList()
         }
     }
@@ -351,7 +349,7 @@ object DatabaseManager {
     fun removeTrackedObject(trackedObj: TrackedObject) {
         transaction {
             TrackedObjects.deleteWhere { TrackedObjects.userId eq trackedObj.user and (TrackedObjects.objectId eq trackedObj.objectId) and
-                    (TrackedObjects.store eq trackedObj.store) and (TrackedObjects.domain eq trackedObj.domain) }
+                    (TrackedObjects.store eq trackedObj.store) and (TrackedObjects.extraKey eq trackedObj.extraKey) }
         }
     }
 }

@@ -2,8 +2,8 @@ package com.miche.krak.kBot.jobs
 
 import com.miche.krak.kBot.bots.MainBot
 import com.miche.krak.kBot.database.DatabaseManager
-import com.miche.krak.kBot.trackingServices.AmazonService
-import com.miche.krak.kBot.trackingServices.UnieuroService
+import com.miche.krak.kBot.services.tracking.AmazonService
+import com.miche.krak.kBot.services.tracking.UnieuroService
 import com.miche.krak.kBot.utils.simpleHTMLMessage
 import org.quartz.InterruptableJob
 import org.quartz.JobExecutionContext

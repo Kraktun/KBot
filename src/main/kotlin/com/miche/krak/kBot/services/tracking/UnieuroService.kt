@@ -1,10 +1,10 @@
-package com.miche.krak.kBot.trackingServices
+package com.miche.krak.kBot.services.tracking
 
 import com.miche.krak.kBot.commands.core.MultiCommandInterface
 import com.miche.krak.kBot.commands.core.MultiCommandsHandler
 import com.miche.krak.kBot.database.DatabaseManager
-import com.miche.krak.kBot.objects.TrackedObject
-import com.miche.krak.kBot.objects.TrackedObjectContainer
+import com.miche.krak.kBot.objects.tracking.TrackedObject
+import com.miche.krak.kBot.objects.tracking.TrackedObjectContainer
 import com.miche.krak.kBot.utils.parsePrice
 import com.miche.krak.kBot.utils.removeKeyboard
 import com.miche.krak.kBot.utils.simpleMessage
@@ -97,9 +97,9 @@ class UnieuroService : TrackingInterface {
             val shippingPrice = parsePrice(shipping) ?: ""
             if (price == null) return null
             return TrackedObjectContainer(
-                            price = price.toString(),
-                            seller = "Unieuro",
-                            shippingPrice = shippingPrice.toString()
+                price = price.toString(),
+                seller = "Unieuro",
+                shippingPrice = shippingPrice.toString()
             )
         }
     }

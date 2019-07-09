@@ -1,4 +1,4 @@
-package com.miche.krak.kBot.trackingServices
+package com.miche.krak.kBot.services.tracking
 
 import org.telegram.telegrambots.meta.api.objects.Chat
 import org.telegram.telegrambots.meta.api.objects.User

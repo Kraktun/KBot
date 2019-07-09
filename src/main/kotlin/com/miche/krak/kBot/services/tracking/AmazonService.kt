@@ -1,12 +1,13 @@
-package com.miche.krak.kBot.trackingServices
+package com.miche.krak.kBot.services.tracking
 
+import com.beust.klaxon.Klaxon
 import com.miche.krak.kBot.commands.core.callbacks.CallbackHolder
 import com.miche.krak.kBot.commands.core.callbacks.CallbackProcessor
 import com.miche.krak.kBot.commands.core.MultiCommandInterface
 import com.miche.krak.kBot.commands.core.MultiCommandsHandler
 import com.miche.krak.kBot.database.DatabaseManager
-import com.miche.krak.kBot.objects.TrackedObject
-import com.miche.krak.kBot.objects.TrackedAmazonObjectContainer
+import com.miche.krak.kBot.objects.tracking.TrackedObject
+import com.miche.krak.kBot.objects.tracking.TrackedObjectContainerAmazon
 import com.miche.krak.kBot.utils.*
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
@@ -24,6 +25,7 @@ class AmazonService : TrackingInterface {
 
     private val acceptedAmazonDomains = listOf("co.jp", "fr", "de", "it", "nl", "es", "co.uk", "ca", "com").sorted() // not all the domains as they'd be too many
     private val trackedObject = TrackedObject.getEmpty()
+    private val companionData = AmazonData(forceSellerK = false, forceShippingK = false)
     private val TAG = "AMAZON_SERVICE"
 
     override fun getName(): String {
@@ -47,7 +49,7 @@ class AmazonService : TrackingInterface {
                 MultiCommandsHandler.insertCommand(user, chat, ManageDomains())
             } else {
                 removeKeyboard(absSender, chat, "Send the ID of the item.")
-                trackedObject.domain = arguments
+                trackedObject.extraKey = arguments
                 MultiCommandsHandler.insertCommand(user, chat, ManageArticle())
             }
         }
@@ -64,8 +66,8 @@ class AmazonService : TrackingInterface {
             } else {
                 trackedObject.objectId = arguments
                 GlobalScope.launch {
-                    simpleMessage(absSender, "Retrieving current prices for domain ${trackedObject.domain} and id ${trackedObject.objectId}", chat)
-                    val priceList = getPrice(trackedObject.domain, trackedObject.objectId)
+                    simpleMessage(absSender, "Retrieving current prices for domain ${trackedObject.extraKey} and id ${trackedObject.objectId}", chat)
+                    val priceList = getPrice(trackedObject.extraKey, trackedObject.objectId)
                     simpleMessage(absSender, priceList.toString(), chat)
                     // Send options to enable forced seller or shipment
                     val soldByAmazon = ManageSoldByAmazon()
@@ -99,11 +101,11 @@ class AmazonService : TrackingInterface {
         }
 
         override fun processCallback(absSender: AbsSender, callback: CallbackQuery) {
-            trackedObject.forceSellerK = !trackedObject.forceSellerK
+            companionData.forceSellerK = !companionData.forceSellerK
             printlnK(TAG, "Received callback ${getId()}")
             val answer = AnswerCallbackQuery()
             answer.callbackQueryId = callback.id
-            val result = if (trackedObject.forceSellerK) "enabled" else "disabled"
+            val result = if (companionData.forceSellerK) "enabled" else "disabled"
             answer.text = "Confirmed option: $result sold by Amazon."
             executeMethod(absSender = absSender, m = answer)
         }
@@ -130,11 +132,11 @@ class AmazonService : TrackingInterface {
         }
 
         override fun processCallback(absSender: AbsSender, callback: CallbackQuery) {
-            trackedObject.forceShippingK = !trackedObject.forceShippingK
+            companionData.forceShippingK = !companionData.forceShippingK
             printlnK(TAG, "Received callback ${getId()}")
             val answer = AnswerCallbackQuery()
             answer.callbackQueryId = callback.id
-            val result = if (trackedObject.forceShippingK) "enabled" else "disabled"
+            val result = if (companionData.forceShippingK) "enabled" else "disabled"
             answer.text = "Confirmed option: $result shipped by Amazon."
             executeMethod(absSender = absSender, m = answer)
         }
@@ -174,6 +176,7 @@ class AmazonService : TrackingInterface {
                 MultiCommandsHandler.insertCommand(user, chat, ManageObjectName())
             } else {
                 trackedObject.name = arguments
+                trackedObject.data = Klaxon().toJsonString(companionData)
                 DatabaseManager.addTrackedObject(trackedObject)
                 simpleMessage(absSender, "Object saved.", chat)
             }
@@ -190,8 +193,8 @@ class AmazonService : TrackingInterface {
          * maxDepth is the number of attempts to search for maxIndex elements before giving up (if there are 3 listings, but maxIndex is 5, maxDepth becomes the new limit to the loop)
          * Be aware that sometimes if some listings are removed\used their child count is still there, but they don't count to maxIndex, so maxDepth may be a limit before maxIndex even when there are > maxIndex listings
          */
-        fun getPrice(domain: String, articleId: String, maxIndex: Int = 5, maxDepth: Int = 20): List<TrackedAmazonObjectContainer> {
-            val list = mutableListOf<TrackedAmazonObjectContainer>()
+        fun getPrice(domain: String, articleId: String, maxIndex: Int = 5, maxDepth: Int = 20): List<TrackedObjectContainerAmazon> {
+            val list = mutableListOf<TrackedObjectContainerAmazon>()
             val doc =
                 Jsoup.connect("https://www.amazon.$domain/gp/offer-listing/$articleId/ref=olp_f_used?ie=UTF8&f_new=true") // only where status = new
                     .userAgent("Chrome/75.0.3770").get()
@@ -210,15 +213,16 @@ class AmazonService : TrackingInterface {
                             ?: ""
                     if (seller.isEmpty())
                         if (doc.select("#olpOfferList > div > div > div:nth-child($child) > div.a-column.a-span2.olpSellerColumn > h3 > img").isNotEmpty())
-                            seller = amazonSellerTag // as Amazon uses an image, when we can't find any text, suppose it's amazon
+                            seller =
+                                amazonSellerTag // as Amazon uses an image, when we can't find any text, suppose it's amazon
                     val shippedByAmazon =
                         doc.select("#olpOfferList > div > div > div:nth-child($child) > div.a-column.a-span2.olpPriceColumn > span.supersaver > i")
                             .isNotEmpty() // if present is the "prime" logo
                     list.add(
-                        TrackedAmazonObjectContainer(
-                            price = price,
-                            seller = seller,
-                            shippingPrice = shippingPrice,
+                        TrackedObjectContainerAmazon(
+                            priceA = price,
+                            sellerA = seller,
+                            shippingPriceA = shippingPrice,
                             shippedByAmazon = shippedByAmazon
                         )
                     )
@@ -238,13 +242,16 @@ class AmazonService : TrackingInterface {
          * Get prices for object and filter results according to chosen options.
          * Return best price if at least one passes all filters, null otherwise.
          */
-        fun filterPrices(obj: TrackedObject): TrackedAmazonObjectContainer ? {
-            var list = getPrice(domain = obj.domain, articleId = obj.objectId)
+        fun filterPrices(obj: TrackedObject): TrackedObjectContainerAmazon? {
+            var list = getPrice(domain = obj.extraKey, articleId = obj.objectId)
+            val data = Klaxon().parse<AmazonData>(obj.data)
             // filter if only sold by amazon
-            if (obj.forceSellerK) list = list.filter { it.seller == amazonSellerTag }
+            if (data != null && data.forceSellerK) list = list.filter { it.seller == amazonSellerTag }
             // filter if only shipped by amazon
-            if (obj.forceShippingK) list = list.filter { it.shippedByAmazon }
+            if (data != null && data.forceShippingK) list = list.filter { it.shippedByAmazon }
             return if (list.isNotEmpty()) list.first() else null
         }
     }
 }
+
+data class AmazonData(var forceSellerK: Boolean, var forceShippingK: Boolean)

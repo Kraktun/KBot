@@ -21,6 +21,5 @@ class TestCommand : CommandInterface {
     )
 
     override fun execute(absSender: AbsSender, user: User, chat: Chat, arguments: List<String>, message: Message) {
-
     }
 }

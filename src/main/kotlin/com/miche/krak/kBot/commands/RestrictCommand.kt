@@ -14,7 +14,6 @@ import org.telegram.telegrambots.meta.bots.AbsSender
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException
 import org.telegram.telegrambots.meta.api.objects.Message
 
-
 /**
  * Restrict command.
  * Use telegram API to restrict a user in a supergroup.
@@ -25,7 +24,7 @@ class RestrictCommand : CommandInterface {
         command = "/restrict",
         description = "Restricts a member in a group using telegram apis",
         targets = listOf(Pair(Target.SUPERGROUP, Status.ADMIN)),
-        filterFun = { m : Message ->
+        filterFun = { m: Message ->
             m.isReply
         },
         chatOptions = mutableListOf(ChatOptions.BOT_IS_ADMIN),

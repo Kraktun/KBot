@@ -9,11 +9,11 @@ import org.telegram.telegrambots.meta.bots.AbsSender
  */
 interface CallbackHolder {
 
-    fun processCallback(absSender : AbsSender, callback : CallbackQuery)
+    fun processCallback(absSender: AbsSender, callback: CallbackQuery)
 
-    fun getId() : String //callback data, used as a ID. Must be unique.
+    fun getId(): String // callback data, used as a ID. Must be unique.
 
-    fun getLabel() : String //callback string to show in the button
+    fun getLabel(): String // callback string to show in the button
 
-    fun getButton() : InlineKeyboardButton //return button with label and data
+    fun getButton(): InlineKeyboardButton // return button with label and data
 }

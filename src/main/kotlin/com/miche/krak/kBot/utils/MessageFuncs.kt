@@ -17,7 +17,7 @@ import java.time.Instant
 
 private const val TAG = "MESSAGEFUNCS"
 
-fun deleteMessage(absSender: AbsSender, m : Message) {
+fun deleteMessage(absSender: AbsSender, m: Message) {
     val message = DeleteMessage()
         .setChatId(m.chatId)
         .setMessageId(m.messageId)
@@ -27,7 +27,7 @@ fun deleteMessage(absSender: AbsSender, m : Message) {
 /**
  * Send a simple message
  */
-fun simpleMessage(absSender: AbsSender, s : String, c : Chat) {
+fun simpleMessage(absSender: AbsSender, s: String, c: Chat) {
     val message = SendMessage()
         .setChatId(c.id)
         .setText(s)
@@ -37,7 +37,7 @@ fun simpleMessage(absSender: AbsSender, s : String, c : Chat) {
 /**
  * Send a simple message
  */
-fun simpleHTMLMessage(absSender: AbsSender, s : String, c : Chat) {
+fun simpleHTMLMessage(absSender: AbsSender, s: String, c: Chat) {
     val message = SendMessage()
         .setChatId(c.id)
         .setText(s)
@@ -48,7 +48,7 @@ fun simpleHTMLMessage(absSender: AbsSender, s : String, c : Chat) {
 /**
  * Send a simple message
  */
-fun simpleMessage(absSender: AbsSender, s : String, c : Long) {
+fun simpleMessage(absSender: AbsSender, s: String, c: Long) {
     val message = SendMessage()
         .setChatId(c)
         .setText(s)
@@ -58,7 +58,7 @@ fun simpleMessage(absSender: AbsSender, s : String, c : Long) {
 /**
  * Send a simple message
  */
-fun simpleHTMLMessage(absSender: AbsSender, s : String, c : Long) {
+fun simpleHTMLMessage(absSender: AbsSender, s: String, c: Long) {
     val message = SendMessage()
         .setChatId(c)
         .setText(s)
@@ -69,7 +69,7 @@ fun simpleHTMLMessage(absSender: AbsSender, s : String, c : Long) {
 /**
  * Kick a user from a chat and optionally ban him for a limited (if date >= 0)  or unlimited (if date = 0) amount of time
  */
-fun kickUser(absSender: AbsSender, u : User, c : Chat, date : Int = -1) {
+fun kickUser(absSender: AbsSender, u: User, c: Chat, date: Int = -1) {
     var message = KickChatMember()
         .setChatId(c.id)
         .setUserId(u.id)
@@ -81,11 +81,11 @@ fun kickUser(absSender: AbsSender, u : User, c : Chat, date : Int = -1) {
 /**
  * Send a custom keyboard for the user to choose
  */
-fun sendKeyboard(absSender: AbsSender, c: Chat, s: String, keyboard : ReplyKeyboard) {
+fun sendKeyboard(absSender: AbsSender, c: Chat, s: String, keyboard: ReplyKeyboard) {
     insertKeyboard(absSender, c, s, keyboard)
 }
 
-fun sendSimpleListKeyboard(absSender: AbsSender, c: Chat, s: String, list : List<Any>) {
+fun sendSimpleListKeyboard(absSender: AbsSender, c: Chat, s: String, list: List<Any>) {
     val key = ReplyKeyboardMarkup()
     key.keyboard.addAll(list.map {
         val row = KeyboardRow()
@@ -99,7 +99,7 @@ fun sendSimpleListKeyboard(absSender: AbsSender, c: Chat, s: String, list : List
 /**
  * Private method to send\remove keyboards
  */
-private fun insertKeyboard(absSender: AbsSender, c: Chat, s: String, keyboard : ReplyKeyboard) {
+private fun insertKeyboard(absSender: AbsSender, c: Chat, s: String, keyboard: ReplyKeyboard) {
     val message = SendMessage()
         .setChatId(c.id)
         .setText(s)
@@ -117,7 +117,7 @@ fun removeKeyboard(absSender: AbsSender, c: Chat, s: String) {
 /**
  * Execute a generic method, catching th exceptions
  */
-fun <T : java.io.Serializable> executeMethod(absSender: AbsSender, m : BotApiMethod<T>) : T? {
+fun <T : java.io.Serializable> executeMethod(absSender: AbsSender, m: BotApiMethod<T>): T? {
     return try {
         absSender.execute(m)
     } catch (e: TelegramApiException) {

@@ -28,10 +28,10 @@ class UnbanCommand : CommandInterface {
         argsNum = 1,
         filterFun = {
             try {
-                //check if first parameter is an int
+                // check if first parameter is an int
                 it.text.substringAfter(" ").plus(" ").substringBefore(" ").toInt()
                 true
-            } catch (e : Exception) {false}
+            } catch (e: Exception) { false }
         },
         chatOptions = mutableListOf(ChatOptions.BOT_IS_ADMIN),
         onError = { absSender, _, message, _ ->
@@ -41,14 +41,14 @@ class UnbanCommand : CommandInterface {
     )
 
     override fun execute(absSender: AbsSender, user: User, chat: Chat, arguments: List<String>, message: Message) {
-        //DatabaseManager.addGroupUser(groupId = chat.id, userId = message.replyToMessage.from.id, statusK = Status.USER)
+        // DatabaseManager.addGroupUser(groupId = chat.id, userId = message.replyToMessage.from.id, statusK = Status.USER)
         val method = UnbanChatMember()
             .setChatId(chat.id)
             .setUserId(arguments[0].toInt())
         try {
             absSender.execute(method)
             simpleMessage(absSender = absSender, s = "Unbanned user ${arguments[0].toInt()}", c = chat)
-        } catch (e : TelegramApiException) {
+        } catch (e: TelegramApiException) {
             logK("UNBANCOMMAND", e)
             e.printStackTrace()
             simpleMessage(absSender = absSender, s = "Error unbanning user", c = chat)

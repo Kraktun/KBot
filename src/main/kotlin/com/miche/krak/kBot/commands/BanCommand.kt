@@ -28,11 +28,11 @@ class BanCommand : CommandInterface {
         targets = listOf(
             Pair(Target.GROUP, Status.ADMIN),
             Pair(Target.SUPERGROUP, Status.ADMIN)),
-        filterFun = { m : Message ->
+        filterFun = { m: Message ->
             m.isReply
         },
         chatOptions = listOf(ChatOptions.BOT_IS_ADMIN, ChatOptions.OPTION_ALL_USER_ADMIN_DISABLED),
-        onError = { absSender, _,  m, result ->
+        onError = { absSender, _, m, result ->
             if (result == FilterResult.INVALID_STATUS)
                 simpleMessage(absSender = absSender, s = "Yeah, as if you could...", c = m.chat)
         },
@@ -44,11 +44,11 @@ class BanCommand : CommandInterface {
             simpleMessage(absSender, "Admins can be removed only by the creator", chat)
             return
         }
-        //DB will be re-added when I'll figure out how to manage temporary bans.
-        //DatabaseManager.addGroupUser(groupId = chat.id, userId = message.replyToMessage.from.id, statusK = Status.BANNED)
+        // DB will be re-added when I'll figure out how to manage temporary bans.
+        // DatabaseManager.addGroupUser(groupId = chat.id, userId = message.replyToMessage.from.id, statusK = Status.BANNED)
         val date = arguments.ifNotEmpty({
-            (arguments[0].toDouble() * 3600).toInt()} //hours to seconds
-            , 0) as Int
+            (arguments[0].toDouble() * 3600).toInt() }, // hours to seconds
+            0) as Int
         kickUser(absSender = absSender, u = message.replyToMessage.from, c = chat, date = date)
         val until = if (date > 0) "for ${arguments[0]} hours." else "forever."
         simpleMessage(absSender = absSender, s = "Banned user ${getQualifiedUser(message.replyToMessage.from)} $until", c = chat)

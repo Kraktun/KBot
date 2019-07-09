@@ -13,7 +13,6 @@ import org.telegram.telegrambots.meta.bots.AbsSender
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException
 import org.telegram.telegrambots.meta.api.objects.Message
 
-
 /**
  * Start command: adds the user/group to the DB and adds admins.
  */
@@ -29,14 +28,14 @@ class StartCommand : CommandInterface {
     )
 
     override fun execute(absSender: AbsSender, user: User, chat: Chat, arguments: List<String>, message: Message) {
-        if (chat.isUserChat && DatabaseManager.getUser(user.id) == null) //Add only if not present, or it will overwrite current value
+        if (chat.isUserChat && DatabaseManager.getUser(user.id) == null) // Add only if not present, or it will overwrite current value
             DatabaseManager.addUser(user = user, userStatus = Status.USER)
         else if (chat.isGroupChat || chat.isSuperGroupChat) {
-            //If it's a group insert the group and add the admins as admin
+            // If it's a group insert the group and add the admins as admin
             if (!DatabaseManager.groupExists(chat.id)) {
                 DatabaseManager.addGroup(chat.id)
             } else {
-                //Reset old admins
+                // Reset old admins
                 DatabaseManager.updateGroupUsersStatus(groupId = chat.id, oldStatus = Status.ADMIN, newStatus = Status.USER)
             }
             val getAdmins = GetChatAdministrators()

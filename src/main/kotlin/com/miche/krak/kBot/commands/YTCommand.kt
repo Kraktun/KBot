@@ -21,7 +21,6 @@ import org.telegram.telegrambots.meta.api.objects.Message
 import java.io.File
 import java.util.concurrent.TimeUnit
 
-
 /**
  * YTCommand command.
  * Download audio from passed link using youtube-dl.
@@ -46,7 +45,7 @@ class YTCommand : CommandInterface, MultiCommandInterface {
     override fun executeAfter(absSender: AbsSender, user: User, chat: Chat, arguments: String, message: Message, data: Any?) {
         GlobalScope.launch {
             val audioExtension = "m4a"
-            //Remove url of video from filename
+            // Remove url of video from filename
             printlnK(TAG, "Retrieving filename")
             val audio = (File(getMainFolder() + "/downloads").executeScript(
                 "youtube-dl",

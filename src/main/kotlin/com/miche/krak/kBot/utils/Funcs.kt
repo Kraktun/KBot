@@ -12,12 +12,11 @@ import java.time.format.DateTimeFormatter
 import java.util.concurrent.TimeUnit
 import java.util.regex.Pattern
 
-
 /**
  * Get identification string for user:
  * if it has a username, use that, if not use first + last name or only first
  */
-fun getQualifiedUser(user: User) : String {
+fun getQualifiedUser(user: User): String {
     return when {
         user.userName != null -> "@${user.userName}"
         user.lastName != null -> "${user.firstName} ${user.lastName}"
@@ -28,7 +27,7 @@ fun getQualifiedUser(user: User) : String {
 /**
  * Maps a chat into the corresponding enum
  */
-fun chatMapper(chat : Chat) : Target {
+fun chatMapper(chat: Chat): Target {
     return when {
         chat.isGroupChat -> Target.GROUP
         chat.isSuperGroupChat -> Target.SUPERGROUP
@@ -40,7 +39,7 @@ fun chatMapper(chat : Chat) : Target {
 /**
  * Returns status of user according to the passed chat
  */
-fun getDBStatus(user : User, chat : Chat) : Status {
+fun getDBStatus(user: User, chat: Chat): Status {
     return when {
         chat.isUserChat -> DatabaseManager.getUser(user.id)?.status ?: Status.NOT_REGISTERED
         chat.isGroupChat || chat.isSuperGroupChat -> DatabaseManager.getGroupUserStatus(groupId = chat.id, userId = user.id)
@@ -51,11 +50,11 @@ fun getDBStatus(user : User, chat : Chat) : Status {
 /**
  * Execute function for a collection, defaults to passed value if list is empty or null, or an exception is thrown.
  */
-inline fun <E: Any, T: Collection<E>> T?.ifNotEmpty(func : T.() -> Any?, default : Any?): Any? {
+inline fun <E : Any, T : Collection<E>> T?.ifNotEmpty(func: T.() -> Any?, default: Any?): Any? {
     return if (this != null && this.isNotEmpty()) {
         try {
             func(this)
-        } catch (e : Exception) {
+        } catch (e: Exception) {
             default
         }
     } else default
@@ -64,21 +63,21 @@ inline fun <E: Any, T: Collection<E>> T?.ifNotEmpty(func : T.() -> Any?, default
 /**
  * Print & log functions
  */
-fun printK(tag : String, s : Any = "") {
+fun printK(tag: String, s: Any = "") {
     val d = LocalDateTime.now()
         .format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"))
     print("$d $tag: $s")
     LoggerK.log("$d $tag: $s")
 }
 
-fun printlnK(tag : String, s : Any = "") {
+fun printlnK(tag: String, s: Any = "") {
     val d = LocalDateTime.now()
         .format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"))
     println("$d $tag: $s")
     LoggerK.log("$d $tag: $s")
 }
 
-fun logK(tag : String, s : Any = "") {
+fun logK(tag: String, s: Any = "") {
     val d = LocalDateTime.now()
         .format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"))
     LoggerK.log("$d $tag: $s")
@@ -87,9 +86,11 @@ fun logK(tag : String, s : Any = "") {
 /**
  * Execute script with passed arguments in fixed amount of time
  */
-fun File.executeScript(timeoutAmount: Long,
-                       timeoutUnit: TimeUnit,
-                       vararg arguments: String): String {
+fun File.executeScript(
+    timeoutAmount: Long,
+    timeoutUnit: TimeUnit,
+    vararg arguments: String
+): String {
     val process = ProcessBuilder(*arguments)
         .directory(this)
         .start()
@@ -115,17 +116,16 @@ fun getCurrentDateTimeStamp(): String {
 
 /**
  * Tries to parse a string to get a price, Null if nothing found or an error occurred.
- * Will be changed later.
+ * Will be changed later: as now it's quite broken.
  */
-fun parsePrice(price : String) : Float? {
-    var mod = price.replace(",",".")
+fun parsePrice(price: String): Float? {
+    var mod = price.replace(",", ".")
     if (!mod.contains("."))
-        mod = "$mod.00" //simple fix for most common price mismatch
-    mod = mod.substringBeforeLast(".").replace(".", "") + "." + mod.substringAfterLast(".") //remove , or . for thousands etc.
+        mod = "$mod.00" // simple fix for most common price mismatch
+    mod = mod.substringBeforeLast(".").replace(".", "") + "." + mod.substringAfterLast(".") // remove , or . for thousands etc.
     val p = Pattern.compile("(\\d{1,9})*(?:[.,]\\d{2})")
     val m = p.matcher(mod)
     return if (m.find()) m.group().toFloat() else null
-
 }
 
 /**

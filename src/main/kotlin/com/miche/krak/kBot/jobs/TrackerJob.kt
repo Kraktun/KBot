@@ -3,6 +3,7 @@ package com.miche.krak.kBot.jobs
 import com.miche.krak.kBot.bots.MainBot
 import com.miche.krak.kBot.database.DatabaseManager
 import com.miche.krak.kBot.trackingServices.AmazonService
+import com.miche.krak.kBot.trackingServices.UnieuroService
 import com.miche.krak.kBot.utils.simpleHTMLMessage
 import org.quartz.InterruptableJob
 import org.quartz.JobExecutionContext
@@ -34,6 +35,16 @@ class TrackerJob : InterruptableJob {
                     if (bestPrice != null && bestPrice.totalPrice() <= obj.targetPrice) {
                         jobInfo.botList.forEach {
                             simpleHTMLMessage(it as AbsSender, "The object <b>${obj.name}</b> has reached the target price (${obj.targetPrice}):\n$bestPrice", obj.user.toLong())
+                        }
+                        DatabaseManager.removeTrackedObject(obj)
+                    }
+                }
+                UnieuroService().getName() -> {
+                    Thread.sleep((WAIT_TIME + Random.nextInt(until = 300)) * 1000) // make checks a bit more random
+                    val price = UnieuroService.getPrice(obj.objectId)
+                    if (price != null && price.totalPrice() <= obj.targetPrice) {
+                        jobInfo.botList.forEach {
+                            simpleHTMLMessage(it as AbsSender, "The object <b>${obj.name}</b> has reached the target price (${obj.targetPrice}):\n$price", obj.user.toLong())
                         }
                         DatabaseManager.removeTrackedObject(obj)
                     }

@@ -7,7 +7,7 @@ import com.miche.krak.kBot.commands.core.MultiCommandsHandler
 import com.miche.krak.kBot.objects.Status
 import com.miche.krak.kBot.objects.Target
 import com.miche.krak.kBot.trackingServices.AmazonService
-import com.miche.krak.kBot.trackingServices.TrackingInterface
+import com.miche.krak.kBot.trackingServices.UnieuroService
 import com.miche.krak.kBot.utils.sendSimpleListKeyboard
 import com.miche.krak.kBot.utils.simpleMessage
 import org.telegram.telegrambots.meta.api.objects.Chat
@@ -30,7 +30,7 @@ class TrackCommand : CommandInterface {
         exe = this
     )
 
-    val acceptedStores = listOf<TrackingInterface>(AmazonService())
+    val acceptedStores = listOf(AmazonService(), UnieuroService())
 
     /**
      * First part: ask store

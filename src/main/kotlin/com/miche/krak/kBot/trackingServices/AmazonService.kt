@@ -6,7 +6,7 @@ import com.miche.krak.kBot.commands.core.MultiCommandInterface
 import com.miche.krak.kBot.commands.core.MultiCommandsHandler
 import com.miche.krak.kBot.database.DatabaseManager
 import com.miche.krak.kBot.objects.TrackedObject
-import com.miche.krak.kBot.objects.TrackedObjectContainer
+import com.miche.krak.kBot.objects.TrackedAmazonObjectContainer
 import com.miche.krak.kBot.utils.*
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
@@ -190,8 +190,8 @@ class AmazonService : TrackingInterface {
          * maxDepth is the number of attempts to search for maxIndex elements before giving up (if there are 3 listings, but maxIndex is 5, maxDepth becomes the new limit to the loop)
          * Be aware that sometimes if some listings are removed\used their child count is still there, but they don't count to maxIndex, so maxDepth may be a limit before maxIndex even when there are > maxIndex listings
          */
-        fun getPrice(domain: String, articleId: String, maxIndex: Int = 5, maxDepth: Int = 20): List<TrackedObjectContainer> {
-            val list = mutableListOf<TrackedObjectContainer>()
+        fun getPrice(domain: String, articleId: String, maxIndex: Int = 5, maxDepth: Int = 20): List<TrackedAmazonObjectContainer> {
+            val list = mutableListOf<TrackedAmazonObjectContainer>()
             val doc =
                 Jsoup.connect("https://www.amazon.$domain/gp/offer-listing/$articleId/ref=olp_f_used?ie=UTF8&f_new=true") // only where status = new
                     .userAgent("Chrome/75.0.3770").get()
@@ -215,7 +215,7 @@ class AmazonService : TrackingInterface {
                         doc.select("#olpOfferList > div > div > div:nth-child($child) > div.a-column.a-span2.olpPriceColumn > span.supersaver > i")
                             .isNotEmpty() // if present is the "prime" logo
                     list.add(
-                        TrackedObjectContainer(
+                        TrackedAmazonObjectContainer(
                             price = price,
                             seller = seller,
                             shippingPrice = shippingPrice,
@@ -238,10 +238,10 @@ class AmazonService : TrackingInterface {
          * Get prices for object and filter results according to chosen options.
          * Return best price if at least one passes all filters, null otherwise.
          */
-        fun filterPrices(obj: TrackedObject): TrackedObjectContainer ? {
+        fun filterPrices(obj: TrackedObject): TrackedAmazonObjectContainer ? {
             var list = getPrice(domain = obj.domain, articleId = obj.objectId)
             // filter if only sold by amazon
-            if (obj.forceSellerK) list = list.filter { it.seller == AmazonService.amazonSellerTag }
+            if (obj.forceSellerK) list = list.filter { it.seller == amazonSellerTag }
             // filter if only shipped by amazon
             if (obj.forceShippingK) list = list.filter { it.shippedByAmazon }
             return if (list.isNotEmpty()) list.first() else null

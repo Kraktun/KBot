@@ -5,16 +5,17 @@ import org.telegram.telegrambots.meta.bots.AbsSender
 
 /**
  * Class to store handlers for callbacks.
- * Callbacks holders are objects and not static classes.
+ * As of now only callbacks in private chats can be managed in this way.
+ * TODO THis needs a cleaner (job)
  */
 object CallbackProcessor {
 
-    @Volatile private var list = mutableListOf<CallbackHolder>()
+    @Volatile private var list = mutableListOf<Pair<CallbackHolder, Int>>()
 
-    fun fireCallback(absSender: AbsSender, callback: CallbackQuery): Boolean {
+    fun fireCallback(absSender: AbsSender, user: Int, callback: CallbackQuery): Boolean {
         return if (callback.data.isNotEmpty()) {
             synchronized(this) {
-                list.find { it.getId() == callback.data }?.processCallback(absSender, callback) != null
+                list.find { it.first.getId() == callback.data && it.second == user }?.first?.processCallback(absSender, callback) != null
             }
         } else false
     }
@@ -22,19 +23,19 @@ object CallbackProcessor {
     /**
      * Register a listener for a callback
      */
-    fun insertCallback(callbackHolder: CallbackHolder) {
+    fun insertCallback(user: Int, callbackHolder: CallbackHolder) {
         synchronized(this) {
-            list.add(callbackHolder)
+            list.add(Pair(callbackHolder, user))
         }
     }
 
     /**
      * Remove a listener for a callback
      */
-    fun removeCallback(callbackHolderId: String) {
+    fun removeCallback(user: Int, callbackHolderId: String) {
         // printlnK("CALLBACK PROCESSOR", "Deleting callback ($callbackHolderId)")
         synchronized(this) {
-            list.removeIf { it.getId() == callbackHolderId }
+            list.removeIf { it.first.getId() == callbackHolderId && it.second == user }
         }
     }
 }

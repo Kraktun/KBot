@@ -72,8 +72,8 @@ class AmazonService : TrackingInterface {
                     // Send options to enable forced seller or shipment
                     val soldByAmazon = ManageSoldByAmazon()
                     val shippedByAmazon = ManageShippedByAmazon()
-                    CallbackProcessor.insertCallback(soldByAmazon)
-                    CallbackProcessor.insertCallback(shippedByAmazon)
+                    CallbackProcessor.insertCallback(user.id, soldByAmazon)
+                    CallbackProcessor.insertCallback(user.id, shippedByAmazon)
                     val keyboard = InlineKeyboardMarkup()
                     keyboard.keyboard.add(listOf(soldByAmazon.getButton(), shippedByAmazon.getButton()))
                     sendKeyboard(absSender, chat, "Choose the options you need from below.", keyboard)
@@ -152,7 +152,7 @@ class AmazonService : TrackingInterface {
     private inner class ManagePrice : MultiCommandInterface {
         override fun executeAfter(absSender: AbsSender, user: User, chat: Chat, arguments: String, message: Message, data: Any?) {
             (data as List<*>).forEach {
-                CallbackProcessor.removeCallback(it as String)
+                CallbackProcessor.removeCallback(user.id, it as String)
             }
             val priceD = parsePrice(arguments) ?: 0f
             if (priceD <= 0f) {

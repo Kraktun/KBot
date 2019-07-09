@@ -61,7 +61,7 @@ class MainBot(options: DefaultBotOptions) : TelegramLongPollingBot(options) {
     override fun onUpdateReceived(update: Update) {
         // filter callbacks first, as they usually have a null message
         if (update.hasCallbackQuery()) {
-            CallbackProcessor.fireCallback(absSender = this, callback = update.callbackQuery)
+            CallbackProcessor.fireCallback(absSender = this, callback = update.callbackQuery, user = update.callbackQuery.from.id)
             return
         }
         val message = update.message

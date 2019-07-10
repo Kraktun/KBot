@@ -5,8 +5,8 @@ import com.miche.krak.kBot.objects.tracking.TrackedObject
 import com.miche.krak.kBot.utils.getMainFolder
 import com.miche.krak.kBot.utils.printlnK
 import org.jetbrains.exposed.sql.*
-import org.jetbrains.exposed.sql.transactions.TransactionManager
 import org.jetbrains.exposed.sql.transactions.transaction
+import org.jetbrains.exposed.sql.transactions.transactionManager
 import org.telegram.telegrambots.meta.api.objects.User
 import java.sql.Connection
 
@@ -21,8 +21,8 @@ object DatabaseManager {
     private fun connectDB() {
         val dbLink = getMainFolder() + "/KBotDB.db"
         printlnK(TAG, "DB is stored in: $dbLink")
-        Database.connect("jdbc:sqlite:$dbLink", "org.sqlite.JDBC")
-        TransactionManager.manager.defaultIsolationLevel = Connection.TRANSACTION_SERIALIZABLE // Or Connection.TRANSACTION_READ_UNCOMMITTED
+        val db = Database.connect("jdbc:sqlite:$dbLink", "org.sqlite.JDBC")
+        db.transactionManager.defaultIsolationLevel = Connection.TRANSACTION_SERIALIZABLE // Or Connection.TRANSACTION_READ_UNCOMMITTED
 
         transaction {
             addLogger(BotLoggerK)

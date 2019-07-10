@@ -6,6 +6,8 @@ Libraries used:
 [JSoup](https://github.com/jhy/jsoup)   
 [Exposed](https://github.com/JetBrains/Exposed)   
 [Coroutines](https://github.com/Kotlin/kotlinx.coroutines)  
+[klaxon](https://github.com/cbeust/klaxon)  
+[ktlint-gradle](https://github.com/jlleitschuh/ktlint-gradle)   
 
 
 ### Build Status   

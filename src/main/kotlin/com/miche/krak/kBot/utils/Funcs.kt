@@ -4,6 +4,7 @@ import com.miche.krak.kBot.database.DatabaseManager
 import com.miche.krak.kBot.objects.Status
 import com.miche.krak.kBot.objects.Target
 import org.telegram.telegrambots.meta.api.objects.Chat
+import org.telegram.telegrambots.meta.api.objects.Message
 import org.telegram.telegrambots.meta.api.objects.User
 import java.io.File
 import java.net.URLDecoder
@@ -42,7 +43,7 @@ fun chatMapper(chat: Chat): Target {
 fun getDBStatus(user: User, chat: Chat): Status {
     return when {
         chat.isUserChat -> DatabaseManager.getUser(user.id)?.status ?: Status.NOT_REGISTERED
-        chat.isGroupChat || chat.isSuperGroupChat -> DatabaseManager.getGroupUserStatus(groupId = chat.id, userId = user.id)
+        chat.isGroupOrSuper() -> DatabaseManager.getGroupUserStatus(groupId = chat.id, userId = user.id)
         else -> Status.NOT_REGISTERED
     }
 }
@@ -84,7 +85,7 @@ fun logK(tag: String, s: Any = "") {
 }
 
 /**
- * Execute script with passed arguments in fixed amount of time
+ * Execute script with passed arguments in custom amount of time
  */
 fun File.executeScript(
     timeoutAmount: Long,
@@ -102,8 +103,25 @@ fun File.executeScript(
     return process.inputStream.bufferedReader().readText().substringBeforeLast("\n")
 }
 
+/**
+ * Execute script with passed arguments in fixed amount of time
+ */
 fun File.executeScript(vararg arguments: String): String {
     return this.executeScript(10, TimeUnit.SECONDS, *arguments)
+}
+
+/**
+ * Convenient way to check if it's a group or supergroup message
+ */
+fun Message.isGroupOrSuper(): Boolean {
+    return this.isGroupMessage || this.isSuperGroupMessage
+}
+
+/**
+ * Convenient way to check if it's a group or supergroup chat
+ */
+fun Chat.isGroupOrSuper(): Boolean {
+    return this.isSuperGroupChat || this.isGroupChat
 }
 
 /**

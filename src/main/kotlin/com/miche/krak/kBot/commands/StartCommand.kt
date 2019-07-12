@@ -5,6 +5,7 @@ import com.miche.krak.kBot.commands.core.CommandInterface
 import com.miche.krak.kBot.database.DatabaseManager
 import com.miche.krak.kBot.objects.Status
 import com.miche.krak.kBot.objects.Target
+import com.miche.krak.kBot.utils.isGroupOrSuper
 import com.miche.krak.kBot.utils.simpleMessage
 import org.telegram.telegrambots.meta.api.methods.groupadministration.GetChatAdministrators
 import org.telegram.telegrambots.meta.api.objects.Chat
@@ -30,7 +31,7 @@ class StartCommand : CommandInterface {
     override fun execute(absSender: AbsSender, user: User, chat: Chat, arguments: List<String>, message: Message) {
         if (chat.isUserChat && DatabaseManager.getUser(user.id) == null) // Add only if not present, or it will overwrite current value
             DatabaseManager.addUser(user = user, userStatus = Status.USER)
-        else if (chat.isGroupChat || chat.isSuperGroupChat) {
+        else if (chat.isGroupOrSuper()) {
             // If it's a group insert the group and add the admins as admin
             if (!DatabaseManager.groupExists(chat.id)) {
                 DatabaseManager.addGroup(chat.id)

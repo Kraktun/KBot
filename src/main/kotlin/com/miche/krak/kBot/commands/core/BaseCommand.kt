@@ -9,6 +9,7 @@ import com.miche.krak.kBot.utils.getDBStatus
 import com.miche.krak.kBot.utils.ifNotEmpty
 import com.miche.krak.kBot.commands.core.FilterResult.*
 import com.miche.krak.kBot.commands.core.ChatOptions.*
+import com.miche.krak.kBot.utils.isGroupOrSuper
 import org.telegram.telegrambots.bots.TelegramLongPollingBot
 import org.telegram.telegrambots.meta.api.methods.groupadministration.GetChatAdministrators
 import org.telegram.telegrambots.meta.api.objects.Chat
@@ -116,7 +117,7 @@ class BaseCommand(
      */
     private fun filterBotAdmin(absSender: AbsSender, chat: Chat): Boolean {
         val botId = (absSender as TelegramLongPollingBot).botToken.substringBefore(":").toInt()
-        return if (chatOptions.contains(BOT_IS_ADMIN) && (chat.isGroupChat || chat.isSuperGroupChat)) {
+        return if (chatOptions.contains(BOT_IS_ADMIN) && chat.isGroupOrSuper()) {
             val getAdmins = GetChatAdministrators()
             getAdmins.chatId = chat.id.toString()
             try {
@@ -148,7 +149,7 @@ class BaseCommand(
          * Return true if message is allowed (aka group not locked or status >= admin).
          */
         fun filterLock(user: User, chat: Chat): Boolean {
-            return !(chat.isGroupChat || chat.isSuperGroupChat) ||
+            return !chat.isGroupOrSuper() ||
                     DatabaseManager.getGroupStatus(chat.id) != GroupStatus.LOCKED ||
                         DatabaseManager.getGroupUserStatus(chat.id, user.id) >= Status.ADMIN
         }

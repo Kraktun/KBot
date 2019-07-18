@@ -6,7 +6,7 @@ import org.telegram.telegrambots.meta.bots.AbsSender
 /**
  * Class to store handlers for callbacks.
  * As of now only callbacks in private chats can be managed in this way.
- * TODO THis needs a cleaner (job)
+ * TODO This needs a cleaner (job)
  */
 object CallbackProcessor {
 

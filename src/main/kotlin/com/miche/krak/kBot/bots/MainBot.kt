@@ -52,6 +52,8 @@ class MainBot(options: DefaultBotOptions) : TelegramLongPollingBot(options) {
         // CommandProcessor.registerCommand(MultiExampleCommand().engine)
         // CommandProcessor.registerCommand(KeyboardExampleCommand().engine)
         // CommandProcessor.registerCommand(TrackCommand().engine)
+        CommandProcessor.registerCommand(AdminCommand().engine)
+        CommandProcessor.registerCommand(FormattedHelpCommand().engine)
         instance = this
     }
 

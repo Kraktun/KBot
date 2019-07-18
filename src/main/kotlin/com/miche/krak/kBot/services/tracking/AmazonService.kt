@@ -35,7 +35,7 @@ class AmazonService : TrackingInterface {
     override fun startTracking(absSender: AbsSender, user: User, chat: Chat) {
         trackedObject.user = user.id
         trackedObject.store = getName()
-        sendSimpleListKeyboard(absSender, chat, "Choose the domain.", acceptedAmazonDomains)
+        sendKeyboard(absSender, chat, "Choose the domain.", getSimpleListKeyboard(acceptedAmazonDomains))
         MultiCommandsHandler.insertCommand(user, chat, ManageDomains())
     }
 

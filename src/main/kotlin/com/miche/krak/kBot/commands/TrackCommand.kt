@@ -8,7 +8,8 @@ import com.miche.krak.kBot.objects.Status
 import com.miche.krak.kBot.objects.Target
 import com.miche.krak.kBot.services.tracking.AmazonService
 import com.miche.krak.kBot.services.tracking.UnieuroService
-import com.miche.krak.kBot.utils.sendSimpleListKeyboard
+import com.miche.krak.kBot.utils.getSimpleListKeyboard
+import com.miche.krak.kBot.utils.sendKeyboard
 import com.miche.krak.kBot.utils.simpleMessage
 import org.telegram.telegrambots.meta.api.objects.Chat
 import org.telegram.telegrambots.meta.api.objects.Message
@@ -36,7 +37,7 @@ class TrackCommand : CommandInterface {
      * First part: ask store
      */
     override fun execute(absSender: AbsSender, user: User, chat: Chat, arguments: List<String>, message: Message) {
-        sendSimpleListKeyboard(absSender, chat, "Choose the store.", acceptedStores.map { it.getName() }.toList())
+        sendKeyboard(absSender, chat, "Choose the store.", getSimpleListKeyboard(acceptedStores.map { it.getName() }.toList()))
         MultiCommandsHandler.insertCommand(user, chat, ManageStore())
     }
 

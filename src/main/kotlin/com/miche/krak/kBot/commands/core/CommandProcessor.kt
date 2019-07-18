@@ -1,5 +1,8 @@
 package com.miche.krak.kBot.commands.core
 
+import com.miche.krak.kBot.objects.Status
+import com.miche.krak.kBot.objects.Target
+import com.miche.krak.kBot.utils.ifNotEmpty
 import org.telegram.telegrambots.meta.api.objects.Update
 import org.telegram.telegrambots.meta.bots.AbsSender
 import org.telegram.telegrambots.meta.generics.LongPollingBot
@@ -25,6 +28,19 @@ object CommandProcessor {
      */
     fun getRegisteredCommands(): List<BaseCommand> {
         return map.values.toList()
+    }
+
+    /**
+     * Return all registered commands for pair user, chat.
+     */
+    fun getRegisteredCommands(status: Status, c: Target): List<BaseCommand> {
+        return getRegisteredCommands().filter {
+            it.targets.filter { m ->
+                m.first == c
+            }.ifNotEmpty({
+                this[0].second <= status // [0] as a command can have only one single pair with a unique Target
+            }, default = false) as Boolean
+        }
     }
 
     /**

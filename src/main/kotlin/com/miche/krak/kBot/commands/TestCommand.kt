@@ -14,9 +14,7 @@ class TestCommand : CommandInterface {
     val engine = BaseCommand(
         command = "/test",
         description = "Command to test new commands",
-        targets = listOf(
-            Pair(Target.GROUP, Status.ADMIN),
-            Pair(Target.SUPERGROUP, Status.ADMIN)),
+        targets = listOf(Pair(Target.USER, Status.ADMIN)),
         exe = this
     )
 

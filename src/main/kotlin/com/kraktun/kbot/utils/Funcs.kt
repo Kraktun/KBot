@@ -161,6 +161,17 @@ fun AbsSender.username(): String {
 }
 
 /**
+ * Get token of bot
+ */
+fun AbsSender.botToken(): String {
+    return if (this is LongPollingBot) {
+        this.botToken
+    } else {
+        (this as WebhookBot).botToken
+    }
+}
+
+/**
  * Get parent folder of java\jar file specified.
  * From: https://stackoverflow.com/questions/320542/how-to-get-the-path-of-a-running-jar-file
  * Edited.

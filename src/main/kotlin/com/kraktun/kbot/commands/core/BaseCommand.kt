@@ -4,16 +4,12 @@ import com.kraktun.kbot.database.DatabaseManager
 import com.kraktun.kbot.objects.GroupStatus
 import com.kraktun.kbot.objects.Status
 import com.kraktun.kbot.objects.Target
-import com.kraktun.kbot.utils.chatMapper
-import com.kraktun.kbot.utils.getDBStatus
-import com.kraktun.kbot.utils.ifNotEmpty
 import com.kraktun.kbot.commands.core.FilterResult.*
 import com.kraktun.kbot.commands.core.ChatOptions.*
-import com.kraktun.kbot.utils.isGroupOrSuper
+import com.kraktun.kbot.utils.*
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
-import org.telegram.telegrambots.bots.TelegramLongPollingBot
 import org.telegram.telegrambots.meta.api.methods.groupadministration.GetChatAdministrators
 import org.telegram.telegrambots.meta.api.objects.Chat
 import org.telegram.telegrambots.meta.api.objects.Message
@@ -123,7 +119,7 @@ class BaseCommand(
      * Return true if command does not need bot as admin or if bot is admin
      */
     private fun filterBotAdmin(absSender: AbsSender, chat: Chat): Boolean {
-        val botId = (absSender as TelegramLongPollingBot).botToken.substringBefore(":").toInt()
+        val botId = absSender.botToken().substringBefore(":").toInt()
         return if (chatOptions.contains(BOT_IS_ADMIN) && chat.isGroupOrSuper()) {
             val getAdmins = GetChatAdministrators()
             getAdmins.chatId = chat.id.toString()

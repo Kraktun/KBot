@@ -36,12 +36,6 @@ Boot-shutdown hooks.
 * Change whatever you want...   
 
 
-## Notes   
-The ```commands.core``` folder is meant to be used in a single bot (=thread). For concurrent threads on the same bot, every access to the ```var map``` must be synchronized.      
-For concurrent bots, ```CommandProcessor.kt``` and ```MultiCommandsHandler.kt``` must be duplicated and each class used in a single bot.   
-Classes in ```utils``` folder are already synchronized to manage concurrent bots.   
-
-
 ## License
 
 ![GitHub](https://img.shields.io/github/license/Kraktun/KBot.svg)   

@@ -2,6 +2,9 @@ package com.kraktun.kbot.commands.core
 
 import com.kraktun.kbot.jobs.JobInfo
 import com.kraktun.kbot.utils.username
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.runBlocking
 import org.quartz.InterruptableJob
 import org.quartz.JobExecutionContext
 import org.quartz.JobExecutionException
@@ -35,12 +38,18 @@ object MultiCommandsHandler {
             temp = map[Triple(absSender.username(), message.from.id, message.chatId)]
         }
         if (temp != null) deleteCommand(absSender, message.from, message.chat)
-        return temp?.multiInterface?.executeAfter(absSender,
-            message.from,
-            message.chat,
-            message.text,
-            message,
-            temp?.data) != null
+        val executor = temp?.multiInterface
+        runBlocking {
+            GlobalScope.launch {
+                executor?.executeAfter(absSender,
+                    message.from,
+                    message.chat,
+                    message.text,
+                    message,
+                    temp?.data)
+            }
+        }
+        return executor != null
     }
 
     /**

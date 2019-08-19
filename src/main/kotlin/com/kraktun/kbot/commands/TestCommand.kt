@@ -4,6 +4,7 @@ import com.kraktun.kbot.commands.core.BaseCommand
 import com.kraktun.kbot.commands.core.CommandInterface
 import com.kraktun.kbot.objects.Status
 import com.kraktun.kbot.objects.Target
+import com.kraktun.kbot.utils.simpleMessage
 import org.telegram.telegrambots.meta.api.objects.Chat
 import org.telegram.telegrambots.meta.api.objects.Message
 import org.telegram.telegrambots.meta.api.objects.User
@@ -19,5 +20,7 @@ class TestCommand : CommandInterface {
     )
 
     override fun execute(absSender: AbsSender, user: User, chat: Chat, arguments: List<String>, message: Message) {
+        Thread.sleep(5000)
+        simpleMessage(absSender, "TEST COMPLETED", chat)
     }
 }

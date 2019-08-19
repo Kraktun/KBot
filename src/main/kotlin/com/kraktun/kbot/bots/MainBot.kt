@@ -38,7 +38,7 @@ class MainBot(options: DefaultBotOptions) : TelegramLongPollingBot(options) {
      * Register Commands
      */
     init {
-        // CommandProcessor.registerCommand(TestCommand().engine)
+        // CommandProcessor.registerCommand(botUsername!!, TestCommand().engine)
         CommandProcessor.registerCommand(botUsername!!, HelloCommand().engine)
         CommandProcessor.registerCommand(botUsername!!, StartCommand().engine)
         CommandProcessor.registerCommand(botUsername!!, HelpCommand().engine)

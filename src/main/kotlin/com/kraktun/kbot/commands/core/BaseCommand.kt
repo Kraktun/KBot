@@ -10,7 +10,8 @@ import com.kraktun.kbot.utils.ifNotEmpty
 import com.kraktun.kbot.commands.core.FilterResult.*
 import com.kraktun.kbot.commands.core.ChatOptions.*
 import com.kraktun.kbot.utils.isGroupOrSuper
-import kotlinx.coroutines.async
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import org.telegram.telegrambots.bots.TelegramLongPollingBot
 import org.telegram.telegrambots.meta.api.methods.groupadministration.GetChatAdministrators
@@ -54,17 +55,16 @@ class BaseCommand(
      */
     fun fire(absSender: AbsSender, user: User, chat: Chat, arguments: List<String>, message: Message): FilterResult {
         // apply filters
-        return runBlocking {
-            val job = async {
-                val result = filterAll(absSender, arguments, message)
+        val result = filterAll(absSender, arguments, message)
+        runBlocking {
+            GlobalScope.launch {
                 if (result == FILTER_RESULT_OK)
                     exe.execute(absSender, user, chat, arguments, message)
                 else
                     onError(absSender, arguments, message, result)
-                result
             }
-            return@runBlocking job.await()
         }
+        return result
     }
 
     /**

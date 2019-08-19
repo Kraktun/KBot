@@ -36,11 +36,11 @@ class BaseCommand(
     private val argsNum: Int = 0,
     // function with additional logic to execute before firing the command
     // only non-intensive (aka non-DB) operations should be done here
-    private val filterFun: (Message) -> Boolean = { true },
+    private val filterFun: (message: Message) -> Boolean = { true },
     // define other options necessary fot this command
     private val chatOptions: List<ChatOptions> = mutableListOf(),
     // Function to execute when a filter (including filterFun) fails and returns false
-    private val onError: (AbsSender, List<String>, Message, FilterResult) -> Unit = { _, _, _, _ -> },
+    private val onError: (absSender: AbsSender, arguments: List<String>, message: Message, filterResult: FilterResult) -> Unit = { _, _, _, _ -> },
     // implementation of the CommandInterface (aka execute method)
     private val exe: CommandInterface
 ) {

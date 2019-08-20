@@ -22,18 +22,21 @@ Libraries used:
 
 
 ## Features   
-Filter commands received by the bot according to the chat and the status of the user.   
-Add optional filters (e.g. accept a command only if it's a reply).   
-Receive feedback when command is rejected and execute a function.   
-Manage multi-reply commands (ask-answer model) with a timer.   
-Boot-shutdown hooks.   
+* Filter commands received by the bot according to the chat and the status of the user.   
+* Add optional filters (e.g. accept a command only if it's a reply).   
+* Receive feedback when command is rejected and execute a function.   
+* Manage multi-reply commands (ask-answer model) with a timer.   
+* Boot-shutdown hooks.   
+
 
 ## How To   
-* Add/edit a command in ```commands```: implement ```CommandInterface.kt``` and create an instance of ```BaseCommand.kt```.   
-   * You can check ```example``` package for a list of templates.   
-* Register your new command in ```MainBot.kt```.   
-* For deeper customizations, change the method ```onUpdateReceived``` in ```MainBot.kt```.   
-* Change whatever you want...   
+* The package ```com.kraktun.kbot.commands``` contains a list of all the commands one or more of your bots support.
+	* You can check ```com.kraktun.kbot.commands.examples``` package for a list of templates for both normal commands and ask-answer commands.  
+* The package ```com.kraktun.kbot.commands.core``` contains the logic to register commands and parse messages.
+* The package ```com.kraktun.kbot.bots``` contains the core of a bot, where you define which commands you want to register for that particular bot.
+	* Note that a command is equal for all bots where it is registered. You can change the behaviour for one or more bot by checking the username (```absSender.username()```) but not the engine (targets, filters etc).
+* The package ```com.kraktun.kbot.jobs``` contains a list of jobs to execute in a time frame. A job may be bound to one or more bots (as of now only LongPolling). Jobs must be registered in ```JobExecutor.kt```.
+* The bots defined in package ```com.kraktun.kbot.bots``` must be registered in ```Main.kt``` and have a valid token + username in ```BotConfig.kt```.
 
 
 ## License

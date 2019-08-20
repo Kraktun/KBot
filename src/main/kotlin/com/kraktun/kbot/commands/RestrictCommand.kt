@@ -34,7 +34,7 @@ class RestrictCommand : CommandInterface {
         val restricted = RestrictChatMember()
         restricted.chatId = message.chatId.toString()
         restricted.userId = message.replyToMessage.from.id
-        val permissions = ChatPermissions() //Default everything is false
+        val permissions = ChatPermissions() // Default everything is false
         restricted.permissions = permissions
         try {
             absSender.execute(restricted)

@@ -1,9 +1,6 @@
-package com.kraktun.kbot.utils
+package com.kraktun.kbot.jobs
 
 import com.kraktun.kbot.commands.core.MultiCommandsHandler
-import com.kraktun.kbot.jobs.JobInfo
-import com.kraktun.kbot.jobs.LoggerJob
-import com.kraktun.kbot.jobs.TrackerJob
 import org.quartz.Job
 import org.quartz.JobBuilder.newJob
 import org.quartz.SchedulerException

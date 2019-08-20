@@ -133,7 +133,7 @@ fun removeKeyboard(absSender: AbsSender, c: Chat, s: String) {
 }
 
 /**
- * Execute a generic method, catching th exceptions
+ * Execute a generic method, catching the exceptions
  */
 fun <T : java.io.Serializable> executeMethod(absSender: AbsSender, m: BotApiMethod<T>): T? {
     return try {

@@ -1,5 +1,6 @@
 package com.kraktun.kbot
 
+import com.kraktun.kbot.bots.PingBot
 import com.kraktun.kbot.bots.MainBot
 import com.kraktun.kbot.utils.*
 import org.telegram.telegrambots.ApiContextInitializer
@@ -26,6 +27,7 @@ fun main() {
     val botsApi = TelegramBotsApi()
     try {
         botsApi.registerBot(MainBot(DefaultBotOptions()))
+        botsApi.registerBot(PingBot(DefaultBotOptions()))
         onStart()
     } catch (e: TelegramApiException) {
         e.printStackTrace()

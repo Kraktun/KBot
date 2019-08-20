@@ -45,6 +45,7 @@ class PingBot(options: DefaultBotOptions) : TelegramLongPollingBot(options) {
         CommandProcessor.registerCommand(botUsername!!, FormattedHelpCommand().engine)
         CommandProcessor.registerCommand(botUsername!!, StartPingCommand().engine)
         CommandProcessor.registerCommand(botUsername!!, StopPingCommand().engine)
+        CommandProcessor.registerCommand(botUsername!!, InfoCommand().engine)
         instance = this
     }
 

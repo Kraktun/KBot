@@ -1,5 +1,6 @@
 package com.kraktun.kbot.commands
 
+import com.kraktun.kbot.PING_BOT_GROUP
 import com.kraktun.kbot.commands.core.BaseCommand
 import com.kraktun.kbot.commands.core.CommandInterface
 import com.kraktun.kbot.jobs.JobExecutor
@@ -18,12 +19,14 @@ class StartPingCommand : CommandInterface { // Implement CommandInterface (execu
     val engine = BaseCommand(
         command = "/startping",
         description = "Start pinging",
-        targets = listOf(Pair(Target.GROUP, Status.DEV)),
+        targets = listOf(Pair(Target.GROUP, Status.ADMIN)),
         exe = this
     )
 
     override fun execute(absSender: AbsSender, message: Message) {
-        JobExecutor.addJob(PingJob(), PingJob.jobInfo) // I use add/remove rather than some check because I need only 1 pingBot
-        simpleMessage(absSender = absSender, s = "Enabled ping", c = message.chat)
+        if (message.chatId == PING_BOT_GROUP) {
+            JobExecutor.addJob(PingJob(), PingJob.jobInfo) // I use add/remove rather than some check because I need only 1 pingBot
+            simpleMessage(absSender = absSender, s = "Enabled ping", c = message.chat)
+        }
     }
 }

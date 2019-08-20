@@ -8,20 +8,21 @@ import org.quartz.InterruptableJob
 import org.quartz.JobExecutionContext
 import org.telegram.telegrambots.meta.bots.AbsSender
 
+// TODO: Write which job are enabled in DB and restore on boot (keep track of how many bot require them to remove inactive ones).
+//  Also keep track of which bot (username) to link them again in botList (needs a mapper username -> absSender)
 class PingJob : InterruptableJob {
 
     companion object {
         val jobInfo = JobInfo(
             name = "PING_JOB",
-            interval = 5100, // seconds
+            interval = 15, // seconds
             trigger = "PING_JOB_TRIGGER",
             group = "jobs",
-            delay = 120, // seconds
+            delay = 10, // seconds
             botList = listOf(PingBot.instance))
     }
 
     private val TAG = "PING_JOB"
-    private val WAIT_TIME = 60L // seconds
 
     override fun execute(context: JobExecutionContext) {
         // printlnK(TAG, "Retrieving articles")

@@ -10,7 +10,7 @@ enum class Target {
 
 /**
  * Users status
- * Note that NOT_REGISTERED, DEV and CREATOR are usually used in private chats
+ * Note that NOT_REGISTERED, DEV and CREATOR can only be used in private chats
  */
 enum class Status {
     BANNED, NOT_REGISTERED, USER, POWER_USER, ADMIN, DEV, CREATOR

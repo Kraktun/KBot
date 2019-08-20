@@ -8,6 +8,7 @@ import org.quartz.SchedulerException
 import org.quartz.impl.StdSchedulerFactory
 import org.quartz.SimpleScheduleBuilder.simpleSchedule
 import org.quartz.TriggerBuilder.newTrigger
+import org.quartz.TriggerKey
 import java.util.*
 
 /**
@@ -73,7 +74,8 @@ object JobExecutor {
     }
 
     fun removeJob(jobInfo: JobInfo) {
-        scheduler.deleteJob(JobKey.jobKey(jobInfo.trigger, jobInfo.group))
+        scheduler.interrupt(JobKey.jobKey(jobInfo.trigger, jobInfo.group))
+        scheduler.unscheduleJob(TriggerKey.triggerKey(jobInfo.trigger, jobInfo.group))
     }
 
     /**

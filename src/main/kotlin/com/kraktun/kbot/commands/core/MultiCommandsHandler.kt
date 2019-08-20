@@ -1,7 +1,9 @@
 package com.kraktun.kbot.commands.core
 
 import com.kraktun.kbot.jobs.JobInfo
+import com.kraktun.kbot.utils.readInLock
 import com.kraktun.kbot.utils.username
+import com.kraktun.kbot.utils.writeInLock
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
@@ -13,6 +15,7 @@ import org.telegram.telegrambots.meta.api.objects.Message
 import org.telegram.telegrambots.meta.api.objects.User
 import org.telegram.telegrambots.meta.bots.AbsSender
 import java.time.Instant
+import java.util.concurrent.locks.ReentrantReadWriteLock
 
 /**
  * Handles multi-input commands (commands that need more messages). ForceReply is not enough for me.
@@ -27,14 +30,15 @@ object MultiCommandsHandler {
      */
     @Volatile private var map = mutableMapOf<Triple<String, Int, Long>, MultiBaseCommand>()
     private const val maxCommandTime: Long = 60L // seconds. After this time has passed the user must resend the activation command.
+    private val lock = ReentrantReadWriteLock()
 
     /**
      * Execute next command for pair user + chat.
      * False if no command is found.
      */
     fun fireCommand(message: Message, absSender: AbsSender): Boolean {
-        var temp: MultiBaseCommand?
-        synchronized(this) {
+        var temp: MultiBaseCommand? = null
+        lock.readInLock {
             temp = map[Triple(absSender.username(), message.from.id, message.chatId)]
         }
         if (temp != null) deleteCommand(absSender, message.from, message.chat)
@@ -54,7 +58,7 @@ object MultiCommandsHandler {
      */
     fun insertCommand(absSender: AbsSender, user: Int, chat: Long, command: MultiCommandInterface, data: Any? = null) {
         // printlnK(TAG, "Received command ($user + $chat)")
-        synchronized(this) {
+        lock.writeInLock {
             map[Triple(absSender.username(), user, chat)] = MultiBaseCommand(command, data)
         }
     }
@@ -72,7 +76,7 @@ object MultiCommandsHandler {
      */
     fun deleteCommand(absSender: AbsSender, user: Int, chat: Long) {
         // printlnK(TAG, "Deleting command ($user + $chat)")
-        synchronized(this) {
+        lock.writeInLock {
             map.remove(Triple(absSender.username(), user, chat))
         }
     }
@@ -108,7 +112,7 @@ object MultiCommandsHandler {
         @Throws(JobExecutionException::class)
         override fun execute(context: JobExecutionContext) {
             val now = Instant.now()
-            synchronized(MultiCommandsHandler) {
+            lock.writeInLock {
                 map.filter {
                     it.value.time.plusSeconds(maxCommandTime).isBefore(now)
                 }.forEach {

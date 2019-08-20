@@ -5,6 +5,7 @@ import java.net.URLDecoder
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
 import java.util.concurrent.TimeUnit
+import java.util.concurrent.locks.ReadWriteLock
 import java.util.regex.Pattern
 
 /**
@@ -89,6 +90,24 @@ fun parsePrice(price: String): Float? {
     val p = Pattern.compile("(\\d{1,9})*(?:[.,]\\d{2})")
     val m = p.matcher(mod)
     return if (m.find()) m.group().toFloat() else null
+}
+
+inline fun <K> ReadWriteLock?.writeInLock(f: () -> K): K {
+    this?.writeLock()?.lock()
+    try {
+        return f.invoke()
+    } finally {
+        this?.writeLock()?.unlock()
+    }
+}
+
+inline fun <K> ReadWriteLock?.readInLock(f: () -> K): K {
+    this?.readLock()?.lock()
+    try {
+        return f.invoke()
+    } finally {
+        this?.readLock()?.unlock()
+    }
 }
 
 /**

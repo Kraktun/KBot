@@ -1,7 +1,10 @@
 package com.kraktun.kbot.commands.core.callbacks
 
+import com.kraktun.kbot.utils.readInLock
+import com.kraktun.kbot.utils.writeInLock
 import org.telegram.telegrambots.meta.api.objects.CallbackQuery
 import org.telegram.telegrambots.meta.bots.AbsSender
+import java.util.concurrent.locks.ReentrantReadWriteLock
 
 /**
  * Class to store handlers for callbacks.
@@ -11,10 +14,11 @@ import org.telegram.telegrambots.meta.bots.AbsSender
 object CallbackProcessor {
 
     @Volatile private var list = mutableListOf<Pair<CallbackHolder, Int>>()
+    private val lock = ReentrantReadWriteLock()
 
     fun fireCallback(absSender: AbsSender, user: Int, callback: CallbackQuery): Boolean {
         return if (callback.data.isNotEmpty()) {
-            synchronized(this) {
+            lock.readInLock {
                 list.find { it.first.getId() == callback.data && it.second == user }?.first?.processCallback(absSender, callback) != null
             }
         } else false
@@ -24,7 +28,7 @@ object CallbackProcessor {
      * Register a listener for a callback
      */
     fun insertCallback(user: Int, callbackHolder: CallbackHolder) {
-        synchronized(this) {
+        lock.writeInLock {
             list.add(Pair(callbackHolder, user))
         }
     }
@@ -34,7 +38,7 @@ object CallbackProcessor {
      */
     fun removeCallback(user: Int, callbackHolderId: String) {
         // printlnK("CALLBACK PROCESSOR", "Deleting callback ($callbackHolderId)")
-        synchronized(this) {
+        lock.writeInLock {
             list.removeIf { it.first.getId() == callbackHolderId && it.second == user }
         }
     }

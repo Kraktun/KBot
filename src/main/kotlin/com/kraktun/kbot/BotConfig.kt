@@ -14,7 +14,8 @@ const val MAIN_NAME = "my_bot"
 const val TEST_TOKEN = "000000000:AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA"
 const val TEST_NAME = "my_bot_test"
 
-const val CAMERABOT_TOKEN = "000000000:AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA"
-const val CAMERABOT_NAME = "my_camera"
+const val PING_BOT_TOKEN = "000000000:AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA"
+const val PING_BOT_NAME = "my_ping_bot"
+const val PING_BOT_GROUP = -0L
 
 val predefinedUsers = listOf<UserK>()

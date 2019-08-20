@@ -77,7 +77,6 @@ class BaseCommand(
             !filterFormat(arguments) -> INVALID_FORMAT
             !filterLock(user, chat) -> LOCKED_CHAT
             !filterBotAdmin(absSender, chat) -> BOT_NOT_ADMIN
-            !filterAllUserAdmin(chat) -> ALL_USER_ADMINS_ENABLED
             else -> FILTER_RESULT_OK
             // filterBans is not necessary as this check is already performed by filterChat()
             // (and someone may decide to enable a command for banned users)
@@ -134,16 +133,6 @@ class BaseCommand(
                 false
             }
         } else true
-    }
-
-    /**
-     * Return true if the command does not need the option allUserAreAdmins to be disabled
-     * or if option allUserAreAdmins is not enabled
-     */
-    private fun filterAllUserAdmin(chat: Chat): Boolean {
-        return !(chatOptions.contains(OPTION_ALL_USER_ADMIN_DISABLED) &&
-                chat.isGroupChat &&
-                chat.allMembersAreAdministrators) //TODO USE PERMISSIONS
     }
 
     companion object {

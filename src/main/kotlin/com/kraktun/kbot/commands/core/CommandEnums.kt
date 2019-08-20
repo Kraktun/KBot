@@ -10,12 +10,10 @@ enum class FilterResult {
     LOCKED_CHAT,
     BANNED_USER,
     BOT_NOT_ADMIN,
-    ALL_USER_ADMINS_ENABLED,
     NOT_COMMAND
 }
 
 enum class ChatOptions {
 
-    BOT_IS_ADMIN, // Bot must be admin
-    OPTION_ALL_USER_ADMIN_DISABLED // Option allUserAreAdmins must be disabled
+    BOT_IS_ADMIN // Bot must be admin
 }

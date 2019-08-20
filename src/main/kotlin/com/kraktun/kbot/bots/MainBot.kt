@@ -76,7 +76,7 @@ class MainBot(options: DefaultBotOptions) : TelegramLongPollingBot(options) {
             (message.isGroupOrSuper() && message.newChatMembers.isNotEmpty()) -> {
                 if (BaseCommand.filterBans(user, chat)) { // TODO check if it fails with multiple new members one of which is banned
                     val welcomeU = message.newChatMembers.map {
-                        getQualifiedUser(it)
+                        it.getFormattedName()
                     }.reduce { acc, sing ->
                         "$acc $sing,"
                     }

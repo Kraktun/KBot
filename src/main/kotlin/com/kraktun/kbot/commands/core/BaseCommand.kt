@@ -40,7 +40,7 @@ class BaseCommand(
     // define other options necessary fot this command
     private val chatOptions: List<ChatOptions> = mutableListOf(),
     // Function to execute when a filter (including filterFun) fails and returns false
-    private val onError: (absSender: AbsSender, arguments: List<String>, message: Message, filterResult: FilterResult) -> Unit = { _, _, _, _ -> },
+    private val onError: (absSender: AbsSender, message: Message, filterResult: FilterResult) -> Unit = { _, _, _ -> },
     // implementation of the CommandInterface (aka execute method)
     private val exe: CommandInterface
 ) {
@@ -49,15 +49,15 @@ class BaseCommand(
      * Fire execute command of CommandInterface if all filters pass.
      * Return result of filters.
      */
-    fun fire(absSender: AbsSender, user: User, chat: Chat, arguments: List<String>, message: Message): FilterResult {
+    fun fire(absSender: AbsSender, message: Message): FilterResult {
         // apply filters
-        val result = filterAll(absSender, arguments, message)
+        val result = filterAll(absSender, message)
         runBlocking {
             GlobalScope.launch {
                 if (result == FILTER_RESULT_OK)
-                    exe.execute(absSender, user, chat, arguments, message)
+                    exe.execute(absSender, message)
                 else
-                    onError(absSender, arguments, message, result)
+                    onError(absSender, message, result)
             }
         }
         return result
@@ -66,9 +66,10 @@ class BaseCommand(
     /**
      * Apply all filters. Return true if everything is ok.
      */
-    private fun filterAll(absSender: AbsSender, arguments: List<String>, message: Message): FilterResult {
+    private fun filterAll(absSender: AbsSender, message: Message): FilterResult {
         val user = message.from
         val chat = message.chat
+        val arguments = message.arguments()
         return when {
             !filterFun(message) -> INVALID_PRECONDITIONS
             !filterChat(chat) -> INVALID_CHAT
@@ -90,7 +91,7 @@ class BaseCommand(
      */
     private fun filterChat(chat: Chat): Boolean {
         return targets.filter {
-            it.first == chatMapper(chat)
+            it.first == chat.toEnum()
         }.toList().isNotEmpty()
     }
 
@@ -101,7 +102,7 @@ class BaseCommand(
     private fun filterStatus(user: User, chat: Chat): Boolean {
         val userStatus: Status = getDBStatus(user, chat)
         return targets.filter {
-            it.first == chatMapper(chat)
+            it.first == chat.toEnum()
         }.ifNotEmpty({
             this[0].second <= userStatus // [0] as a command can have only one single pair with a unique Target
         }, default = false) as Boolean
@@ -142,7 +143,7 @@ class BaseCommand(
     private fun filterAllUserAdmin(chat: Chat): Boolean {
         return !(chatOptions.contains(OPTION_ALL_USER_ADMIN_DISABLED) &&
                 chat.isGroupChat &&
-                chat.allMembersAreAdministrators)
+                chat.allMembersAreAdministrators) //TODO USE PERMISSIONS
     }
 
     companion object {

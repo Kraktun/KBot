@@ -42,9 +42,6 @@ object MultiCommandsHandler {
         runBlocking {
             GlobalScope.launch {
                 executor?.executeAfter(absSender,
-                    message.from,
-                    message.chat,
-                    message.text,
                     message,
                     temp?.data)
             }

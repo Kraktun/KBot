@@ -6,9 +6,8 @@ import com.kraktun.kbot.commands.core.MultiCommandInterface
 import com.kraktun.kbot.commands.core.MultiCommandsHandler
 import com.kraktun.kbot.objects.Status
 import com.kraktun.kbot.objects.Target
+import com.kraktun.kbot.utils.arguments
 import com.kraktun.kbot.utils.simpleMessage
-import org.telegram.telegrambots.meta.api.objects.Chat
-import org.telegram.telegrambots.meta.api.objects.User
 import org.telegram.telegrambots.meta.bots.AbsSender
 import org.telegram.telegrambots.meta.api.objects.Message
 
@@ -27,9 +26,9 @@ class MultiExampleCommand : CommandInterface, MultiCommandInterface {
     /**
      * Executed when command is first sent.
      */
-    override fun execute(absSender: AbsSender, user: User, chat: Chat, arguments: List<String>, message: Message) {
-        MultiCommandsHandler.insertCommand(absSender = absSender, user = user.id, chat = chat.id, command = this)
-        simpleMessage(absSender, "First part", chat)
+    override fun execute(absSender: AbsSender, message: Message) {
+        MultiCommandsHandler.insertCommand(absSender = absSender, user = message.from, chat = message.chat, command = this)
+        simpleMessage(absSender, "First part", message.chat)
     }
 
     /**
@@ -37,9 +36,9 @@ class MultiExampleCommand : CommandInterface, MultiCommandInterface {
      * @arguments is the reply to what is sent above.
      * @data is usually empty here
      */
-    override fun executeAfter(absSender: AbsSender, user: User, chat: Chat, arguments: String, message: Message, data: Any?) {
-        MultiCommandsHandler.insertCommand(absSender = absSender, user = user.id, chat = chat.id, command = ThirdStep(), data = arguments)
-        simpleMessage(absSender, "Second part", chat)
+    override fun executeAfter(absSender: AbsSender, message: Message, data: Any?) {
+        MultiCommandsHandler.insertCommand(absSender = absSender, user = message.from, chat = message.chat, command = ThirdStep(), data = message.arguments())
+        simpleMessage(absSender, "Second part", message.chat)
     }
 
     /**
@@ -48,9 +47,9 @@ class MultiExampleCommand : CommandInterface, MultiCommandInterface {
      * @data is the old reply.
      */
     class ThirdStep : MultiCommandInterface {
-        override fun executeAfter(absSender: AbsSender, user: User, chat: Chat, arguments: String, message: Message, data: Any?) {
-            MultiCommandsHandler.deleteCommand(absSender = absSender, user = user.id, chat = chat.id)
-            simpleMessage(absSender, "Third part, data is $data, \nnew data is $arguments", chat)
+        override fun executeAfter(absSender: AbsSender, message: Message, data: Any?) {
+            MultiCommandsHandler.deleteCommand(absSender = absSender, user = message.from, chat = message.chat)
+            simpleMessage(absSender, "Third part, data is $data, \nnew data is ${message.arguments()}", message.chat)
         }
     }
 }

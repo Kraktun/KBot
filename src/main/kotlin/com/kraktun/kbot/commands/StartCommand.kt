@@ -8,8 +8,6 @@ import com.kraktun.kbot.objects.Target
 import com.kraktun.kbot.utils.isGroupOrSuper
 import com.kraktun.kbot.utils.simpleMessage
 import org.telegram.telegrambots.meta.api.methods.groupadministration.GetChatAdministrators
-import org.telegram.telegrambots.meta.api.objects.Chat
-import org.telegram.telegrambots.meta.api.objects.User
 import org.telegram.telegrambots.meta.bots.AbsSender
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException
 import org.telegram.telegrambots.meta.api.objects.Message
@@ -28,27 +26,28 @@ class StartCommand : CommandInterface {
         exe = this
     )
 
-    override fun execute(absSender: AbsSender, user: User, chat: Chat, arguments: List<String>, message: Message) {
-        if (chat.isUserChat && DatabaseManager.getUser(user.id) == null) // Add only if not present, or it will overwrite current value
-            DatabaseManager.addUser(user = user, userStatus = Status.USER)
-        else if (chat.isGroupOrSuper()) {
+    override fun execute(absSender: AbsSender, message: Message) {
+        val chatId = message.chatId
+        if (message.chat.isUserChat && DatabaseManager.getUser(message.from.id) == null) // Add only if not present, or it will overwrite current value
+            DatabaseManager.addUser(user = message.from, userStatus = Status.USER)
+        else if (message.chat.isGroupOrSuper()) {
             // If it's a group insert the group and add the admins as admin
-            if (!DatabaseManager.groupExists(chat.id)) {
-                DatabaseManager.addGroup(chat.id)
+            if (!DatabaseManager.groupExists(chatId)) {
+                DatabaseManager.addGroup(chatId)
             } else {
                 // Reset old admins
-                DatabaseManager.updateGroupUsersStatus(groupId = chat.id, oldStatus = Status.ADMIN, newStatus = Status.USER)
+                DatabaseManager.updateGroupUsersStatus(groupId = chatId, oldStatus = Status.ADMIN, newStatus = Status.USER)
             }
             val getAdmins = GetChatAdministrators()
-            getAdmins.chatId = chat.id.toString()
+            getAdmins.chatId = chatId.toString()
             try {
                 val admins = absSender.execute(getAdmins)
-                DatabaseManager.addGroupUsers(groupId = chat.id, usersId = admins.map { admin -> admin.user.id }, statusK = Status.ADMIN)
+                DatabaseManager.addGroupUsers(groupId = chatId, usersId = admins.map { admin -> admin.user.id }, statusK = Status.ADMIN)
             } catch (e: TelegramApiException) {
-                simpleMessage(absSender, "An error occurred: ${e.message}", chat)
+                simpleMessage(absSender, "An error occurred: ${e.message}", chatId)
                 e.printStackTrace()
             }
         }
-        simpleMessage(absSender, "Welcome to me", chat)
+        simpleMessage(absSender, "Welcome to me", chatId)
     }
 }

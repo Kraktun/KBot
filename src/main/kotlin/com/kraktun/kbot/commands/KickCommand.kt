@@ -27,7 +27,7 @@ class KickCommand : CommandInterface {
         filterFun = { m: Message ->
             m.isReply
         },
-        chatOptions = mutableListOf(ChatOptions.BOT_IS_ADMIN, ChatOptions.OPTION_ALL_USER_ADMIN_DISABLED),
+        chatOptions = mutableListOf(ChatOptions.BOT_IS_ADMIN),
         onError = { absSender, m, result ->
             if (result == FilterResult.INVALID_STATUS)
                 simpleMessage(absSender = absSender, s = "Yeah, as if you could...", c = m.chat)

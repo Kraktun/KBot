@@ -18,10 +18,6 @@ import org.telegram.telegrambots.meta.api.methods.send.SendMessage
  */
 class MainBot(options: DefaultBotOptions) : TelegramLongPollingBot(options) {
 
-    companion object {
-        lateinit var instance: TelegramLongPollingBot
-    }
-
     /**
      * Return username of the bot
      */
@@ -56,7 +52,6 @@ class MainBot(options: DefaultBotOptions) : TelegramLongPollingBot(options) {
         // CommandProcessor.registerCommand(botUsername!!, TrackCommand().engine)
         CommandProcessor.registerCommand(botUsername!!, AdminCommand().engine)
         CommandProcessor.registerCommand(botUsername!!, FormattedHelpCommand().engine)
-        instance = this
     }
 
     /**
@@ -82,27 +77,27 @@ class MainBot(options: DefaultBotOptions) : TelegramLongPollingBot(options) {
                     }.reduce { acc, sing ->
                         "$acc $sing,"
                     }
-                    simpleMessage(instance, "Welcome $welcomeU", chat)
+                    simpleMessage(this, "Welcome $welcomeU", chat)
                 } else {
-                    kickUser(instance, user, chat)
+                    kickUser(this, user, chat)
                 }
             }
 
             // Check if chat is locked or user is banned  and if so delete the message
             (!BaseCommand.filterLock(user, chat) || !BaseCommand.filterBans(user, chat)) -> {
-                deleteMessage(instance, message)
+                deleteMessage(this, message)
             }
 
             // Check if it's a ask-answer interaction
             // Nothing to do here, as the command is fired directly in the 'if'
             // Note that this goes after the check on locks and bans, as the commands in MultiCommandsHandler
             // do not implement a check on bans and locks
-            MultiCommandsHandler.fireCommand(message, instance) -> { }
+            MultiCommandsHandler.fireCommand(message, this) -> { }
 
             // Check if it's a command and attempt to fire the response
             // Nothing to do in the function here, as the command is fired directly in the 'if'.
             // This goes after multiCommandsHandler as you may need to use a command in a multiCommand interaction
-            CommandProcessor.fireCommand(update, instance) != FilterResult.NOT_COMMAND -> {}
+            CommandProcessor.fireCommand(update, this) != FilterResult.NOT_COMMAND -> {}
 
             // manage normal messages
             (chat.isUserChat && update.hasMessage() && message.hasText()) -> {

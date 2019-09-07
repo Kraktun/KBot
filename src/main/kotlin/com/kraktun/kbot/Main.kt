@@ -1,12 +1,10 @@
 package com.kraktun.kbot
 
+import com.kraktun.kbot.bots.BotsController
 import com.kraktun.kbot.bots.PingBot
 import com.kraktun.kbot.bots.MainBot
 import com.kraktun.kbot.utils.*
-import org.telegram.telegrambots.ApiContextInitializer
 import org.telegram.telegrambots.bots.DefaultBotOptions
-import org.telegram.telegrambots.meta.TelegramBotsApi
-import org.telegram.telegrambots.meta.exceptions.TelegramApiException
 
 // Necessary to access manifest variables and have a top level class (to get path)
 // Better than having many single object{} I think
@@ -23,13 +21,7 @@ fun main() {
         }
     })
 
-    ApiContextInitializer.init()
-    val botsApi = TelegramBotsApi()
-    try {
-        botsApi.registerBot(MainBot(DefaultBotOptions()))
-        botsApi.registerBot(PingBot(DefaultBotOptions()))
-        onStart()
-    } catch (e: TelegramApiException) {
-        e.printStackTrace()
-    }
+    BotsController.initialize(MainBot(DefaultBotOptions()))
+    BotsController.initialize(PingBot(DefaultBotOptions()))
+    onStart()
 }

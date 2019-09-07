@@ -2,11 +2,12 @@ package com.kraktun.kbot.jobs
 
 import com.kraktun.kbot.PING_BOT_GROUP
 import com.kraktun.kbot.PING_BOT_NAME
-import com.kraktun.kbot.bots.PingBot
+import com.kraktun.kbot.bots.BotsController
+import com.kraktun.kbot.bots.ping.PingController
 import com.kraktun.kbot.utils.simpleMessage
+import com.kraktun.kbot.utils.username
 import org.quartz.InterruptableJob
 import org.quartz.JobExecutionContext
-import org.telegram.telegrambots.meta.bots.AbsSender
 
 // TODO: Write which job are enabled in DB and restore on boot (keep track of how many bot require them to remove inactive ones).
 //  Also keep track of which bot (username) to link them again in botList (needs a mapper username -> absSender)
@@ -19,7 +20,8 @@ class PingJob : InterruptableJob {
             trigger = "PING_JOB_TRIGGER",
             group = "jobs",
             delay = 10, // seconds
-            botList = listOf(PingBot.instance))
+            botList = listOfNotNull(BotsController.getBot(PING_BOT_NAME))
+        )
     }
 
     private val TAG = "PING_JOB"
@@ -27,8 +29,10 @@ class PingJob : InterruptableJob {
     override fun execute(context: JobExecutionContext) {
         // printlnK(TAG, "Retrieving articles")
         jobInfo.botList.forEach {
-            if (it.botUsername == PING_BOT_NAME)
-                simpleMessage(it as AbsSender, "/ping", PING_BOT_GROUP)
+            if (it.username() == PING_BOT_NAME) {
+                simpleMessage(it, "ping", PING_BOT_GROUP)
+                PingController.registerPing()
+            }
         }
     }
 

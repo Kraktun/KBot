@@ -1,3 +1,7 @@
+## TODO 
+### Add channel support
+
+
 ## Info
 Libraries used:   
 [TelegramBots](https://github.com/rubenlagus/TelegramBots)   

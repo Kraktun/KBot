@@ -1,9 +1,11 @@
 package com.kraktun.kbot.bots
 
 import com.kraktun.kbot.*
-import com.kraktun.kbot.commands.*
+import com.kraktun.kbot.commands.common.*
 import com.kraktun.kbot.commands.core.*
 import com.kraktun.kbot.commands.core.callbacks.CallbackProcessor
+import com.kraktun.kbot.commands.functions.YTCommand
+import com.kraktun.kbot.commands.groups.*
 import com.kraktun.kbot.utils.*
 import org.telegram.telegrambots.bots.DefaultBotOptions
 import org.telegram.telegrambots.bots.TelegramLongPollingBot

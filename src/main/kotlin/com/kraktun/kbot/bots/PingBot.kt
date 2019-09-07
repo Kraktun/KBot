@@ -1,9 +1,14 @@
 package com.kraktun.kbot.bots
 
 import com.kraktun.kbot.*
-import com.kraktun.kbot.commands.*
+import com.kraktun.kbot.commands.common.FormattedHelpCommand
+import com.kraktun.kbot.commands.common.HelloCommand
+import com.kraktun.kbot.commands.common.HelpCommand
+import com.kraktun.kbot.commands.common.StartCommand
 import com.kraktun.kbot.commands.core.*
 import com.kraktun.kbot.commands.core.callbacks.CallbackProcessor
+import com.kraktun.kbot.commands.misc.StartPingCommand
+import com.kraktun.kbot.commands.misc.StopPingCommand
 import com.kraktun.kbot.utils.*
 import org.telegram.telegrambots.bots.DefaultBotOptions
 import org.telegram.telegrambots.bots.TelegramLongPollingBot
@@ -45,7 +50,7 @@ class PingBot(options: DefaultBotOptions) : TelegramLongPollingBot(options) {
         CommandProcessor.registerCommand(botUsername!!, FormattedHelpCommand().engine)
         CommandProcessor.registerCommand(botUsername!!, StartPingCommand().engine)
         CommandProcessor.registerCommand(botUsername!!, StopPingCommand().engine)
-        CommandProcessor.registerCommand(botUsername!!, InfoCommand().engine)
+        // CommandProcessor.registerCommand(botUsername!!, InfoCommand().engine)
         instance = this
     }
 
@@ -62,10 +67,6 @@ class PingBot(options: DefaultBotOptions) : TelegramLongPollingBot(options) {
         val chat = message.chat
         val user = message.from
         when {
-            // If it's a group
-            // Remove new user if it's banned, otherwise welcome him
-            (message.isGroupOrSuper() && message.newChatMembers.isNotEmpty()) -> { }
-
             // Check if chat is locked or user is banned  and if so delete the message
             (!BaseCommand.filterLock(user, chat) || !BaseCommand.filterBans(user, chat)) -> {
                 deleteMessage(instance, message)

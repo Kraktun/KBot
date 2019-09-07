@@ -1,4 +1,4 @@
-package com.kraktun.kbot.commands
+package com.kraktun.kbot.commands.misc
 
 import com.kraktun.kbot.PING_BOT_GROUP
 import com.kraktun.kbot.commands.core.BaseCommand
@@ -14,7 +14,7 @@ import org.telegram.telegrambots.meta.api.objects.Message
 /**
  * Simple command
  */
-class StartPingCommand : CommandInterface { // Implement CommandInterface (execute method)
+class StartPingCommand : CommandInterface {
 
     val engine = BaseCommand(
         command = "/startping",

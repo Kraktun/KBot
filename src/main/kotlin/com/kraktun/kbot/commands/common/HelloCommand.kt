@@ -1,4 +1,4 @@
-package com.kraktun.kbot.commands
+package com.kraktun.kbot.commands.common
 
 import com.kraktun.kbot.commands.core.BaseCommand
 import com.kraktun.kbot.commands.core.CommandInterface

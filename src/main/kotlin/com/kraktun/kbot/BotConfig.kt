@@ -16,6 +16,10 @@ const val TEST_NAME = "my_bot_test"
 
 const val PING_BOT_TOKEN = "000000000:AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA"
 const val PING_BOT_NAME = "my_ping_bot"
-const val PING_BOT_GROUP = -0L
+const val PING_BOT_ALERT = 0L
+const val PING_PONG_CHAT = 0L
+
+const val PING_RECEIVER_TOKEN = "000000000:AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA"
+const val PING_RECEIVER_NAME = "my_pong_bot"
 
 val predefinedUsers = listOf<UserK>()

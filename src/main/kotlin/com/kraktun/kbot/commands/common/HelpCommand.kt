@@ -1,15 +1,13 @@
-package com.kraktun.kbot.commands
+package com.kraktun.kbot.commands.common
 
 import com.kraktun.kbot.commands.core.BaseCommand
 import com.kraktun.kbot.commands.core.CommandInterface
 import com.kraktun.kbot.commands.core.CommandProcessor
 import com.kraktun.kbot.objects.Status
 import com.kraktun.kbot.objects.Target
-import com.kraktun.kbot.utils.chatMapper
 import com.kraktun.kbot.utils.getDBStatus
 import com.kraktun.kbot.utils.simpleHTMLMessage
-import org.telegram.telegrambots.meta.api.objects.Chat
-import org.telegram.telegrambots.meta.api.objects.User
+import com.kraktun.kbot.utils.toEnum
 import org.telegram.telegrambots.meta.bots.AbsSender
 import org.telegram.telegrambots.meta.api.objects.Message
 
@@ -28,11 +26,11 @@ class HelpCommand : CommandInterface {
         exe = this
     )
 
-    override fun execute(absSender: AbsSender, user: User, chat: Chat, arguments: List<String>, message: Message) {
+    override fun execute(absSender: AbsSender, message: Message) {
         var text = "<b>Here is a list of all the commands</b>:\n"
-        CommandProcessor.getRegisteredCommands(absSender, getDBStatus(user, chat), chatMapper(chat)).forEach {
+        CommandProcessor.getRegisteredCommands(absSender, getDBStatus(message.from, message.chat), message.chat.toEnum()).forEach {
             text += "${it.command} : ${it.description}\n"
         }
-        simpleHTMLMessage(absSender, text, chat)
+        simpleHTMLMessage(absSender, text, message.chat)
     }
 }

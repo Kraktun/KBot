@@ -1,4 +1,4 @@
-package com.kraktun.kbot.commands
+package com.kraktun.kbot.commands.groups
 
 import com.kraktun.kbot.commands.core.BaseCommand
 import com.kraktun.kbot.commands.core.ChatOptions
@@ -8,9 +8,7 @@ import com.kraktun.kbot.database.DatabaseManager
 import com.kraktun.kbot.objects.Status
 import com.kraktun.kbot.objects.Target
 import com.kraktun.kbot.utils.*
-import org.telegram.telegrambots.meta.api.objects.Chat
 import org.telegram.telegrambots.meta.api.objects.Message
-import org.telegram.telegrambots.meta.api.objects.User
 import org.telegram.telegrambots.meta.bots.AbsSender
 
 /**
@@ -28,26 +26,26 @@ class BanCommand : CommandInterface {
         filterFun = { m: Message ->
             m.isReply
         },
-        chatOptions = listOf(ChatOptions.BOT_IS_ADMIN, ChatOptions.OPTION_ALL_USER_ADMIN_DISABLED),
-        onError = { absSender, _, m, result ->
+        chatOptions = listOf(ChatOptions.BOT_IS_ADMIN),
+        onError = { absSender, m, result ->
             if (result == FilterResult.INVALID_STATUS)
                 simpleMessage(absSender = absSender, s = "Yeah, as if you could...", c = m.chat)
         },
         exe = this
     )
 
-    override fun execute(absSender: AbsSender, user: User, chat: Chat, arguments: List<String>, message: Message) {
-        if (chat.isGroupChat && DatabaseManager.getGroupUserStatus(chat.id, message.replyToMessage.from.id) == Status.ADMIN) {
-            simpleMessage(absSender, "Admins can be removed only by the creator", chat)
+    override fun execute(absSender: AbsSender, message: Message) {
+        if (message.chat.isGroupChat && DatabaseManager.getGroupUserStatus(message.chatId, message.replyToMessage.from.id) == Status.ADMIN) {
+            simpleMessage(absSender, "Admins can be removed only by the creator", message.chat)
             return
         }
         // DB will be re-added when I'll figure out how to manage temporary bans.
         // DatabaseManager.addGroupUser(groupId = chat.id, userId = message.replyToMessage.from.id, statusK = Status.BANNED)
-        val date = arguments.ifNotEmpty({
-            (arguments[0].toDouble() * 3600).toInt() }, // hours to seconds
+        val date = message.arguments().ifNotEmpty({
+            (message.arguments()[0].toDouble() * 3600).toInt() }, // hours to seconds
             0) as Int
-        kickUser(absSender = absSender, u = message.replyToMessage.from, c = chat, date = date)
-        val until = if (date > 0) "for ${arguments[0]} hours." else "forever."
-        simpleMessage(absSender = absSender, s = "Banned user ${getQualifiedUser(message.replyToMessage.from)} $until", c = chat)
+        kickUser(absSender = absSender, u = message.replyToMessage.from, c = message.chat, date = date)
+        val until = if (date > 0) "for ${message.arguments()[0]} hours." else "forever."
+        simpleMessage(absSender = absSender, s = "Banned user ${message.replyToMessage.from.getFormattedName()} $until", c = message.chat)
     }
 }

@@ -4,16 +4,12 @@ import com.kraktun.kbot.database.DatabaseManager
 import com.kraktun.kbot.objects.GroupStatus
 import com.kraktun.kbot.objects.Status
 import com.kraktun.kbot.objects.Target
-import com.kraktun.kbot.utils.chatMapper
-import com.kraktun.kbot.utils.getDBStatus
-import com.kraktun.kbot.utils.ifNotEmpty
 import com.kraktun.kbot.commands.core.FilterResult.*
 import com.kraktun.kbot.commands.core.ChatOptions.*
-import com.kraktun.kbot.utils.isGroupOrSuper
+import com.kraktun.kbot.utils.*
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
-import org.telegram.telegrambots.bots.TelegramLongPollingBot
 import org.telegram.telegrambots.meta.api.methods.groupadministration.GetChatAdministrators
 import org.telegram.telegrambots.meta.api.objects.Chat
 import org.telegram.telegrambots.meta.api.objects.Message
@@ -40,11 +36,11 @@ class BaseCommand(
     private val argsNum: Int = 0,
     // function with additional logic to execute before firing the command
     // only non-intensive (aka non-DB) operations should be done here
-    private val filterFun: (Message) -> Boolean = { true },
+    private val filterFun: (message: Message) -> Boolean = { true },
     // define other options necessary fot this command
     private val chatOptions: List<ChatOptions> = mutableListOf(),
     // Function to execute when a filter (including filterFun) fails and returns false
-    private val onError: (AbsSender, List<String>, Message, FilterResult) -> Unit = { _, _, _, _ -> },
+    private val onError: (absSender: AbsSender, message: Message, filterResult: FilterResult) -> Unit = { _, _, _ -> },
     // implementation of the CommandInterface (aka execute method)
     private val exe: CommandInterface
 ) {
@@ -53,15 +49,15 @@ class BaseCommand(
      * Fire execute command of CommandInterface if all filters pass.
      * Return result of filters.
      */
-    fun fire(absSender: AbsSender, user: User, chat: Chat, arguments: List<String>, message: Message): FilterResult {
+    fun fire(absSender: AbsSender, message: Message): FilterResult {
         // apply filters
-        val result = filterAll(absSender, arguments, message)
+        val result = filterAll(absSender, message)
         runBlocking {
             GlobalScope.launch {
                 if (result == FILTER_RESULT_OK)
-                    exe.execute(absSender, user, chat, arguments, message)
+                    exe.execute(absSender, message)
                 else
-                    onError(absSender, arguments, message, result)
+                    onError(absSender, message, result)
             }
         }
         return result
@@ -70,9 +66,10 @@ class BaseCommand(
     /**
      * Apply all filters. Return true if everything is ok.
      */
-    private fun filterAll(absSender: AbsSender, arguments: List<String>, message: Message): FilterResult {
+    private fun filterAll(absSender: AbsSender, message: Message): FilterResult {
         val user = message.from
         val chat = message.chat
+        val arguments = message.arguments()
         return when {
             !filterFun(message) -> INVALID_PRECONDITIONS
             !filterChat(chat) -> INVALID_CHAT
@@ -80,7 +77,6 @@ class BaseCommand(
             !filterFormat(arguments) -> INVALID_FORMAT
             !filterLock(user, chat) -> LOCKED_CHAT
             !filterBotAdmin(absSender, chat) -> BOT_NOT_ADMIN
-            !filterAllUserAdmin(chat) -> ALL_USER_ADMINS_ENABLED
             else -> FILTER_RESULT_OK
             // filterBans is not necessary as this check is already performed by filterChat()
             // (and someone may decide to enable a command for banned users)
@@ -94,7 +90,7 @@ class BaseCommand(
      */
     private fun filterChat(chat: Chat): Boolean {
         return targets.filter {
-            it.first == chatMapper(chat)
+            it.first == chat.toEnum()
         }.toList().isNotEmpty()
     }
 
@@ -102,10 +98,11 @@ class BaseCommand(
      * Return true if message received comes from a valid chat and user.
      * In other words if the chat is part of the targets list and the status of the user is equal to or higher than the privacy.
      */
-    private fun filterStatus(user: User, chat: Chat): Boolean {
+    private fun filterStatus(user: User?, chat: Chat): Boolean {
+        if (chat.isChannelChat) return true
         val userStatus: Status = getDBStatus(user, chat)
         return targets.filter {
-            it.first == chatMapper(chat)
+            it.first == chat.toEnum()
         }.ifNotEmpty({
             this[0].second <= userStatus // [0] as a command can have only one single pair with a unique Target
         }, default = false) as Boolean
@@ -123,7 +120,8 @@ class BaseCommand(
      * Return true if command does not need bot as admin or if bot is admin
      */
     private fun filterBotAdmin(absSender: AbsSender, chat: Chat): Boolean {
-        val botId = (absSender as TelegramLongPollingBot).botToken.substringBefore(":").toInt()
+        if (chat.isChannelChat) return true // All bots are admins in channels
+        val botId = absSender.botToken().substringBefore(":").toInt()
         return if (chatOptions.contains(BOT_IS_ADMIN) && chat.isGroupOrSuper()) {
             val getAdmins = GetChatAdministrators()
             getAdmins.chatId = chat.id.toString()
@@ -139,26 +137,16 @@ class BaseCommand(
         } else true
     }
 
-    /**
-     * Return true if the command does not need the option allUserAreAdmins to be disabled
-     * or if option allUserAreAdmins is not enabled
-     */
-    private fun filterAllUserAdmin(chat: Chat): Boolean {
-        return !(chatOptions.contains(OPTION_ALL_USER_ADMIN_DISABLED) &&
-                chat.isGroupChat &&
-                chat.allMembersAreAdministrators)
-    }
-
     companion object {
 
         /**
          * Filter used for locked groups.
          * Return true if message is allowed (aka group not locked or status >= admin).
          */
-        fun filterLock(user: User, chat: Chat): Boolean {
+        fun filterLock(user: User?, chat: Chat): Boolean {
             return !chat.isGroupOrSuper() ||
                     DatabaseManager.getGroupStatus(chat.id) != GroupStatus.LOCKED ||
-                        DatabaseManager.getGroupUserStatus(chat.id, user.id) >= Status.ADMIN
+                        DatabaseManager.getGroupUserStatus(chat.id, user!!.id) >= Status.ADMIN
         }
 
         /**
@@ -166,8 +154,9 @@ class BaseCommand(
          * Return true if message is allowed (aka user not banned).
          */
         fun filterBans(user: User, chat: Chat): Boolean {
-            return DatabaseManager.getUser(user.id)?.status != Status.BANNED &&
-                    DatabaseManager.getGroupUserStatus(chat.id, user.id) != Status.BANNED
+            return chat.isChannelChat || (
+                    DatabaseManager.getUser(user.id)?.status != Status.BANNED &&
+                    DatabaseManager.getGroupUserStatus(chat.id, user.id) != Status.BANNED)
         }
     }
 }

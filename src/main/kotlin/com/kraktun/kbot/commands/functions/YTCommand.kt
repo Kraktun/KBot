@@ -1,4 +1,4 @@
-package com.kraktun.kbot.commands
+package com.kraktun.kbot.commands.functions
 
 import com.kraktun.kbot.commands.core.BaseCommand
 import com.kraktun.kbot.commands.core.CommandInterface
@@ -6,15 +6,10 @@ import com.kraktun.kbot.commands.core.MultiCommandInterface
 import com.kraktun.kbot.commands.core.MultiCommandsHandler
 import com.kraktun.kbot.objects.Status
 import com.kraktun.kbot.objects.Target
-import com.kraktun.kbot.utils.executeScript
-import com.kraktun.kbot.utils.getMainFolder
-import com.kraktun.kbot.utils.printlnK
-import com.kraktun.kbot.utils.simpleMessage
+import com.kraktun.kbot.utils.*
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 import org.telegram.telegrambots.meta.api.methods.send.SendDocument
-import org.telegram.telegrambots.meta.api.objects.Chat
-import org.telegram.telegrambots.meta.api.objects.User
 import org.telegram.telegrambots.meta.bots.AbsSender
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException
 import org.telegram.telegrambots.meta.api.objects.Message
@@ -37,12 +32,13 @@ class YTCommand : CommandInterface, MultiCommandInterface {
         exe = this
     )
 
-    override fun execute(absSender: AbsSender, user: User, chat: Chat, arguments: List<String>, message: Message) {
-        MultiCommandsHandler.insertCommand(absSender = absSender, user = user.id, chat = chat.id, command = this)
-        simpleMessage(absSender, "Send the link", chat)
+    override fun execute(absSender: AbsSender, message: Message) {
+        MultiCommandsHandler.insertCommand(absSender = absSender, user = message.from, chat = message.chat, command = this)
+        simpleMessage(absSender, "Send the link", message.chat)
     }
 
-    override fun executeAfter(absSender: AbsSender, user: User, chat: Chat, arguments: String, message: Message, data: Any?) {
+    override fun executeAfter(absSender: AbsSender, message: Message, data: Any?) {
+        val arguments = message.text
         GlobalScope.launch {
             val audioExtension = "m4a"
             // Remove url of video from filename
@@ -54,7 +50,7 @@ class YTCommand : CommandInterface, MultiCommandInterface {
                 arguments
             )).substringBeforeLast('.').plus(".$audioExtension")
             printlnK(TAG, "Filename is $audio")
-            simpleMessage(absSender, "Downloading file: $audio", chat)
+            simpleMessage(absSender, "Downloading file: $audio", message.chat)
             val result = File(getMainFolder() + "/downloads").executeScript(
                 30,
                 TimeUnit.SECONDS,
@@ -63,12 +59,12 @@ class YTCommand : CommandInterface, MultiCommandInterface {
                 "bestaudio[ext=$audioExtension]",
                 arguments
             )
-            simpleMessage(absSender, "Uploading file...", chat)
+            simpleMessage(absSender, "Uploading file...", message.chat)
             val file = File(getMainFolder() + "/downloads/" + audio)
             printlnK(TAG, "Uploading file. Size is ${file.length()}")
             if (file.length() > 0) {
                 val document = SendDocument()
-                document.setChatId(chat.id)
+                document.setChatId(message.chatId)
                     .setDocument(file)
                 try {
                     absSender.execute(document)
@@ -78,7 +74,7 @@ class YTCommand : CommandInterface, MultiCommandInterface {
                     file.delete()
                 }
             } else {
-                simpleMessage(absSender, "An error occurred: \n$result\n\n${file.absolutePath}", chat)
+                simpleMessage(absSender, "An error occurred: \n$result\n\n${file.absolutePath}", message.chat)
                 printlnK(TAG, "Error: $result\n${file.absolutePath}")
                 file.delete()
             }

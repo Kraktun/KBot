@@ -1,9 +1,11 @@
 package com.kraktun.kbot.bots
 
 import com.kraktun.kbot.*
-import com.kraktun.kbot.commands.*
+import com.kraktun.kbot.commands.common.*
 import com.kraktun.kbot.commands.core.*
 import com.kraktun.kbot.commands.core.callbacks.CallbackProcessor
+import com.kraktun.kbot.commands.functions.YTCommand
+import com.kraktun.kbot.commands.groups.*
 import com.kraktun.kbot.utils.*
 import org.telegram.telegrambots.bots.DefaultBotOptions
 import org.telegram.telegrambots.bots.TelegramLongPollingBot
@@ -15,10 +17,6 @@ import org.telegram.telegrambots.meta.api.methods.send.SendMessage
  * Main class: register the commands and process non-command updates
  */
 class MainBot(options: DefaultBotOptions) : TelegramLongPollingBot(options) {
-
-    companion object {
-        lateinit var instance: TelegramLongPollingBot
-    }
 
     /**
      * Return username of the bot
@@ -54,7 +52,6 @@ class MainBot(options: DefaultBotOptions) : TelegramLongPollingBot(options) {
         // CommandProcessor.registerCommand(botUsername!!, TrackCommand().engine)
         CommandProcessor.registerCommand(botUsername!!, AdminCommand().engine)
         CommandProcessor.registerCommand(botUsername!!, FormattedHelpCommand().engine)
-        instance = this
     }
 
     /**
@@ -66,9 +63,9 @@ class MainBot(options: DefaultBotOptions) : TelegramLongPollingBot(options) {
             CallbackProcessor.fireCallback(absSender = this, callback = update.callbackQuery, user = update.callbackQuery.from.id)
             return
         }
-        val message = update.message
+        val message = if (update.channelPost != null) update.channelPost else update.message
         val chat = message.chat
-        val user = message.from
+        val user = message.from // null if message is from channel
         // printlnK("MAIN", "MESSAGE IS: $message")
         when {
             // If it's a group
@@ -76,31 +73,31 @@ class MainBot(options: DefaultBotOptions) : TelegramLongPollingBot(options) {
             (message.isGroupOrSuper() && message.newChatMembers.isNotEmpty()) -> {
                 if (BaseCommand.filterBans(user, chat)) { // TODO check if it fails with multiple new members one of which is banned
                     val welcomeU = message.newChatMembers.map {
-                        getQualifiedUser(it)
+                        it.getFormattedName()
                     }.reduce { acc, sing ->
                         "$acc $sing,"
                     }
-                    simpleMessage(instance, "Welcome $welcomeU", chat)
+                    simpleMessage(this, "Welcome $welcomeU", chat)
                 } else {
-                    kickUser(instance, user, chat)
+                    kickUser(this, user, chat)
                 }
             }
 
             // Check if chat is locked or user is banned  and if so delete the message
-            (!BaseCommand.filterLock(user, chat) || !BaseCommand.filterBans(user, chat)) -> {
-                deleteMessage(instance, message)
+            user != null && (!BaseCommand.filterLock(user, chat) || !BaseCommand.filterBans(user, chat)) -> {
+                deleteMessage(this, message)
             }
 
             // Check if it's a ask-answer interaction
             // Nothing to do here, as the command is fired directly in the 'if'
             // Note that this goes after the check on locks and bans, as the commands in MultiCommandsHandler
             // do not implement a check on bans and locks
-            MultiCommandsHandler.fireCommand(message, instance) -> { }
+            MultiCommandsHandler.fireCommand(message, this) -> { }
 
             // Check if it's a command and attempt to fire the response
             // Nothing to do in the function here, as the command is fired directly in the 'if'.
             // This goes after multiCommandsHandler as you may need to use a command in a multiCommand interaction
-            CommandProcessor.fireCommand(update, instance) != FilterResult.NOT_COMMAND -> {}
+            CommandProcessor.fireCommand(message, this) != FilterResult.NOT_COMMAND -> { }
 
             // manage normal messages
             (chat.isUserChat && update.hasMessage() && message.hasText()) -> {

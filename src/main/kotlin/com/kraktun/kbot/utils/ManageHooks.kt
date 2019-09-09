@@ -1,6 +1,7 @@
 package com.kraktun.kbot.utils
 
 import com.kraktun.kbot.database.DatabaseManager
+import com.kraktun.kbot.jobs.JobExecutor
 import com.kraktun.kbot.predefinedUsers
 import java.io.File
 

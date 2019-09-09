@@ -43,14 +43,14 @@ class AmazonService : TrackingInterface {
      * Third part: check domain and ask item ID
      */
     private inner class ManageDomains : MultiCommandInterface {
-        override fun executeAfter(absSender: AbsSender, user: User, chat: Chat, arguments: String, message: Message, data: Any?) {
-            if (!acceptedAmazonDomains.contains(arguments)) {
-                simpleMessage(absSender, "Invalid code. Retry.", chat)
-                MultiCommandsHandler.insertCommand(absSender, user, chat, ManageDomains())
+        override fun executeAfter(absSender: AbsSender, message: Message, data: Any?) {
+            if (!acceptedAmazonDomains.contains(message.text)) {
+                simpleMessage(absSender, "Invalid code. Retry.", message.chat)
+                MultiCommandsHandler.insertCommand(absSender, message.from, message.chat, ManageDomains())
             } else {
-                removeKeyboard(absSender, chat, "Send the ID of the item.")
-                trackedObject.extraKey = arguments
-                MultiCommandsHandler.insertCommand(absSender, user, chat, ManageArticle())
+                removeKeyboard(absSender, message.chat, "Send the ID of the item.")
+                trackedObject.extraKey = message.text
+                MultiCommandsHandler.insertCommand(absSender, message.from, message.chat, ManageArticle())
             }
         }
     }
@@ -59,26 +59,26 @@ class AmazonService : TrackingInterface {
      * Fourth part: check id, send current prices and ask target price
      */
     private inner class ManageArticle : MultiCommandInterface {
-        override fun executeAfter(absSender: AbsSender, user: User, chat: Chat, arguments: String, message: Message, data: Any?) {
-            if (arguments.length != 10) {
-                simpleMessage(absSender, "Wrong code. Retry.", chat)
-                MultiCommandsHandler.insertCommand(absSender, user, chat, ManageArticle())
+        override fun executeAfter(absSender: AbsSender, message: Message, data: Any?) {
+            if (message.text.length != 10) {
+                simpleMessage(absSender, "Wrong code. Retry.", message.chat)
+                MultiCommandsHandler.insertCommand(absSender, message.from, message.chat, ManageArticle())
             } else {
-                trackedObject.objectId = arguments
+                trackedObject.objectId = message.text
                 GlobalScope.launch {
-                    simpleMessage(absSender, "Retrieving current prices for domain ${trackedObject.extraKey} and id ${trackedObject.objectId}", chat)
+                    simpleMessage(absSender, "Retrieving current prices for domain ${trackedObject.extraKey} and id ${trackedObject.objectId}", message.chat)
                     val priceList = getPrice(trackedObject.extraKey, trackedObject.objectId)
-                    simpleMessage(absSender, priceList.toString(), chat)
+                    simpleMessage(absSender, priceList.toString(), message.chat)
                     // Send options to enable forced seller or shipment
                     val soldByAmazon = ManageSoldByAmazon()
                     val shippedByAmazon = ManageShippedByAmazon()
-                    CallbackProcessor.insertCallback(user.id, soldByAmazon)
-                    CallbackProcessor.insertCallback(user.id, shippedByAmazon)
+                    CallbackProcessor.insertCallback(message.from.id, soldByAmazon)
+                    CallbackProcessor.insertCallback(message.from.id, shippedByAmazon)
                     val keyboard = InlineKeyboardMarkup()
                     keyboard.keyboard.add(listOf(soldByAmazon.getButton(), shippedByAmazon.getButton()))
-                    sendKeyboard(absSender, chat, "Choose the options you need from below.", keyboard)
-                    simpleMessage(absSender, "When you are ready send the target price in the form XXX.XX", chat)
-                    MultiCommandsHandler.insertCommand(absSender, user, chat, ManagePrice(), listOf(soldByAmazon.getId(), shippedByAmazon.getId())) // Send as data the id of the callbacks, to remove them later
+                    sendKeyboard(absSender, message.chat, "Choose the options you need from below.", keyboard)
+                    simpleMessage(absSender, "When you are ready send the target price in the form XXX.XX", message.chat)
+                    MultiCommandsHandler.insertCommand(absSender, message.from, message.chat, ManagePrice(), listOf(soldByAmazon.getId(), shippedByAmazon.getId())) // Send as data the id of the callbacks, to remove them later
                 }
             }
         }
@@ -150,18 +150,18 @@ class AmazonService : TrackingInterface {
      * Fifth part: set target price and ask name
      */
     private inner class ManagePrice : MultiCommandInterface {
-        override fun executeAfter(absSender: AbsSender, user: User, chat: Chat, arguments: String, message: Message, data: Any?) {
+        override fun executeAfter(absSender: AbsSender, message: Message, data: Any?) {
             (data as List<*>).forEach {
-                CallbackProcessor.removeCallback(user.id, it as String)
+                CallbackProcessor.removeCallback(message.from.id, it as String)
             }
-            val priceD = parsePrice(arguments) ?: 0f
+            val priceD = parsePrice(message.text) ?: 0f
             if (priceD <= 0f) {
-                simpleMessage(absSender, "Wrong number. Retry.", chat)
-                MultiCommandsHandler.insertCommand(absSender, user, chat, ManagePrice())
+                simpleMessage(absSender, "Wrong number. Retry.", message.chat)
+                MultiCommandsHandler.insertCommand(absSender, message.from, message.chat, ManagePrice())
             } else {
                 trackedObject.targetPrice = priceD
-                simpleMessage(absSender, "Send the name for this object.", chat)
-                MultiCommandsHandler.insertCommand(absSender, user, chat, ManageObjectName())
+                simpleMessage(absSender, "Send the name for this object.", message.chat)
+                MultiCommandsHandler.insertCommand(absSender, message.from, message.chat, ManageObjectName())
             }
         }
     }
@@ -170,15 +170,15 @@ class AmazonService : TrackingInterface {
      * Sixth part: set name and save in DB
      */
     private inner class ManageObjectName : MultiCommandInterface {
-        override fun executeAfter(absSender: AbsSender, user: User, chat: Chat, arguments: String, message: Message, data: Any?) {
-            if (arguments.isEmpty()) {
-                simpleMessage(absSender, "Name can't be empty", chat)
-                MultiCommandsHandler.insertCommand(absSender, user, chat, ManageObjectName())
+        override fun executeAfter(absSender: AbsSender, message: Message, data: Any?) {
+            if (message.text.isEmpty()) {
+                simpleMessage(absSender, "Name can't be empty", message.chat)
+                MultiCommandsHandler.insertCommand(absSender, message.from, message.chat, ManageObjectName())
             } else {
-                trackedObject.name = arguments
+                trackedObject.name = message.text
                 trackedObject.data = Klaxon().toJsonString(companionData)
                 DatabaseManager.addTrackedObject(trackedObject)
-                simpleMessage(absSender, "Object saved.", chat)
+                simpleMessage(absSender, "Object saved.", message.chat)
             }
         }
     }

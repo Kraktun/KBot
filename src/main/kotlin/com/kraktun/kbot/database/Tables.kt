@@ -4,6 +4,7 @@ import org.jetbrains.exposed.sql.*
 
 // https://www.kotlinresources.com/library/exposed/
 // DSL
+// TODO Rewrite to manage temporary bans
 
 object Users : Table() {
     val id = integer("id").primaryKey()

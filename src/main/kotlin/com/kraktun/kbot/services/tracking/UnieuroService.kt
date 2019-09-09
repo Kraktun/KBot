@@ -39,18 +39,18 @@ class UnieuroService : TrackingInterface {
      *
      */
     private inner class ManageUrl : MultiCommandInterface {
-        override fun executeAfter(absSender: AbsSender, user: User, chat: Chat, arguments: String, message: Message, data: Any?) {
-            trackedObject.objectId = arguments // url
+        override fun executeAfter(absSender: AbsSender, message: Message, data: Any?) {
+            trackedObject.objectId = message.text // url
             GlobalScope.launch {
-                simpleMessage(absSender, "Retrieving current price for url ${trackedObject.objectId}", chat)
+                simpleMessage(absSender, "Retrieving current price for url ${trackedObject.objectId}", message.chat)
                 val price = getPrice(trackedObject.objectId)
                 if (price == null) {
-                    simpleMessage(absSender, "Wrong url, retry.", chat)
-                    MultiCommandsHandler.insertCommand(absSender, user, chat, ManageUrl())
+                    simpleMessage(absSender, "Wrong url, retry.", message.chat)
+                    MultiCommandsHandler.insertCommand(absSender, message.from, message.chat, ManageUrl())
                 } else {
-                    simpleMessage(absSender, price.toString(), chat)
-                    simpleMessage(absSender, "Send the target price in the form XXX.XX", chat)
-                    MultiCommandsHandler.insertCommand(absSender, user, chat, ManagePrice())
+                    simpleMessage(absSender, price.toString(), message.chat)
+                    simpleMessage(absSender, "Send the target price in the form XXX.XX", message.chat)
+                    MultiCommandsHandler.insertCommand(absSender, message.from, message.chat, ManagePrice())
                 }
             }
         }
@@ -60,15 +60,15 @@ class UnieuroService : TrackingInterface {
      *
      */
     private inner class ManagePrice : MultiCommandInterface {
-        override fun executeAfter(absSender: AbsSender, user: User, chat: Chat, arguments: String, message: Message, data: Any?) {
-            val priceD = parsePrice(arguments) ?: 0f
+        override fun executeAfter(absSender: AbsSender, message: Message, data: Any?) {
+            val priceD = parsePrice(message.text) ?: 0f
             if (priceD <= 0f) {
-                simpleMessage(absSender, "Wrong number. Retry.", chat)
-                MultiCommandsHandler.insertCommand(absSender, user, chat, ManagePrice())
+                simpleMessage(absSender, "Wrong number. Retry.", message.chat)
+                MultiCommandsHandler.insertCommand(absSender, message.from, message.chat, ManagePrice())
             } else {
                 trackedObject.targetPrice = priceD
-                simpleMessage(absSender, "Send the name for this object.", chat)
-                MultiCommandsHandler.insertCommand(absSender, user, chat, ManageObjectName())
+                simpleMessage(absSender, "Send the name for this object.", message.chat)
+                MultiCommandsHandler.insertCommand(absSender, message.from, message.chat, ManageObjectName())
             }
         }
     }
@@ -77,14 +77,14 @@ class UnieuroService : TrackingInterface {
      *
      */
     private inner class ManageObjectName : MultiCommandInterface {
-        override fun executeAfter(absSender: AbsSender, user: User, chat: Chat, arguments: String, message: Message, data: Any?) {
-            if (arguments.isEmpty()) {
-                simpleMessage(absSender, "Name can't be empty", chat)
-                MultiCommandsHandler.insertCommand(absSender, user, chat, ManageObjectName())
+        override fun executeAfter(absSender: AbsSender, message: Message, data: Any?) {
+            if (message.text.isEmpty()) {
+                simpleMessage(absSender, "Name can't be empty", message.chat)
+                MultiCommandsHandler.insertCommand(absSender, message.from, message.chat, ManageObjectName())
             } else {
-                trackedObject.name = arguments
+                trackedObject.name = message.text
                 DatabaseManager.addTrackedObject(trackedObject)
-                simpleMessage(absSender, "Object saved.", chat)
+                simpleMessage(absSender, "Object saved.", message.chat)
             }
         }
     }

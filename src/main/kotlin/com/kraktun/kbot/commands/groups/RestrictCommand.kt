@@ -1,15 +1,14 @@
-package com.kraktun.kbot.commands
+package com.kraktun.kbot.commands.groups
 
 import com.kraktun.kbot.commands.core.BaseCommand
 import com.kraktun.kbot.commands.core.ChatOptions
 import com.kraktun.kbot.commands.core.CommandInterface
 import com.kraktun.kbot.objects.Status
 import com.kraktun.kbot.objects.Target
-import com.kraktun.kbot.utils.getQualifiedUser
+import com.kraktun.kbot.utils.getFormattedName
 import com.kraktun.kbot.utils.simpleMessage
 import org.telegram.telegrambots.meta.api.methods.groupadministration.RestrictChatMember
-import org.telegram.telegrambots.meta.api.objects.Chat
-import org.telegram.telegrambots.meta.api.objects.User
+import org.telegram.telegrambots.meta.api.objects.ChatPermissions
 import org.telegram.telegrambots.meta.bots.AbsSender
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException
 import org.telegram.telegrambots.meta.api.objects.Message
@@ -31,19 +30,17 @@ class RestrictCommand : CommandInterface {
         exe = this
     )
 
-    override fun execute(absSender: AbsSender, user: User, chat: Chat, arguments: List<String>, message: Message) {
+    override fun execute(absSender: AbsSender, message: Message) {
         val restricted = RestrictChatMember()
-        restricted.chatId = chat.id.toString()
+        restricted.chatId = message.chatId.toString()
         restricted.userId = message.replyToMessage.from.id
-        restricted.canAddWebPagePreviews = false
-        restricted.canSendMediaMessages = false
-        restricted.canSendMessages = false
-        restricted.canSendOtherMessages = false
+        val permissions = ChatPermissions() // Default everything is false
+        restricted.permissions = permissions
         try {
             absSender.execute(restricted)
-            simpleMessage(absSender, "Restricted user ${getQualifiedUser(message.replyToMessage.from)}", chat)
+            simpleMessage(absSender, "Restricted user ${message.replyToMessage.from.getFormattedName()}", message.chat)
         } catch (e: TelegramApiException) {
-            simpleMessage(absSender, "Error: ${e.message}", chat)
+            simpleMessage(absSender, "Error: ${e.message}", message.chat)
             e.printStackTrace()
         }
     }

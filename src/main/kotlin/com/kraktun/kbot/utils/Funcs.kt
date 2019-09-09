@@ -1,55 +1,12 @@
 package com.kraktun.kbot.utils
 
-import com.kraktun.kbot.database.DatabaseManager
-import com.kraktun.kbot.objects.Status
-import com.kraktun.kbot.objects.Target
-import org.telegram.telegrambots.meta.api.objects.Chat
-import org.telegram.telegrambots.meta.api.objects.Message
-import org.telegram.telegrambots.meta.api.objects.User
-import org.telegram.telegrambots.meta.bots.AbsSender
-import org.telegram.telegrambots.meta.generics.LongPollingBot
-import org.telegram.telegrambots.meta.generics.WebhookBot
 import java.io.File
 import java.net.URLDecoder
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
 import java.util.concurrent.TimeUnit
+import java.util.concurrent.locks.ReadWriteLock
 import java.util.regex.Pattern
-
-/**
- * Get identification string for user:
- * if it has a username, use that, if not use first + last name or only first
- */
-fun getQualifiedUser(user: User): String {
-    return when {
-        user.userName != null -> "@${user.userName}"
-        user.lastName != null -> "${user.firstName} ${user.lastName}"
-        else -> user.firstName
-    }
-}
-
-/**
- * Maps a chat into the corresponding enum
- */
-fun chatMapper(chat: Chat): Target {
-    return when {
-        chat.isGroupChat -> Target.GROUP
-        chat.isSuperGroupChat -> Target.SUPERGROUP
-        chat.isUserChat -> Target.USER
-        else -> Target.INVALID
-    }
-}
-
-/**
- * Returns status of user according to the passed chat
- */
-fun getDBStatus(user: User, chat: Chat): Status {
-    return when {
-        chat.isUserChat -> DatabaseManager.getUser(user.id)?.status ?: Status.NOT_REGISTERED
-        chat.isGroupOrSuper() -> DatabaseManager.getGroupUserStatus(groupId = chat.id, userId = user.id)
-        else -> Status.NOT_REGISTERED
-    }
-}
 
 /**
  * Execute function for a collection, defaults to passed value if list is empty or null, or an exception is thrown.
@@ -114,20 +71,6 @@ fun File.executeScript(vararg arguments: String): String {
 }
 
 /**
- * Convenient way to check if it's a group or supergroup message
- */
-fun Message.isGroupOrSuper(): Boolean {
-    return this.isGroupMessage || this.isSuperGroupMessage
-}
-
-/**
- * Convenient way to check if it's a group or supergroup chat
- */
-fun Chat.isGroupOrSuper(): Boolean {
-    return this.isSuperGroupChat || this.isGroupChat
-}
-
-/**
  * Get current date and time formatted as yyyy-MM-dd_HH-mm-ss
  */
 fun getCurrentDateTimeStamp(): String {
@@ -149,14 +92,21 @@ fun parsePrice(price: String): Float? {
     return if (m.find()) m.group().toFloat() else null
 }
 
-/**
- * Get username of bot
- */
-fun AbsSender.username(): String {
-    return if (this is LongPollingBot) {
-        this.botUsername
-    } else {
-        (this as WebhookBot).botUsername
+inline fun <K> ReadWriteLock?.writeInLock(f: () -> K): K {
+    this?.writeLock()?.lock()
+    try {
+        return f.invoke()
+    } finally {
+        this?.writeLock()?.unlock()
+    }
+}
+
+inline fun <K> ReadWriteLock?.readInLock(f: () -> K): K {
+    this?.readLock()?.lock()
+    try {
+        return f.invoke()
+    } finally {
+        this?.readLock()?.unlock()
     }
 }
 

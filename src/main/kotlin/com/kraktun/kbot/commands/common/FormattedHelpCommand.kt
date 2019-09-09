@@ -1,4 +1,4 @@
-package com.kraktun.kbot.commands
+package com.kraktun.kbot.commands.common
 
 import com.kraktun.kbot.commands.core.BaseCommand
 import com.kraktun.kbot.commands.core.CommandInterface
@@ -6,8 +6,6 @@ import com.kraktun.kbot.commands.core.CommandProcessor
 import com.kraktun.kbot.objects.Status
 import com.kraktun.kbot.objects.Target
 import com.kraktun.kbot.utils.simpleHTMLMessage
-import org.telegram.telegrambots.meta.api.objects.Chat
-import org.telegram.telegrambots.meta.api.objects.User
 import org.telegram.telegrambots.meta.bots.AbsSender
 import org.telegram.telegrambots.meta.api.objects.Message
 
@@ -24,13 +22,13 @@ class FormattedHelpCommand : CommandInterface {
         exe = this
     )
 
-    override fun execute(absSender: AbsSender, user: User, chat: Chat, arguments: List<String>, message: Message) {
+    override fun execute(absSender: AbsSender, message: Message) {
         var text = ""
         CommandProcessor.getRegisteredCommands(absSender, Status.ADMIN, Target.GROUP).filter {
             it.command.startsWith("/")
         }.forEach {
             text += "${it.command.substringAfter("/")} - ${it.description}\n"
         }
-        simpleHTMLMessage(absSender, text, chat)
+        simpleHTMLMessage(absSender, text, message.chat)
     }
 }

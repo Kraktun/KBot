@@ -1,15 +1,14 @@
-package com.kraktun.kbot.utils
+package com.kraktun.kbot.jobs
 
 import com.kraktun.kbot.commands.core.MultiCommandsHandler
-import com.kraktun.kbot.jobs.JobInfo
-import com.kraktun.kbot.jobs.LoggerJob
-import com.kraktun.kbot.jobs.TrackerJob
 import org.quartz.Job
 import org.quartz.JobBuilder.newJob
+import org.quartz.JobKey
 import org.quartz.SchedulerException
 import org.quartz.impl.StdSchedulerFactory
 import org.quartz.SimpleScheduleBuilder.simpleSchedule
 import org.quartz.TriggerBuilder.newTrigger
+import org.quartz.TriggerKey
 import java.util.*
 
 /**
@@ -51,6 +50,32 @@ object JobExecutor {
         } catch (e: InterruptedException) {
             false
         }
+    }
+
+    fun addJob(job: Job, info: JobInfo) {
+        val appendedJob = newJob(job::class.java)
+            .withIdentity(info.name, info.group)
+            .build()
+        // Trigger the job to run now, and then every n seconds
+        val startingTime = Calendar.getInstance()
+        startingTime.add(Calendar.SECOND, info.delay)
+        val trigger = newTrigger()
+            .withIdentity(info.trigger, info.group)
+            .startAt(startingTime.time)
+            .withSchedule(
+                simpleSchedule()
+                    .withIntervalInSeconds(info.interval)
+                    .repeatForever()
+            )
+            .forJob(appendedJob)
+            .build()
+        // Tell quartz to schedule the job using our trigger
+        scheduler.scheduleJob(appendedJob, trigger)
+    }
+
+    fun removeJob(jobInfo: JobInfo) {
+        scheduler.interrupt(JobKey.jobKey(jobInfo.trigger, jobInfo.group))
+        scheduler.unscheduleJob(TriggerKey.triggerKey(jobInfo.trigger, jobInfo.group))
     }
 
     /**

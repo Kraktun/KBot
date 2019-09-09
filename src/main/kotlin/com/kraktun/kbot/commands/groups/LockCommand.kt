@@ -1,4 +1,4 @@
-package com.kraktun.kbot.commands
+package com.kraktun.kbot.commands.groups
 
 import com.kraktun.kbot.commands.core.BaseCommand
 import com.kraktun.kbot.commands.core.ChatOptions
@@ -8,9 +8,7 @@ import com.kraktun.kbot.objects.GroupStatus
 import com.kraktun.kbot.objects.Status
 import com.kraktun.kbot.objects.Target
 import com.kraktun.kbot.utils.simpleMessage
-import org.telegram.telegrambots.meta.api.objects.Chat
 import org.telegram.telegrambots.meta.api.objects.Message
-import org.telegram.telegrambots.meta.api.objects.User
 import org.telegram.telegrambots.meta.bots.AbsSender
 
 /**
@@ -30,8 +28,8 @@ class LockCommand : CommandInterface {
         exe = this
     )
 
-    override fun execute(absSender: AbsSender, user: User, chat: Chat, arguments: List<String>, message: Message) {
-        DatabaseManager.updateGroup(chat.id, GroupStatus.LOCKED)
-        simpleMessage(absSender = absSender, s = "Group is locked. Only admins can send messages", c = chat)
+    override fun execute(absSender: AbsSender, message: Message) {
+        DatabaseManager.updateGroup(message.chatId, GroupStatus.LOCKED)
+        simpleMessage(absSender = absSender, s = "Group is locked. Only admins can send messages", c = message.chat)
     }
 }

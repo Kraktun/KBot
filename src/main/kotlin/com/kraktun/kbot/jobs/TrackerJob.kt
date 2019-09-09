@@ -1,13 +1,13 @@
 package com.kraktun.kbot.jobs
 
-import com.kraktun.kbot.bots.MainBot
+import com.kraktun.kbot.MAIN_NAME
+import com.kraktun.kbot.bots.BotsController
 import com.kraktun.kbot.database.DatabaseManager
 import com.kraktun.kbot.services.tracking.AmazonService
 import com.kraktun.kbot.services.tracking.UnieuroService
 import com.kraktun.kbot.utils.simpleHTMLMessage
 import org.quartz.InterruptableJob
 import org.quartz.JobExecutionContext
-import org.telegram.telegrambots.meta.bots.AbsSender
 import kotlin.random.Random
 
 class TrackerJob : InterruptableJob {
@@ -19,7 +19,8 @@ class TrackerJob : InterruptableJob {
             trigger = "TRACKER_JOB_TRIGGER",
             group = "jobs",
             delay = 120, // seconds
-            botList = listOf(MainBot.instance))
+            botList = listOfNotNull(BotsController.getBot(MAIN_NAME))
+        )
     }
 
     private val TAG = "TRACKER_JOB"
@@ -34,7 +35,7 @@ class TrackerJob : InterruptableJob {
                     val bestPrice = AmazonService.filterPrices(obj)
                     if (bestPrice != null && bestPrice.totalPrice() <= obj.targetPrice) {
                         jobInfo.botList.forEach {
-                            simpleHTMLMessage(it as AbsSender, "The object <b>${obj.name}</b> has reached the target price (${obj.targetPrice}):\n$bestPrice", obj.user.toLong())
+                            simpleHTMLMessage(it, "The object <b>${obj.name}</b> has reached the target price (${obj.targetPrice}):\n$bestPrice", obj.user.toLong())
                         }
                         DatabaseManager.removeTrackedObject(obj)
                     }
@@ -44,7 +45,7 @@ class TrackerJob : InterruptableJob {
                     val price = UnieuroService.getPrice(obj.objectId)
                     if (price != null && price.totalPrice() <= obj.targetPrice) {
                         jobInfo.botList.forEach {
-                            simpleHTMLMessage(it as AbsSender, "The object <b>${obj.name}</b> has reached the target price (${obj.targetPrice}):\n$price", obj.user.toLong())
+                            simpleHTMLMessage(it, "The object <b>${obj.name}</b> has reached the target price (${obj.targetPrice}):\n$price", obj.user.toLong())
                         }
                         DatabaseManager.removeTrackedObject(obj)
                     }

@@ -33,4 +33,6 @@ build/tmp/*
 build/resources/*
 build/libs/downloads/*
 build/libs/logs/*
+build/libs/releases/*
 build/reports/*
+build/scripts/*

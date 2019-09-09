@@ -19,7 +19,7 @@ class StartPingCommand : CommandInterface {
     val engine = BaseCommand(
         command = "/startping",
         description = "Start pinging",
-        targets = listOf(Pair(Target.GROUP, Status.ADMIN)),
+        targets = listOf(Pair(Target.USER, Status.CREATOR)),
         exe = this
     )
 

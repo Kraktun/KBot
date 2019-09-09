@@ -13,8 +13,9 @@ import org.telegram.telegrambots.meta.generics.WebhookBot
 /**
  * Returns status of user according to the passed chat
  */
-fun getDBStatus(user: User, chat: Chat): Status {
+fun getDBStatus(user: User?, chat: Chat): Status {
     return when {
+        user == null -> Status.NOT_REGISTERED
         chat.isUserChat -> DatabaseManager.getUser(user.id)?.status ?: Status.NOT_REGISTERED
         chat.isGroupOrSuper() -> DatabaseManager.getGroupUserStatus(groupId = chat.id, userId = user.id)
         else -> Status.NOT_REGISTERED
@@ -85,6 +86,7 @@ fun Chat.toEnum(): Target {
         isGroupChat -> Target.GROUP
         isSuperGroupChat -> Target.SUPERGROUP
         isUserChat -> Target.USER
+        isChannelChat -> Target.CHANNEL
         else -> Target.INVALID
     }
 }

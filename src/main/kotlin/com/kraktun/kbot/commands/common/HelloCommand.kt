@@ -19,11 +19,15 @@ class HelloCommand : CommandInterface {
         description = "Hi",
         targets = listOf(Pair(Target.USER, Status.USER),
             Pair(Target.GROUP, Status.NOT_REGISTERED),
-            Pair(Target.SUPERGROUP, Status.NOT_REGISTERED)),
+            Pair(Target.SUPERGROUP, Status.NOT_REGISTERED),
+            Pair(Target.CHANNEL, Status.NOT_REGISTERED)),
         exe = this
     )
 
     override fun execute(absSender: AbsSender, message: Message) {
-        simpleMessage(absSender = absSender, s = "Hello there, ${message.from.getFormattedName()}", c = message.chat)
+        if (message.isChannelMessage)
+            simpleMessage(absSender, "Hello There", message.chat)
+        else
+            simpleMessage(absSender = absSender, s = "Hello there, ${message.from.getFormattedName()}", c = message.chat)
     }
 }

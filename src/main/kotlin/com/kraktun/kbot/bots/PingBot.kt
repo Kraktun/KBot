@@ -14,8 +14,6 @@ import com.kraktun.kbot.utils.*
 import org.telegram.telegrambots.bots.DefaultBotOptions
 import org.telegram.telegrambots.bots.TelegramLongPollingBot
 import org.telegram.telegrambots.meta.api.objects.Update
-import org.telegram.telegrambots.meta.exceptions.TelegramApiException
-import org.telegram.telegrambots.meta.api.methods.send.SendMessage
 
 /**
  * Main class: register the commands and process non-command updates
@@ -57,7 +55,7 @@ class PingBot(options: DefaultBotOptions) : TelegramLongPollingBot(options), Pin
             CallbackProcessor.fireCallback(absSender = this, callback = update.callbackQuery, user = update.callbackQuery.from.id)
             return
         }
-        val message = update.message
+        val message = if (update.channelPost != null) update.channelPost else update.message
         val chat = message.chat
         val user = message.from
         when {
@@ -75,21 +73,10 @@ class PingBot(options: DefaultBotOptions) : TelegramLongPollingBot(options), Pin
             // Check if it's a command and attempt to fire the response
             // Nothing to do in the function here, as the command is fired directly in the 'if'.
             // This goes after multiCommandsHandler as you may need to use a command in a multiCommand interaction
-            CommandProcessor.fireCommand(update, this) != FilterResult.NOT_COMMAND -> { }
+            CommandProcessor.fireCommand(message, this) != FilterResult.NOT_COMMAND -> { }
 
             (message.hasText() && message.text.equals("pong", ignoreCase = true)) -> {
                 PingController.registerPong()
-            }
-            // manage normal messages
-            (chat.isUserChat && update.hasMessage() && message.hasText()) -> {
-                val reply = SendMessage()
-                    .setChatId(chat.id)
-                    .setText("I'm a parrot\n ${message.text}")
-                try {
-                    execute(reply)
-                } catch (e: TelegramApiException) {
-                    e.printStackTrace()
-                }
             }
         }
     }

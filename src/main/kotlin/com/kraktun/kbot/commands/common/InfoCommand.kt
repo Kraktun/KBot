@@ -18,7 +18,8 @@ class InfoCommand : CommandInterface { // Implement CommandInterface (execute me
         description = "Get basic info",
         targets = listOf(Pair(Target.USER, Status.ADMIN),
             Pair(Target.GROUP, Status.ADMIN),
-            Pair(Target.SUPERGROUP, Status.ADMIN)),
+            Pair(Target.SUPERGROUP, Status.ADMIN),
+            Pair(Target.CHANNEL, Status.NOT_REGISTERED)),
         exe = this
     )
 

@@ -19,6 +19,7 @@ import java.util.concurrent.locks.ReentrantReadWriteLock
 
 /**
  * Handles multi-input commands (commands that need more messages). ForceReply is not enough for me.
+ * Channels are not supported.
  */
 
 const val TAG = "MULTICOMMANDS_HANDLER"
@@ -34,9 +35,10 @@ object MultiCommandsHandler {
 
     /**
      * Execute next command for pair user + chat.
-     * False if no command is found.
+     * False if no command is found or message is from a channel.
      */
     fun fireCommand(message: Message, absSender: AbsSender): Boolean {
+        if (message.isChannelMessage) return false
         var temp: MultiBaseCommand? = null
         lock.readInLock {
             temp = map[Triple(absSender.username(), message.from.id, message.chatId)]

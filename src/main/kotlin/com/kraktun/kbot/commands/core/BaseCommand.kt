@@ -98,7 +98,8 @@ class BaseCommand(
      * Return true if message received comes from a valid chat and user.
      * In other words if the chat is part of the targets list and the status of the user is equal to or higher than the privacy.
      */
-    private fun filterStatus(user: User, chat: Chat): Boolean {
+    private fun filterStatus(user: User?, chat: Chat): Boolean {
+        if (chat.isChannelChat) return true
         val userStatus: Status = getDBStatus(user, chat)
         return targets.filter {
             it.first == chat.toEnum()
@@ -119,6 +120,7 @@ class BaseCommand(
      * Return true if command does not need bot as admin or if bot is admin
      */
     private fun filterBotAdmin(absSender: AbsSender, chat: Chat): Boolean {
+        if (chat.isChannelChat) return true // All bots are admins in channels
         val botId = absSender.botToken().substringBefore(":").toInt()
         return if (chatOptions.contains(BOT_IS_ADMIN) && chat.isGroupOrSuper()) {
             val getAdmins = GetChatAdministrators()
@@ -141,10 +143,10 @@ class BaseCommand(
          * Filter used for locked groups.
          * Return true if message is allowed (aka group not locked or status >= admin).
          */
-        fun filterLock(user: User, chat: Chat): Boolean {
+        fun filterLock(user: User?, chat: Chat): Boolean {
             return !chat.isGroupOrSuper() ||
                     DatabaseManager.getGroupStatus(chat.id) != GroupStatus.LOCKED ||
-                        DatabaseManager.getGroupUserStatus(chat.id, user.id) >= Status.ADMIN
+                        DatabaseManager.getGroupUserStatus(chat.id, user!!.id) >= Status.ADMIN
         }
 
         /**
@@ -152,8 +154,9 @@ class BaseCommand(
          * Return true if message is allowed (aka user not banned).
          */
         fun filterBans(user: User, chat: Chat): Boolean {
-            return DatabaseManager.getUser(user.id)?.status != Status.BANNED &&
-                    DatabaseManager.getGroupUserStatus(chat.id, user.id) != Status.BANNED
+            return chat.isChannelChat || (
+                    DatabaseManager.getUser(user.id)?.status != Status.BANNED &&
+                    DatabaseManager.getGroupUserStatus(chat.id, user.id) != Status.BANNED)
         }
     }
 }

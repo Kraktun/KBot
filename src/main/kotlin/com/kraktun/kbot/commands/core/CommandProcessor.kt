@@ -6,7 +6,7 @@ import com.kraktun.kbot.utils.ifNotEmpty
 import com.kraktun.kbot.utils.readInLock
 import com.kraktun.kbot.utils.username
 import com.kraktun.kbot.utils.writeInLock
-import org.telegram.telegrambots.meta.api.objects.Update
+import org.telegram.telegrambots.meta.api.objects.Message
 import org.telegram.telegrambots.meta.bots.AbsSender
 import java.util.concurrent.locks.ReentrantReadWriteLock
 
@@ -57,16 +57,16 @@ object CommandProcessor {
      * Return NOT_COMMAND if no command is found for parsed update.
      * Results are propagated to the calling class even if now it is useless
      */
-    fun fireCommand(update: Update, absSender: AbsSender): FilterResult {
+    fun fireCommand(message: Message, absSender: AbsSender): FilterResult {
         lock.readInLock {
             val botName = absSender.username()
-            val commandInput = update.message.text.plus(" ") // Add space at the end, for single-word commands
+            val commandInput = message.text.plus(" ") // Add space at the end, for single-word commands
                 .substringBefore(" ") // take first word
                 .plus("@$botName") // fixes commands in groups, where command can be in the form command@botName
                 .substringBefore("@$botName")
             return map[Pair(botName, commandInput)]?.fire(
                 absSender,
-                update.message
+                message
             ) ?: FilterResult.NOT_COMMAND // when key is not present, map[]? equals null, so return is NOT_COMMAND
         }
     }

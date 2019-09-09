@@ -1,7 +1,9 @@
 package com.kraktun.kbot.bots
 
 import com.kraktun.kbot.*
+import com.kraktun.kbot.bots.ping.PONG
 import com.kraktun.kbot.bots.ping.PingController
+import com.kraktun.kbot.bots.ping.PingJob
 import com.kraktun.kbot.bots.ping.PingListener
 import com.kraktun.kbot.commands.common.FormattedHelpCommand
 import com.kraktun.kbot.commands.common.HelpCommand
@@ -10,13 +12,18 @@ import com.kraktun.kbot.commands.core.*
 import com.kraktun.kbot.commands.core.callbacks.CallbackProcessor
 import com.kraktun.kbot.commands.misc.StartPingCommand
 import com.kraktun.kbot.commands.misc.StopPingCommand
+import com.kraktun.kbot.jobs.JobExecutor
 import com.kraktun.kbot.utils.*
 import org.telegram.telegrambots.bots.DefaultBotOptions
 import org.telegram.telegrambots.bots.TelegramLongPollingBot
 import org.telegram.telegrambots.meta.api.objects.Update
 
 /**
- * Main class: register the commands and process non-command updates
+ * How to use this:
+ * Register PingBot and PongBot in two different jar.
+ * Add both bots to a channel as admins.
+ * Use /startping from a user chat with PingBot.
+ * Sit down and enjoy.
  */
 class PingBot(options: DefaultBotOptions) : TelegramLongPollingBot(options), PingListener {
 
@@ -44,6 +51,7 @@ class PingBot(options: DefaultBotOptions) : TelegramLongPollingBot(options), Pin
         CommandProcessor.registerCommand(botUsername!!, StartPingCommand().engine)
         CommandProcessor.registerCommand(botUsername!!, StopPingCommand().engine)
         PingController.registerListener(this)
+        simpleMessage(this, "Initiated boot sequence. Ping service is disabled.", PING_BOT_ALERT)
     }
 
     /**
@@ -60,7 +68,7 @@ class PingBot(options: DefaultBotOptions) : TelegramLongPollingBot(options), Pin
         val user = message.from
         when {
             // Check if chat is locked or user is banned  and if so delete the message
-            (!BaseCommand.filterLock(user, chat) || !BaseCommand.filterBans(user, chat)) -> {
+            user != null && (!BaseCommand.filterLock(user, chat) || !BaseCommand.filterBans(user, chat)) -> {
                 deleteMessage(this, message)
             }
 
@@ -75,13 +83,14 @@ class PingBot(options: DefaultBotOptions) : TelegramLongPollingBot(options), Pin
             // This goes after multiCommandsHandler as you may need to use a command in a multiCommand interaction
             CommandProcessor.fireCommand(message, this) != FilterResult.NOT_COMMAND -> { }
 
-            (message.hasText() && message.text.equals("pong", ignoreCase = true)) -> {
+            (message.hasText() && chat.id == PING_PONG_CHAT && message.text.equals(PONG, ignoreCase = true)) -> {
                 PingController.registerPong()
             }
         }
     }
 
     override fun onPongTimeExceeded() {
-        simpleMessage(this, "Ping time exceeded", PING_BOT_GROUP)
+        simpleMessage(this, "Ping time exceeded. Disabled job.", PING_BOT_ALERT)
+        JobExecutor.removeJob(PingJob.jobInfo)
     }
 }

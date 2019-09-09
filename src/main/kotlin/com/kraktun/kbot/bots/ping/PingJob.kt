@@ -1,9 +1,9 @@
-package com.kraktun.kbot.jobs
+package com.kraktun.kbot.bots.ping
 
-import com.kraktun.kbot.PING_BOT_GROUP
 import com.kraktun.kbot.PING_BOT_NAME
+import com.kraktun.kbot.PING_PONG_CHAT
 import com.kraktun.kbot.bots.BotsController
-import com.kraktun.kbot.bots.ping.PingController
+import com.kraktun.kbot.jobs.JobInfo
 import com.kraktun.kbot.utils.simpleMessage
 import com.kraktun.kbot.utils.username
 import org.quartz.InterruptableJob
@@ -30,7 +30,7 @@ class PingJob : InterruptableJob {
         // printlnK(TAG, "Retrieving articles")
         jobInfo.botList.forEach {
             if (it.username() == PING_BOT_NAME) {
-                simpleMessage(it, "ping", PING_BOT_GROUP)
+                simpleMessage(it, "ping", PING_PONG_CHAT)
                 PingController.registerPing()
             }
         }

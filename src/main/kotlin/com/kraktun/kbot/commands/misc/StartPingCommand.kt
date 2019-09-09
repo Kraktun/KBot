@@ -1,10 +1,10 @@
 package com.kraktun.kbot.commands.misc
 
-import com.kraktun.kbot.PING_BOT_GROUP
+import com.kraktun.kbot.PING_BOT_ALERT
 import com.kraktun.kbot.commands.core.BaseCommand
 import com.kraktun.kbot.commands.core.CommandInterface
 import com.kraktun.kbot.jobs.JobExecutor
-import com.kraktun.kbot.jobs.PingJob
+import com.kraktun.kbot.bots.ping.PingJob
 import com.kraktun.kbot.objects.Status
 import com.kraktun.kbot.objects.Target
 import com.kraktun.kbot.utils.simpleMessage
@@ -24,7 +24,7 @@ class StartPingCommand : CommandInterface {
     )
 
     override fun execute(absSender: AbsSender, message: Message) {
-        if (message.chatId == PING_BOT_GROUP) {
+        if (message.chatId == PING_BOT_ALERT) {
             JobExecutor.addJob(PingJob(), PingJob.jobInfo) // I use add/remove rather than some check because I need only 1 pingBot
             simpleMessage(absSender = absSender, s = "Enabled ping", c = message.chat)
         }

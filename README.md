@@ -1,3 +1,5 @@
+# DEVELOPMENT PAUSED UNTIL February 2020
+
 ## TODO 
 ### Add channel support
 

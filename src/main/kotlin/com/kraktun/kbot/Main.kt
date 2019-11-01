@@ -2,6 +2,7 @@ package com.kraktun.kbot
 
 import com.kraktun.kbot.bots.BotsController
 import com.kraktun.kbot.bots.MainBot
+import com.kraktun.kbot.bots.PingBot
 import com.kraktun.kbot.utils.*
 import org.telegram.telegrambots.bots.DefaultBotOptions
 

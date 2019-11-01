@@ -1,7 +1,8 @@
 # DEVELOPMENT PAUSED UNTIL February 2020
 
 ## TODO 
-### Add channel support
+### Extract a library to manage commands and jobs.
+### Refactor the code (eg. callbacks) 
 
 
 ## Info

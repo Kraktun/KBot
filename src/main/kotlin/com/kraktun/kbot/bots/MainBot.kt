@@ -4,6 +4,7 @@ import com.kraktun.kbot.*
 import com.kraktun.kbot.commands.common.*
 import com.kraktun.kbot.commands.core.*
 import com.kraktun.kbot.commands.core.callbacks.CallbackProcessor
+import com.kraktun.kbot.commands.functions.TrackCommand
 import com.kraktun.kbot.commands.functions.YTCommand
 import com.kraktun.kbot.commands.groups.*
 import com.kraktun.kbot.utils.*

@@ -16,7 +16,7 @@ class PingJob : InterruptableJob {
     companion object {
         val jobInfo = JobInfo(
             name = "PING_JOB",
-            interval = 15, // seconds
+            interval = 300, // seconds
             trigger = "PING_JOB_TRIGGER",
             group = "jobs",
             delay = 10, // seconds

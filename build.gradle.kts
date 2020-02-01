@@ -2,6 +2,8 @@ import org.gradle.jvm.tasks.Jar
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 plugins {
+    java
+    application
     kotlin("jvm") version "1.3.61"
     id("org.jlleitschuh.gradle.ktlint") version "9.1.1"
 }
@@ -30,6 +32,7 @@ application {
 repositories {
     mavenCentral()
     jcenter()
+    maven(url = "https://jitpack.io")
 }
 
 dependencies {

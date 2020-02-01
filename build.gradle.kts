@@ -2,23 +2,21 @@ import org.gradle.jvm.tasks.Jar
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 plugins {
-    java
-    application
-    kotlin("jvm") version "1.3.50"
-    id("org.jlleitschuh.gradle.ktlint") version "8.1.0"
+    kotlin("jvm") version "1.3.61"
+    id("org.jlleitschuh.gradle.ktlint") version "9.1.1"
 }
 
 group = "com.kraktun"
-version = "0.4.8"
+version = "0.5.0"
 
-val coroutinesVersion = "1.3.0-RC2"
-val kotlinVersion = "1.3.41"
-val sqliteVersion = "3.27.2.1"
-val quartzVersion = "2.3.1"
+val coroutinesVersion = "1.3.3"
+val kotlinVersion = "1.3.61"
+val sqliteVersion = "3.30.1"
+val quartzVersion = "2.3.2"
 val jsoupVersion = "1.12.1"
-val exposedVersion = "0.17.1"
-val klaxon = "5.0.11"
-val telegramVersion = "4.4.0.1"
+val exposedVersion = "0.17.7"
+val telegramVersion = "4.6"
+val kUtilsVersion = "c8801c1"
 
 java {
     sourceCompatibility = JavaVersion.VERSION_1_8
@@ -35,18 +33,18 @@ repositories {
 }
 
 dependencies {
-    compile("org.jetbrains.kotlin:kotlin-stdlib-jdk8")
+    implementation("org.jetbrains.kotlin:kotlin-stdlib-jdk8")
     testCompile("junit:junit:4.12")
-    compile("org.jetbrains.kotlinx:kotlinx-coroutines-core:$coroutinesVersion")
-    compile("org.telegram:telegrambots:$telegramVersion")
-    compile("org.telegram:telegrambots-meta:$telegramVersion")
-    compile("org.telegram:telegrambotsextensions:$telegramVersion")
-    compile("org.xerial:sqlite-jdbc:$sqliteVersion")
-    compile("org.quartz-scheduler:quartz:$quartzVersion")
-    compile("org.jsoup:jsoup:$jsoupVersion")
-    compile("org.jetbrains.exposed:exposed:$exposedVersion")
-    compile("org.slf4j:slf4j-log4j12:1.7.26")
-    compile("com.beust:klaxon:$klaxon")
+    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:$coroutinesVersion")
+    implementation("org.telegram:telegrambots:$telegramVersion")
+    implementation("org.telegram:telegrambots-meta:$telegramVersion")
+    implementation("org.telegram:telegrambotsextensions:$telegramVersion")
+    implementation("org.xerial:sqlite-jdbc:$sqliteVersion")
+    implementation("org.quartz-scheduler:quartz:$quartzVersion")
+    implementation("org.jsoup:jsoup:$jsoupVersion")
+    implementation("org.jetbrains.exposed:exposed:$exposedVersion")
+    implementation("org.slf4j:slf4j-log4j12:1.7.26")
+    implementation("com.github.Kraktun:KUtils:$kUtilsVersion")
 }
 
 ktlint {
@@ -63,7 +61,7 @@ val fatJar = task("fatJar", type = Jar::class) {
         attributes["Main-Class"] = "com.kraktun.kbot.MainKt"
     }
     from(configurations.runtime.get().map { if (it.isDirectory) it else zipTree(it) })
-    with(tasks["jar"] as CopySpec)
+    with(tasks.jar.get() as CopySpec)
 }
 
 tasks {

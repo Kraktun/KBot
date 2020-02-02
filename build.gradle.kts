@@ -13,12 +13,9 @@ version = "0.5.0"
 
 val coroutinesVersion = "1.3.3"
 val kotlinVersion = "1.3.61"
-val sqliteVersion = "3.30.1"
 val quartzVersion = "2.3.2"
-val jsoupVersion = "1.12.1"
-val exposedVersion = "0.17.7"
 val telegramVersion = "4.6"
-val kUtilsVersion = "c8801c1"
+val kUtilsVersion = "bde9d66"
 
 java {
     sourceCompatibility = JavaVersion.VERSION_1_8
@@ -37,15 +34,12 @@ repositories {
 
 dependencies {
     implementation("org.jetbrains.kotlin:kotlin-stdlib-jdk8")
-    testCompile("junit:junit:4.12")
+    testImplementation("junit:junit:4.12")
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:$coroutinesVersion")
     implementation("org.telegram:telegrambots:$telegramVersion")
     implementation("org.telegram:telegrambots-meta:$telegramVersion")
     implementation("org.telegram:telegrambotsextensions:$telegramVersion")
-    implementation("org.xerial:sqlite-jdbc:$sqliteVersion")
     implementation("org.quartz-scheduler:quartz:$quartzVersion")
-    implementation("org.jsoup:jsoup:$jsoupVersion")
-    implementation("org.jetbrains.exposed:exposed:$exposedVersion")
     implementation("org.slf4j:slf4j-log4j12:1.7.26")
     implementation("com.github.Kraktun:KUtils:$kUtilsVersion")
 }

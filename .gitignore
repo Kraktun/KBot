@@ -36,3 +36,4 @@ build/libs/logs/*
 build/libs/releases/*
 build/reports/*
 build/scripts/*
+.placeholder

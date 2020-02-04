@@ -8,7 +8,6 @@ import com.kraktun.kbot.utils.arguments
 import com.kraktun.kbot.utils.botToken
 import com.kraktun.kbot.utils.isGroupOrSuper
 import com.kraktun.kbot.utils.toEnum
-import com.kraktun.kutils.collections.ifNotEmpty
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
@@ -24,22 +23,22 @@ import org.telegram.telegrambots.meta.exceptions.TelegramApiException
  * Single commands must extend this class.
  */
 class BaseCommand(
-    // string that fires the command, starting symbol may be anything (e.g. '/', '#'). Must be unique.
+    // string that fires the command, starting symbol may be anything (e.g. '/', '#'). Must be unique for a single bot.
     val command: String,
-    // description for the command, used when calling /help
+    // description for the command, used when calling /help. Supports html.
     val description: String = "",
     // List of pairs<chat, status>.
     // chat is the type of chat where the message was sent
-    // status is the minimum status the user who sent the command must have to fire a reply
+    // status is the minimum status the user who sends the command must have to fire a reply
     // Status is different between groups and user chats
-    // Here status depends on the target: if chat is group => status = groupStatus, else is the userStatus (from DB)
-    val targets: List<Pair<Target, Status>>,
-    // number of arguments after the command (same message) necessary to process the command
+    // Here status depends on the target: if chat is group => status = groupStatus, else is the userStatus
+    val targets: Map<Target, Status>,
+    // number of arguments after the command (in the same message) necessary to consider the command correct
     private val argsNum: Int = 0,
     // function with additional logic to execute before firing the command
     // only non-intensive (aka non-DB) operations should be done here
     private val filterFun: (message: Message) -> Boolean = { true },
-    // define other options necessary fot this command
+    // define other options necessary for this command e.g. BOT_IS_ADMIN
     private val chatOptions: List<ChatOptions> = mutableListOf(),
     // Function to execute when a filter (including filterFun) fails and returns false
     private val onError: (absSender: AbsSender, message: Message, filterResult: FilterResult) -> Unit = { _, _, _ -> },
@@ -80,8 +79,8 @@ class BaseCommand(
             !filterLock(user, chat) -> FilterResult.LOCKED_CHAT
             !filterBotAdmin(absSender, chat) -> FilterResult.BOT_NOT_ADMIN
             else -> FilterResult.FILTER_RESULT_OK
-            // filterBans is not necessary as this check is already performed by filterChat()
-            // (and someone may decide to enable a command for banned users)
+            // filterBans is not necessary as  someone may decide to enable a command for banned users
+            // use filterStatus for that
         }
     }
 
@@ -92,7 +91,7 @@ class BaseCommand(
      */
     private fun filterChat(chat: Chat): Boolean {
         return targets.filter {
-            it.first == chat.toEnum()
+            it.key == chat.toEnum()
         }.toList().isNotEmpty()
     }
 
@@ -101,13 +100,10 @@ class BaseCommand(
      * In other words if the chat is part of the targets list and the status of the user is equal to or higher than the privacy.
      */
     private fun filterStatus(user: User?, chat: Chat): Boolean {
-        if (chat.isChannelChat) return true
-        val userStatus: Status = Configurator.dataManager.getDBStatus(user, chat)
-        return targets.filter {
-            it.first == chat.toEnum()
-        }.ifNotEmpty({
-            this[0].second <= userStatus // [0] as a command can have only one single pair with a unique Target
-        }, default = false) as Boolean
+        if (chat.isChannelChat) return true // no status in chats
+        val userStatus: Status = Configurator.dataManager.getUserStatus(user, chat)
+        val r = targets[chat.toEnum()]
+        return if(r != null) r <= userStatus else false
     }
 
     /**
@@ -156,7 +152,7 @@ class BaseCommand(
          * Return true if message is allowed (aka user not banned).
          */
         fun filterBans(user: User, chat: Chat): Boolean {
-            return chat.isChannelChat || Configurator.dataManager.getDBStatus(user, chat) != Status.BANNED
+            return chat.isChannelChat || Configurator.dataManager.getUserStatus(user, chat) != Status.BANNED
         }
     }
 }

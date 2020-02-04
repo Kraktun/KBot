@@ -13,7 +13,7 @@ interface DataManager {
     /**
      * Returns status of user according to the passed chat
      */
-    fun getDBStatus(user: User?, chat: Chat): Status {
+    fun getUserStatus(user: User?, chat: Chat): Status {
         return when {
             user == null -> Status.NOT_REGISTERED
             chat.isUserChat -> getUser(user.id)?.status ?: Status.NOT_REGISTERED

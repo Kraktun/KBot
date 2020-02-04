@@ -1,15 +1,15 @@
 package com.kraktun.kbot.jobs
 
 import com.kraktun.kbot.commands.core.MultiCommandsHandler
+import java.util.*
 import org.quartz.Job
 import org.quartz.JobBuilder.newJob
 import org.quartz.JobKey
 import org.quartz.SchedulerException
-import org.quartz.impl.StdSchedulerFactory
 import org.quartz.SimpleScheduleBuilder.simpleSchedule
 import org.quartz.TriggerBuilder.newTrigger
 import org.quartz.TriggerKey
-import java.util.*
+import org.quartz.impl.StdSchedulerFactory
 
 /**
  * Executes jobs in set intervals

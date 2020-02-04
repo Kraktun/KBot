@@ -48,6 +48,7 @@ ktlint {
     verbose.set(true)
     outputToConsole.set(true)
     coloredOutput.set(true)
+    disabledRules.set(setOf("no-wildcard-imports"))
 }
 
 val fatJar = task("fatJar", type = Jar::class) {

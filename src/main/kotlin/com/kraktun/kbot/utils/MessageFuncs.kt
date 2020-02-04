@@ -1,6 +1,7 @@
 package com.kraktun.kbot.utils
 
 import com.kraktun.kbot.data.Configurator
+import java.time.Instant
 import org.telegram.telegrambots.meta.api.methods.BotApiMethod
 import org.telegram.telegrambots.meta.api.methods.groupadministration.KickChatMember
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage
@@ -14,7 +15,6 @@ import org.telegram.telegrambots.meta.api.objects.replykeyboard.ReplyKeyboardRem
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.KeyboardRow
 import org.telegram.telegrambots.meta.bots.AbsSender
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException
-import java.time.Instant
 
 private const val TAG = "MESSAGEFUNCS"
 

@@ -6,9 +6,9 @@ import com.kraktun.kbot.utils.username
 import com.kraktun.kutils.collections.ifNotEmpty
 import com.kraktun.kutils.other.readInLock
 import com.kraktun.kutils.other.writeInLock
+import java.util.concurrent.locks.ReentrantReadWriteLock
 import org.telegram.telegrambots.meta.api.objects.Message
 import org.telegram.telegrambots.meta.bots.AbsSender
-import java.util.concurrent.locks.ReentrantReadWriteLock
 
 /**
  * Process commands from bot, locating the correct command to call

@@ -2,9 +2,9 @@ package com.kraktun.kbot.commands.callbacks
 
 import com.kraktun.kutils.other.readInLock
 import com.kraktun.kutils.other.writeInLock
+import java.util.concurrent.locks.ReentrantReadWriteLock
 import org.telegram.telegrambots.meta.api.objects.CallbackQuery
 import org.telegram.telegrambots.meta.bots.AbsSender
-import java.util.concurrent.locks.ReentrantReadWriteLock
 
 /**
  * Class to store handlers for callbacks.

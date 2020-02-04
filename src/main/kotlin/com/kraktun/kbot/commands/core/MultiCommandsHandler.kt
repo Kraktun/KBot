@@ -4,6 +4,8 @@ import com.kraktun.kbot.jobs.JobInfo
 import com.kraktun.kbot.utils.username
 import com.kraktun.kutils.other.readInLock
 import com.kraktun.kutils.other.writeInLock
+import java.time.Instant
+import java.util.concurrent.locks.ReentrantReadWriteLock
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
@@ -14,8 +16,6 @@ import org.telegram.telegrambots.meta.api.objects.Chat
 import org.telegram.telegrambots.meta.api.objects.Message
 import org.telegram.telegrambots.meta.api.objects.User
 import org.telegram.telegrambots.meta.bots.AbsSender
-import java.time.Instant
-import java.util.concurrent.locks.ReentrantReadWriteLock
 
 /**
  * Handles multi-input commands (commands that need more messages). ForceReply is not enough for me.

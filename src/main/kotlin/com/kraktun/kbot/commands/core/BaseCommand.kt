@@ -1,12 +1,13 @@
 package com.kraktun.kbot.commands.core
 
+import com.kraktun.kbot.data.Configurator
 import com.kraktun.kbot.objects.GroupStatus
 import com.kraktun.kbot.objects.Status
 import com.kraktun.kbot.objects.Target
-import com.kraktun.kbot.commands.core.FilterResult.*
-import com.kraktun.kbot.commands.core.ChatOptions.*
-import com.kraktun.kbot.data.Configurator
-import com.kraktun.kbot.utils.*
+import com.kraktun.kbot.utils.arguments
+import com.kraktun.kbot.utils.botToken
+import com.kraktun.kbot.utils.isGroupOrSuper
+import com.kraktun.kbot.utils.toEnum
 import com.kraktun.kutils.collections.ifNotEmpty
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
@@ -55,7 +56,7 @@ class BaseCommand(
         val result = filterAll(absSender, message)
         runBlocking {
             GlobalScope.launch {
-                if (result == FILTER_RESULT_OK)
+                if (result == FilterResult.FILTER_RESULT_OK)
                     exe.execute(absSender, message)
                 else
                     onError(absSender, message, result)
@@ -72,13 +73,13 @@ class BaseCommand(
         val chat = message.chat
         val arguments = message.arguments()
         return when {
-            !filterFun(message) -> INVALID_PRECONDITIONS
-            !filterChat(chat) -> INVALID_CHAT
-            !filterStatus(user, chat) -> INVALID_STATUS
-            !filterFormat(arguments) -> INVALID_FORMAT
-            !filterLock(user, chat) -> LOCKED_CHAT
-            !filterBotAdmin(absSender, chat) -> BOT_NOT_ADMIN
-            else -> FILTER_RESULT_OK
+            !filterFun(message) -> FilterResult.INVALID_PRECONDITIONS
+            !filterChat(chat) -> FilterResult.INVALID_CHAT
+            !filterStatus(user, chat) -> FilterResult.INVALID_STATUS
+            !filterFormat(arguments) -> FilterResult.INVALID_FORMAT
+            !filterLock(user, chat) -> FilterResult.LOCKED_CHAT
+            !filterBotAdmin(absSender, chat) -> FilterResult.BOT_NOT_ADMIN
+            else -> FilterResult.FILTER_RESULT_OK
             // filterBans is not necessary as this check is already performed by filterChat()
             // (and someone may decide to enable a command for banned users)
         }
@@ -123,7 +124,7 @@ class BaseCommand(
     private fun filterBotAdmin(absSender: AbsSender, chat: Chat): Boolean {
         if (chat.isChannelChat) return true // All bots are admins in channels
         val botId = absSender.botToken().substringBefore(":").toInt()
-        return if (chatOptions.contains(BOT_IS_ADMIN) && chat.isGroupOrSuper()) {
+        return if (chatOptions.contains(ChatOptions.BOT_IS_ADMIN) && chat.isGroupOrSuper()) {
             val getAdmins = GetChatAdministrators()
             getAdmins.chatId = chat.id.toString()
             try {

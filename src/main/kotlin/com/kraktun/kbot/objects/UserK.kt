@@ -5,4 +5,8 @@ data class UserK(val id: Int, var username: String? = "", var status: Status, va
     override fun equals(other: Any?): Boolean {
         return other is UserK && id == other.id
     }
+
+    override fun hashCode(): Int {
+        return id
+    }
 }

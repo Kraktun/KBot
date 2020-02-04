@@ -101,7 +101,7 @@ class BaseCommand(
      */
     private fun filterStatus(user: User?, chat: Chat): Boolean {
         if (chat.isChannelChat) return true
-        val userStatus: Status = getDBStatus(user, chat)
+        val userStatus: Status = Configurator.dataManager.getDBStatus(user, chat)
         return targets.filter {
             it.first == chat.toEnum()
         }.ifNotEmpty({
@@ -155,9 +155,7 @@ class BaseCommand(
          * Return true if message is allowed (aka user not banned).
          */
         fun filterBans(user: User, chat: Chat): Boolean {
-            return chat.isChannelChat || (
-                    Configurator.dataManager.getUser(user.id)?.status != Status.BANNED &&
-                            Configurator.dataManager.getGroupUserStatus(chat.id, user.id) != Status.BANNED)
+            return chat.isChannelChat || Configurator.dataManager.getDBStatus(user, chat) != Status.BANNED
         }
     }
 }

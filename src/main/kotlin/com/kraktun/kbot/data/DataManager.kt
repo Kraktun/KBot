@@ -4,9 +4,23 @@ import com.kraktun.kbot.objects.GroupK
 import com.kraktun.kbot.objects.GroupStatus
 import com.kraktun.kbot.objects.Status
 import com.kraktun.kbot.objects.UserK
+import com.kraktun.kbot.utils.isGroupOrSuper
+import org.telegram.telegrambots.meta.api.objects.Chat
 import org.telegram.telegrambots.meta.api.objects.User
 
 interface DataManager {
+
+    /**
+     * Returns status of user according to the passed chat
+     */
+    fun getDBStatus(user: User?, chat: Chat): Status {
+        return when {
+            user == null -> Status.NOT_REGISTERED
+            chat.isUserChat -> getUser(user.id)?.status ?: Status.NOT_REGISTERED
+            chat.isGroupOrSuper() -> getGroupUserStatus(groupId = chat.id, userId = user.id)
+            else -> Status.NOT_REGISTERED
+        }
+    }
 
     /*
     USER MANAGEMENT
@@ -39,7 +53,7 @@ interface DataManager {
     /**
      * Insert group in DB
      */
-    fun addGroup(idd: Long)
+    fun addGroup(groupId: Long)
 
     /**
      * Get group and all the members with a custom status

@@ -1,7 +1,6 @@
 package com.kraktun.kbot.utils
 
-import com.kraktun.kutils.log.KLogger
-import com.kraktun.kutils.log.printlnDTK
+import com.kraktun.kbot.data.Configurator
 import org.telegram.telegrambots.meta.api.methods.BotApiMethod
 import org.telegram.telegrambots.meta.api.methods.groupadministration.KickChatMember
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage
@@ -19,72 +18,52 @@ import java.time.Instant
 
 private const val TAG = "MESSAGEFUNCS"
 
-fun deleteMessage(absSender: AbsSender, m: Message) {
+fun AbsSender.deleteMessage(m: Message) {
     val message = DeleteMessage()
         .setChatId(m.chatId)
         .setMessageId(m.messageId)
-    executeMethod(absSender, message)
+    executeMethod(this, message)
 }
 
 /**
  * Send a simple message
  */
-fun simpleMessage(absSender: AbsSender, s: String, c: Chat) {
+fun AbsSender.simpleMessage(s: String, c: Chat, enableHtml: Boolean = false) {
     val message = SendMessage()
         .setChatId(c.id)
         .setText(s)
-    executeMethod(absSender, message)
+        .enableHtml(enableHtml)
+    executeMethod(this, message)
 }
 
 /**
  * Send a simple message
  */
-fun simpleHTMLMessage(absSender: AbsSender, s: String, c: Chat) {
-    val message = SendMessage()
-        .setChatId(c.id)
-        .setText(s)
-        .enableHtml(true)
-    executeMethod(absSender, message)
-}
-
-/**
- * Send a simple message
- */
-fun simpleMessage(absSender: AbsSender, s: String, c: Long) {
+fun AbsSender.simpleMessage(s: String, c: Long, enableHtml: Boolean = false) {
     val message = SendMessage()
         .setChatId(c)
         .setText(s)
-    executeMethod(absSender, message)
-}
-
-/**
- * Send a simple message
- */
-fun simpleHTMLMessage(absSender: AbsSender, s: String, c: Long) {
-    val message = SendMessage()
-        .setChatId(c)
-        .setText(s)
-        .enableHtml(true)
-    executeMethod(absSender, message)
+        .enableHtml(enableHtml)
+    executeMethod(this, message)
 }
 
 /**
  * Kick a user from a chat and optionally ban him for a limited (if date >= 0)  or unlimited (if date = 0) amount of time
  */
-fun kickUser(absSender: AbsSender, u: User, c: Chat, date: Int = -1) {
+fun AbsSender.kickUser(u: User, c: Chat, date: Int = -1) {
     var message = KickChatMember()
         .setChatId(c.id)
         .setUserId(u.id)
     if (date >= 0)
         message = message.setUntilDate(Instant.now().plusSeconds(date.toLong()))
-    executeMethod(absSender, message)
+    executeMethod(this, message)
 }
 
 /**
  * Send a custom keyboard for the user to choose
  */
-fun sendKeyboard(absSender: AbsSender, c: Chat, s: String, keyboard: ReplyKeyboard) {
-    insertKeyboard(absSender, c, s, keyboard)
+fun AbsSender.sendKeyboard(c: Chat, s: String, keyboard: ReplyKeyboard) {
+    insertKeyboard(c, s, keyboard)
 }
 
 /**
@@ -119,19 +98,19 @@ fun getSimpleListKeyboard(list: List<Any>, buttonsInRow: Int = -1): ReplyKeyboar
 /**
  * Private method to send\remove keyboards
  */
-private fun insertKeyboard(absSender: AbsSender, c: Chat, s: String, keyboard: ReplyKeyboard) {
+private fun AbsSender.insertKeyboard(c: Chat, s: String, keyboard: ReplyKeyboard) {
     val message = SendMessage()
         .setChatId(c.id)
         .setText(s)
         .setReplyMarkup(keyboard)
-    executeMethod(absSender, message)
+    executeMethod(this, message)
 }
 
 /**
  * Remove a keyboard restoring normal keyboard
  */
-fun removeKeyboard(absSender: AbsSender, c: Chat, s: String) {
-    insertKeyboard(absSender, c, s, ReplyKeyboardRemove())
+fun AbsSender.removeKeyboard(c: Chat, s: String) {
+    insertKeyboard(c, s, ReplyKeyboardRemove())
 }
 
 /**
@@ -141,8 +120,7 @@ fun <T : java.io.Serializable> executeMethod(absSender: AbsSender, m: BotApiMeth
     return try {
         absSender.execute(m)
     } catch (e: TelegramApiException) {
-        printlnDTK(TAG, e)
-        e.printStackTrace()
+        if (Configurator.isInitialized()) Configurator.log(e)
         null
     }
 }

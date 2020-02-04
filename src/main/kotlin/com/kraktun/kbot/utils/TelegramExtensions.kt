@@ -1,7 +1,5 @@
 package com.kraktun.kbot.utils
 
-import com.kraktun.kbot.data.Configurator
-import com.kraktun.kbot.objects.Status
 import com.kraktun.kbot.objects.Target
 import org.telegram.telegrambots.meta.api.objects.Chat
 import org.telegram.telegrambots.meta.api.objects.Message
@@ -11,22 +9,10 @@ import org.telegram.telegrambots.meta.generics.LongPollingBot
 import org.telegram.telegrambots.meta.generics.WebhookBot
 
 /**
- * Returns status of user according to the passed chat
- */
-fun getDBStatus(user: User?, chat: Chat): Status {
-    return when {
-        user == null -> Status.NOT_REGISTERED
-        chat.isUserChat -> Configurator.dataManager.getUser(user.id)?.status ?: Status.NOT_REGISTERED
-        chat.isGroupOrSuper() -> Configurator.dataManager.getGroupUserStatus(groupId = chat.id, userId = user.id)
-        else -> Status.NOT_REGISTERED
-    }
-}
-
-/**
  * Get identification string for user:
  * if it has a username, use that, if not use first + last name or only first
  */
-fun User.getFormattedName(): String {
+fun User.formattedName(): String {
     return when {
         userName != null -> "@$userName"
         lastName != null -> "$firstName $lastName"

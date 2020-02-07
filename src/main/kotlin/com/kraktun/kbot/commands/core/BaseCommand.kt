@@ -1,22 +1,19 @@
 package com.kraktun.kbot.commands.core
 
 import com.kraktun.kbot.data.Configurator
-import com.kraktun.kbot.objects.GroupStatus
+import com.kraktun.kbot.data.InvalidDataManagerException
 import com.kraktun.kbot.objects.Status
 import com.kraktun.kbot.objects.Target
-import com.kraktun.kbot.utils.arguments
-import com.kraktun.kbot.utils.botToken
-import com.kraktun.kbot.utils.isGroupOrSuper
-import com.kraktun.kbot.utils.toEnum
+import com.kraktun.kbot.utils.*
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import org.telegram.telegrambots.meta.api.methods.groupadministration.GetChatAdministrators
 import org.telegram.telegrambots.meta.api.objects.Chat
+import org.telegram.telegrambots.meta.api.objects.ChatMember
 import org.telegram.telegrambots.meta.api.objects.Message
 import org.telegram.telegrambots.meta.api.objects.User
 import org.telegram.telegrambots.meta.bots.AbsSender
-import org.telegram.telegrambots.meta.exceptions.TelegramApiException
 
 /**
  * Class that represents a command.
@@ -51,6 +48,8 @@ class BaseCommand(
      * Return result of filters.
      */
     fun fire(absSender: AbsSender, message: Message): FilterResult {
+        if (Configurator.dataManager[absSender.username()] == null)
+            throw InvalidDataManagerException("DataManger for bot: ${absSender.username()} does not exist")
         // apply filters
         val result = filterAll(absSender, message)
         runBlocking {
@@ -74,9 +73,8 @@ class BaseCommand(
         return when {
             !filterFun(message) -> FilterResult.INVALID_PRECONDITIONS
             !filterChat(chat) -> FilterResult.INVALID_CHAT
-            !filterStatus(user, chat) -> FilterResult.INVALID_STATUS
+            !filterStatus(absSender, user, chat) -> FilterResult.INVALID_STATUS
             !filterFormat(arguments) -> FilterResult.INVALID_FORMAT
-            !filterLock(user, chat) -> FilterResult.LOCKED_CHAT
             !filterBotAdmin(absSender, chat) -> FilterResult.BOT_NOT_ADMIN
             else -> FilterResult.FILTER_RESULT_OK
             // filterBans is not necessary as  someone may decide to enable a command for banned users
@@ -99,9 +97,9 @@ class BaseCommand(
      * Return true if message received comes from a valid chat and user.
      * In other words if the chat is part of the targets list and the status of the user is equal to or higher than the privacy.
      */
-    private fun filterStatus(user: User?, chat: Chat): Boolean {
+    private fun filterStatus(absSender: AbsSender, user: User?, chat: Chat): Boolean {
         if (chat.isChannelChat) return true // no status in chats
-        val userStatus: Status = Configurator.dataManager.getUserStatus(user, chat)
+        val userStatus: Status = Configurator.dataManager[absSender.username()]!!.getUserStatus(user, chat)
         val r = targets[chat.toEnum()]
         return if(r != null) r <= userStatus else false
     }
@@ -123,36 +121,10 @@ class BaseCommand(
         return if (chatOptions.contains(ChatOptions.BOT_IS_ADMIN) && chat.isGroupOrSuper()) {
             val getAdmins = GetChatAdministrators()
             getAdmins.chatId = chat.id.toString()
-            try {
-                val admins = absSender.execute(getAdmins)
-                admins.any {
-                    it.user.id == botId
-                }
-            } catch (e: TelegramApiException) {
-                e.printStackTrace()
-                false
+            val admins = executeMethod(absSender, getAdmins) ?: listOf<ChatMember>()
+            admins.any {
+                it.user.id == botId
             }
         } else true
-    }
-
-    companion object {
-
-        /**
-         * Filter used for locked groups.
-         * Return true if message is allowed (aka group not locked or status >= admin).
-         */
-        fun filterLock(user: User?, chat: Chat): Boolean {
-            return !chat.isGroupOrSuper() ||
-                    Configurator.dataManager.getGroupStatus(chat.id) != GroupStatus.LOCKED ||
-                    Configurator.dataManager.getGroupUserStatus(chat.id, user!!.id) >= Status.ADMIN
-        }
-
-        /**
-         * Filter used for banned users.
-         * Return true if message is allowed (aka user not banned).
-         */
-        fun filterBans(user: User, chat: Chat): Boolean {
-            return chat.isChannelChat || Configurator.dataManager.getUserStatus(user, chat) != Status.BANNED
-        }
     }
 }

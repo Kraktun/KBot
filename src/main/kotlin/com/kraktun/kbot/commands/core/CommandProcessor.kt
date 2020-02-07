@@ -3,7 +3,6 @@ package com.kraktun.kbot.commands.core
 import com.kraktun.kbot.objects.Status
 import com.kraktun.kbot.objects.Target
 import com.kraktun.kbot.utils.username
-import com.kraktun.kutils.collections.ifNotEmpty
 import com.kraktun.kutils.other.readInLock
 import com.kraktun.kutils.other.writeInLock
 import java.util.concurrent.locks.ReentrantReadWriteLock
@@ -42,13 +41,9 @@ object CommandProcessor {
      * Return all registered commands for pair user, chat.
      */
     fun getRegisteredCommands(absSender: AbsSender, status: Status, c: Target): List<BaseCommand> {
-        val botUsername = absSender.username()
-        return getRegisteredCommands(botUsername).filter {
-            it.targets.filter { m ->
-                m.first == c
-            }.ifNotEmpty({
-                this[0].second <= status // [0] as a command can have only one single pair with a unique Target
-            }, default = false) as Boolean
+        return getRegisteredCommands(absSender.username()).filter {
+            val r = it.targets[c]
+            r != null && r <= status
         }
     }
 

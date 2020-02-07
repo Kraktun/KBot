@@ -56,7 +56,6 @@ val fatJar = task("fatJar", type = Jar::class) {
     manifest {
         attributes["Implementation-Title"] = "KBot"
         attributes["Implementation-Version"] = version
-        attributes["Main-Class"] = "com.kraktun.kbot.MainKt"
     }
     from(configurations.runtime.get().map { if (it.isDirectory) it else zipTree(it) })
     with(tasks.jar.get() as CopySpec)

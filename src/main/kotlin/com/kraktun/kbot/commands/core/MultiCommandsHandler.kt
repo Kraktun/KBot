@@ -109,8 +109,6 @@ object MultiCommandsHandler {
                 delay = 10)
         }
 
-        private val TAG = "MULTI_COMMAND_CLEANER"
-
         @Throws(JobExecutionException::class)
         override fun execute(context: JobExecutionContext) {
             val now = Instant.now()
@@ -119,7 +117,6 @@ object MultiCommandsHandler {
                     it.value.time.plusSeconds(maxCommandTime).isBefore(now)
                 }.forEach {
                     deleteUnsynch(it.key.first, it.key.second, it.key.third)
-                    // printlnK(TAG, "Cleaned command ${it.key}")
                 }
             }
         }

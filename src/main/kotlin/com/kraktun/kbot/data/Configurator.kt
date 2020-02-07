@@ -8,7 +8,7 @@ import com.kraktun.kbot.jobs.JobManager
  */
 object Configurator {
 
-    lateinit var dataManager: DataManager
+    val dataManager = mutableMapOf<String, DataManager>()
     lateinit var log: (Any) -> Unit
 
     init {
@@ -19,8 +19,8 @@ object Configurator {
         JobManager.shutdown()
     }
 
-    fun withDataManager(d: DataManager): Configurator {
-        dataManager = d
+    fun withDataManager(botUsername: String, d: DataManager): Configurator {
+        dataManager[botUsername] = d
         return this
     }
 
@@ -30,6 +30,6 @@ object Configurator {
     }
 
     fun isInitialized(): Boolean {
-        return ::dataManager.isInitialized && ::log.isInitialized
+        return dataManager.isNotEmpty() && ::log.isInitialized
     }
 }

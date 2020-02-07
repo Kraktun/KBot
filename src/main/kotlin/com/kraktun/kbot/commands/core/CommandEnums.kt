@@ -7,8 +7,6 @@ enum class FilterResult {
     INVALID_STATUS,
     INVALID_FORMAT,
     INVALID_PRECONDITIONS, // used for filterFun
-    LOCKED_CHAT,
-    BANNED_USER,
     BOT_NOT_ADMIN,
     NOT_COMMAND
 }

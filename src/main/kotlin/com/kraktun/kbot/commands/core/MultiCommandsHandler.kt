@@ -22,15 +22,12 @@ import org.telegram.telegrambots.meta.bots.AbsSender
  * Channels are not supported.
  */
 
-const val TAG = "MULTICOMMANDS_HANDLER"
-
 object MultiCommandsHandler {
 
     /*
     Map that contains a pair of user + chatId and the next command to execute for the user in that chat + data to pass to the command
      */
-    @Volatile private var map = mutableMapOf<Triple<String, Int, Long>, MultiBaseCommand>()
-    private const val maxCommandTime: Long = 60L // seconds. After this time has passed the user must resend the activation command.
+    @Volatile private var map = mutableMapOf<MultiCommandChat, MultiBaseCommand>()
     private val lock = ReentrantReadWriteLock()
 
     /**
@@ -41,7 +38,7 @@ object MultiCommandsHandler {
         if (message.isChannelMessage) return false
         var temp: MultiBaseCommand? = null
         lock.readInLock {
-            temp = map[Triple(absSender.username(), message.from.id, message.chatId)]
+            temp = map[MultiCommandChat(absSender.username(), message.from.id, message.chatId)]
         }
         if (temp != null) deleteCommand(absSender, message.from, message.chat)
         val executor = temp?.multiInterface
@@ -59,9 +56,8 @@ object MultiCommandsHandler {
      * Insert new command in chat by user. Overwrite if already present.
      */
     fun insertCommand(absSender: AbsSender, user: Int, chat: Long, command: MultiCommandInterface, data: Any? = null) {
-        // printlnK(TAG, "Received command ($user + $chat)")
         lock.writeInLock {
-            map[Triple(absSender.username(), user, chat)] = MultiBaseCommand(command, data)
+            map[MultiCommandChat(absSender.username(), user, chat)] = MultiBaseCommand(command, data)
         }
     }
 
@@ -77,9 +73,8 @@ object MultiCommandsHandler {
      * A command is automatically deleted after execution.
      */
     fun deleteCommand(absSender: AbsSender, user: Int, chat: Long) {
-        // printlnK(TAG, "Deleting command ($user + $chat)")
         lock.writeInLock {
-            map.remove(Triple(absSender.username(), user, chat))
+            map.remove(MultiCommandChat(absSender.username(), user, chat))
         }
     }
 
@@ -95,7 +90,7 @@ object MultiCommandsHandler {
      * Unsynchronized version.
      */
     private fun deleteUnsynch(botUsername: String, userId: Int, chatId: Long) {
-        map.remove(Triple(botUsername, userId, chatId))
+        map.remove(MultiCommandChat(botUsername, userId, chatId))
     }
 
     class CleanerJob : InterruptableJob {
@@ -114,15 +109,13 @@ object MultiCommandsHandler {
             val now = Instant.now()
             lock.writeInLock {
                 map.filter {
-                    it.value.time.plusSeconds(maxCommandTime).isBefore(now)
+                    it.value.time.plusSeconds(it.value.TTL).isBefore(now)
                 }.forEach {
-                    deleteUnsynch(it.key.first, it.key.second, it.key.third)
+                    deleteUnsynch(it.key.bot, it.key.user, it.key.chat)
                 }
             }
         }
 
-        override fun interrupt() {
-            // interrupt
-        }
+        override fun interrupt() { }
     }
 }

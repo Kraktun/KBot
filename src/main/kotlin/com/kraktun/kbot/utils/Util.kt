@@ -7,7 +7,6 @@ import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.Keyboard
 import org.telegram.telegrambots.meta.bots.AbsSender
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException
 
-
 /**
  * Execute a generic method, catching the exceptions
  */
@@ -19,7 +18,6 @@ fun <T : java.io.Serializable> executeMethod(absSender: AbsSender, m: BotApiMeth
         null
     }
 }
-
 
 /**
  * Get keyboard with buttons from a list.

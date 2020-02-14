@@ -14,7 +14,7 @@ import org.telegram.telegrambots.meta.bots.AbsSender
 fun AbsSender.digest(
     update: Update,
     // execute checks before starting digest
-    onPreDigest: (update: Update) -> Boolean = {true}, // true to continue, false to exit digest
+    onPreDigest: (update: Update) -> Boolean = { true }, // true to continue, false to exit digest
     // execute when new user enters group
     onNewUser: (update: Update) -> Unit = {},
     // execute when command fired (after the command has been processed)
@@ -25,8 +25,8 @@ fun AbsSender.digest(
     onCallbackMessage: (update: Update) -> Unit = {},
     // execute when there is no match
     onElse: (update: Update) -> Unit = {}
-    ) {
-    if(!onPreDigest.invoke(update))
+) {
+    if (!onPreDigest.invoke(update))
         return
     if (update.hasCallbackQuery()) {
         CallbackProcessor.fireCallback(absSender = this, callback = update.callbackQuery, user = update.callbackQuery.from.id)

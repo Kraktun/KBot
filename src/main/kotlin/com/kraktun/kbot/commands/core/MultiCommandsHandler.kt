@@ -98,7 +98,7 @@ object MultiCommandsHandler {
         companion object {
             val jobInfo = JobInfo(
                 name = "MULTICOMMANDCLEANER",
-                interval = 15, // seconds
+                interval = 5, // seconds
                 trigger = "MULTICOMMANDCLEANER_TRIGGER",
                 group = "jobs",
                 delay = 10)

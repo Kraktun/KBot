@@ -11,7 +11,6 @@ import org.telegram.telegrambots.meta.api.objects.replykeyboard.ReplyKeyboard
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.ReplyKeyboardRemove
 import org.telegram.telegrambots.meta.bots.AbsSender
 
-
 fun AbsSender.deleteMessage(m: Message) {
     val message = DeleteMessage()
         .setChatId(m.chatId)

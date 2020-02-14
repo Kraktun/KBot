@@ -1,5 +1,6 @@
 package com.kraktun.kbot.jobs
 
+import com.kraktun.kbot.commands.callbacks.CallbackProcessor
 import com.kraktun.kbot.commands.core.MultiCommandsHandler
 import java.util.*
 import org.quartz.Job
@@ -20,7 +21,8 @@ object JobManager {
     private const val sleepTime = 100L // millis
     @Volatile var isShutdown = scheduler.isShutdown
     private val jobs = mapOf<Job, JobInfo>(
-        MultiCommandsHandler.CleanerJob() to MultiCommandsHandler.CleanerJob.jobInfo
+        MultiCommandsHandler.CleanerJob() to MultiCommandsHandler.CleanerJob.jobInfo,
+        CallbackProcessor.CleanerJob() to CallbackProcessor.CleanerJob.jobInfo
     )
 
     /**

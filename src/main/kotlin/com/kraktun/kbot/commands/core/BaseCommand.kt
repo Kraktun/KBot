@@ -101,7 +101,7 @@ class BaseCommand(
         if (chat.isChannelChat) return true // no status in chats
         val userStatus: Status = Configurator.dataManager[absSender.username()]!!.getUserStatus(user, chat)
         val r = targets[chat.toEnum()]
-        return if(r != null) r <= userStatus else false
+        return if (r != null) r <= userStatus else false
     }
 
     /**

@@ -28,12 +28,12 @@ object CallbackProcessor {
      * @param callback callback from the update
      * @return true if a callback exists, false otherwise
      */
-    fun fireCallback(absSender: AbsSender, user: Int, chat: Long, callback: CallbackQuery): Boolean {
+    fun fireCallback(absSender: AbsSender, user: Int, chatInstance: String, callback: CallbackQuery): Boolean {
         return if (callback.data.isNotEmpty()) {
             lock.readInLock {
                 val c = list.find { it.callback.id == callback.id &&
                         (it.user == user || it.user == -1) &&
-                        it.chat == chat }
+                        it.chatInstance == chatInstance }
                 if (c != null) {
                     val text = c.callback.processCallback(absSender, callback)
                     c.callback.answerCallback(absSender, text)
@@ -51,9 +51,9 @@ object CallbackProcessor {
      * @param chat chat where the callback is defined
      * @param callbackHolder methods to execute
      */
-    fun insertCallback(user: Int, chat: Long, callbackHolder: CallbackHolder) {
+    fun insertCallback(user: Int, chatInstance: String, callbackHolder: CallbackHolder) {
         lock.writeInLock {
-            list.add(CallbackChat(callbackHolder, user, chat))
+            list.add(CallbackChat(callbackHolder, user, chatInstance))
         }
     }
 
@@ -69,18 +69,18 @@ object CallbackProcessor {
     /**
      * Remove a listener for a callback
      */
-    fun removeCallback(chat: Long, callbackHolderId: String) {
+    fun removeCallback(chatInstance: String, callbackHolderId: String) {
         lock.writeInLock {
-            list.removeIf { it.callback.id == callbackHolderId && it.chat == chat }
+            list.removeIf { it.callback.id == callbackHolderId && it.chatInstance == chatInstance }
         }
     }
 
     /**
      * Remove a listener for a callback
      */
-    fun removeCallback(user: Int, chat: Long, callbackHolderId: String) {
+    fun removeCallback(user: Int, chatInstance: String, callbackHolderId: String) {
         lock.writeInLock {
-            list.removeIf { it.callback.id == callbackHolderId && it.user == user && it.chat == chat }
+            list.removeIf { it.callback.id == callbackHolderId && it.user == user && it.chatInstance == chatInstance }
         }
     }
 
@@ -100,10 +100,10 @@ object CallbackProcessor {
             val now = Instant.now()
             lock.writeInLock {
                 list.filter {
-                    it.callback.time.plusSeconds(it.callback.TTL).isBefore(now)
+                    it.callback.time.plusSeconds(it.callback.ttl).isBefore(now)
                 }.forEach {
                     list.removeIf { f -> it.callback.id == f.callback.id &&
-                            it.chat == f.chat &&
+                            it.chatInstance == f.chatInstance &&
                             it.user == f.user }
                 }
             }

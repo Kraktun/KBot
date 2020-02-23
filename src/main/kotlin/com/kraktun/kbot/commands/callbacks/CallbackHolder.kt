@@ -16,7 +16,7 @@ interface CallbackHolder {
     val id: String // callback data, used as a ID. Must be unique.
     val label: String // string to show in the button
     val time: Instant get() = Instant.now()
-    val TTL: Long // how long must the callback be kept alive (i.e. clickable)
+    val ttl: Long // how long must the callback be kept alive (i.e. clickable)
     val button: InlineKeyboardButton
         get() {
             return InlineKeyboardButton().apply {

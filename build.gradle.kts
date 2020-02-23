@@ -4,6 +4,7 @@ import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 plugins {
     java
     application
+    maven
     kotlin("jvm") version "1.3.61"
     id("org.jlleitschuh.gradle.ktlint") version "9.1.1"
 }
@@ -65,7 +66,6 @@ tasks {
     "build" {
         dependsOn(fatJar)
     }
-    "test" {}
 }
 
 tasks.withType<KotlinCompile>().all {

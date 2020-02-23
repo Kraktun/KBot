@@ -65,6 +65,7 @@ tasks {
     "build" {
         dependsOn(fatJar)
     }
+    "test" {}
 }
 
 tasks.withType<KotlinCompile>().all {

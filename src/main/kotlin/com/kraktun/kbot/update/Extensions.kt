@@ -30,7 +30,7 @@ fun AbsSender.digest(
         return
     if (update.hasCallbackQuery()) {
         CallbackProcessor.fireCallback(absSender = this,
-            callback = update.callbackQuery, 
+            callback = update.callbackQuery,
             user = update.callbackQuery.from.id,
             chatInstance = update.callbackQuery.chatInstance)
         onCallbackMessage.invoke(update)

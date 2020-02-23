@@ -21,5 +21,5 @@ enum class Status {
  * Group status
  */
 enum class GroupStatus {
-    NORMAL, LOCKED
+    BANNED, LOCKED, NORMAL
 }

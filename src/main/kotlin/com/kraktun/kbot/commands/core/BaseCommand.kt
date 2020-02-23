@@ -2,6 +2,7 @@ package com.kraktun.kbot.commands.core
 
 import com.kraktun.kbot.data.Configurator
 import com.kraktun.kbot.data.InvalidDataManagerException
+import com.kraktun.kbot.objects.GroupStatus
 import com.kraktun.kbot.objects.Status
 import com.kraktun.kbot.objects.Target
 import com.kraktun.kbot.utils.*
@@ -36,7 +37,7 @@ class BaseCommand(
     // only non-intensive (aka non-DB) operations should be done here
     private val filterFun: (message: Message) -> Boolean = { true },
     // define other options necessary for this command e.g. BOT_IS_ADMIN
-    private val chatOptions: List<ChatOptions> = mutableListOf(),
+    private val chatOptions: List<ChatOption> = mutableListOf(),
     // Function to execute when a filter (including filterFun) fails and returns false
     private val onError: (absSender: AbsSender, message: Message, filterResult: FilterResult) -> Unit = { _, _, _ -> },
     // implementation of the CommandInterface (aka execute method)
@@ -75,7 +76,7 @@ class BaseCommand(
             !filterChat(chat) -> FilterResult.INVALID_CHAT
             !filterStatus(absSender, user, chat) -> FilterResult.INVALID_STATUS
             !filterFormat(arguments) -> FilterResult.INVALID_FORMAT
-            !filterBotAdmin(absSender, chat) -> FilterResult.BOT_NOT_ADMIN
+            !filterChatOptions(absSender, chat) -> FilterResult.INVALID_CHAT_OPTIONS
             else -> FilterResult.FILTER_RESULT_OK
             // filterBans is not necessary as  someone may decide to enable a command for banned users
             // use filterStatus for that
@@ -88,14 +89,13 @@ class BaseCommand(
      * Used only for better handling of errors.
      */
     private fun filterChat(chat: Chat): Boolean {
-        return targets.filter {
-            it.key == chat.toEnum()
-        }.toList().isNotEmpty()
+        return targets[chat.toEnum()] != null
     }
 
     /**
      * Return true if message received comes from a valid chat and user.
      * In other words if the chat is part of the targets list and the status of the user is equal to or higher than the privacy.
+     * Check on group status is done in filterBannedGroup().
      */
     private fun filterStatus(absSender: AbsSender, user: User?, chat: Chat): Boolean {
         if (chat.isChannelChat) return true // no status in chats
@@ -113,18 +113,36 @@ class BaseCommand(
     }
 
     /**
-     * Return true if command does not need bot as admin or if bot is admin
+     * Return true if chat options are satisfied.
+     */
+    private fun filterChatOptions(absSender: AbsSender, chat: Chat) : Boolean {
+        var result = if (ChatOption.BOT_IS_ADMIN in chatOptions) filterBotAdmin(absSender, chat) else true
+        result = result && if (ChatOption.ALLOW_BANNED_GROUPS !in chatOptions) filterBannedGroup(absSender, chat) else true
+        return result
+    }
+
+    /**
+     * Return true if command does not need bot as admin or if bot is admin.
      */
     private fun filterBotAdmin(absSender: AbsSender, chat: Chat): Boolean {
         if (chat.isChannelChat) return true // All bots are admins in channels
         val botId = absSender.botToken().substringBefore(":").toInt()
-        return if (chatOptions.contains(ChatOptions.BOT_IS_ADMIN) && chat.isGroupOrSuper()) {
+        return if (chatOptions.contains(ChatOption.BOT_IS_ADMIN) && chat.isGroupOrSuper()) {
             val getAdmins = GetChatAdministrators()
             getAdmins.chatId = chat.id.toString()
             val admins = executeMethod(absSender, getAdmins) ?: listOf<ChatMember>()
             admins.any {
                 it.user.id == botId
             }
+        } else true
+    }
+
+    /**
+     * Return true if group is not banned.
+     */
+    private fun filterBannedGroup(absSender: AbsSender, chat: Chat): Boolean {
+        return if (chat.isGroupOrSuper()) {
+            Configurator.dataManager[absSender.username()]!!.getGroupStatus(chat.id) != GroupStatus.BANNED
         } else true
     }
 }

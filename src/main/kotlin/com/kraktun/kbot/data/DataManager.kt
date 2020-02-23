@@ -1,5 +1,6 @@
 package com.kraktun.kbot.data
 
+import com.kraktun.kbot.objects.GroupStatus
 import com.kraktun.kbot.objects.Status
 import com.kraktun.kbot.utils.isGroupOrSuper
 import org.telegram.telegrambots.meta.api.objects.Chat
@@ -28,4 +29,9 @@ interface DataManager {
      * Get user status in a group
      */
     fun getGroupUserStatus(groupId: Long, userId: Int): Status
+
+    /**
+     * Get status of a group
+     */
+    fun getGroupStatus(groupId: Long): GroupStatus
 }

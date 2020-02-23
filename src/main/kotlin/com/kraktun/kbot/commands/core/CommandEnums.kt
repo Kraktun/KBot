@@ -7,11 +7,12 @@ enum class FilterResult {
     INVALID_STATUS,
     INVALID_FORMAT,
     INVALID_PRECONDITIONS, // used for filterFun
-    BOT_NOT_ADMIN,
+    INVALID_CHAT_OPTIONS,
     NOT_COMMAND
 }
 
-enum class ChatOptions {
+enum class ChatOption {
 
-    BOT_IS_ADMIN // Bot must be admin
+    BOT_IS_ADMIN, // Bot must be admin in the group
+    ALLOW_BANNED_GROUPS // Allow a command to be used in banned groups
 }

@@ -10,7 +10,7 @@ plugins {
 }
 
 group = "com.kraktun"
-version = "0.5.0"
+version = "0.5.1"
 
 val coroutinesVersion = "1.3.3"
 val kotlinVersion = "1.3.61"

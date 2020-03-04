@@ -3,6 +3,7 @@ package com.kraktun.kbot.utils
 import com.kraktun.kbot.objects.Target
 import org.telegram.telegrambots.meta.api.objects.Chat
 import org.telegram.telegrambots.meta.api.objects.Message
+import org.telegram.telegrambots.meta.api.objects.Update
 import org.telegram.telegrambots.meta.api.objects.User
 import org.telegram.telegrambots.meta.bots.AbsSender
 import org.telegram.telegrambots.meta.generics.LongPollingBot
@@ -74,5 +75,18 @@ fun Chat.toEnum(): Target {
         isUserChat -> Target.USER
         isChannelChat -> Target.CHANNEL
         else -> Target.INVALID
+    }
+}
+
+/**
+ * Get message from update, if it's a channel, get the post
+ */
+fun Update.messageOrPost(): Message? {
+    return when {
+        this.editedMessage != null -> this.editedMessage
+        this.message != null -> this.message
+        this.editedChannelPost != null -> this.editedChannelPost
+        this.channelPost != null -> this.channelPost
+        else -> null
     }
 }

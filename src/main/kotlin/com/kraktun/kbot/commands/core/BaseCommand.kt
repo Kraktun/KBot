@@ -115,7 +115,7 @@ class BaseCommand(
     /**
      * Return true if chat options are satisfied.
      */
-    private fun filterChatOptions(absSender: AbsSender, chat: Chat) : Boolean {
+    private fun filterChatOptions(absSender: AbsSender, chat: Chat): Boolean {
         var result = if (ChatOption.BOT_IS_ADMIN in chatOptions) filterBotAdmin(absSender, chat) else true
         result = result && if (ChatOption.ALLOW_BANNED_GROUPS !in chatOptions) filterBannedGroup(absSender, chat) else true
         return result

@@ -5,7 +5,7 @@ plugins {
     java
     application
     maven
-    kotlin("jvm") version "1.3.61"
+    kotlin("jvm") version "1.3.70"
     id("org.jlleitschuh.gradle.ktlint") version "9.1.1"
 }
 
@@ -13,7 +13,7 @@ group = "com.kraktun"
 version = "0.5.1"
 
 val coroutinesVersion = "1.3.3"
-val kotlinVersion = "1.3.61"
+val kotlinVersion = "1.3.70"
 val quartzVersion = "2.3.2"
 val telegramVersion = "4.6"
 val kUtilsVersion = "bde9d66"

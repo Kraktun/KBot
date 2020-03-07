@@ -1,20 +1,11 @@
-# DEVELOPMENT PAUSED UNTIL February 2020
-
-## TODO 
-### Extract a library to manage commands and jobs.
-### Refactor the code (eg. callbacks) 
-
 
 ## Info
 Libraries used:   
 [TelegramBots](https://github.com/rubenlagus/TelegramBots)   
-[SQLite-jdbc](https://github.com/xerial/sqlite-jdbc)   
 [Quartz](https://github.com/quartz-scheduler/quartz)   
-[JSoup](https://github.com/jhy/jsoup)   
-[Exposed](https://github.com/JetBrains/Exposed)   
 [Coroutines](https://github.com/Kotlin/kotlinx.coroutines)  
-[klaxon](https://github.com/cbeust/klaxon)  
 [ktlint-gradle](https://github.com/jlleitschuh/ktlint-gradle)   
+[KUtils](https://github.com/Kraktun/KUtils)   
 
 
 ### Build Status   
@@ -29,21 +20,22 @@ Libraries used:
 
 
 ## Features   
-* Filter commands received by the bot according to the chat and the status of the user.   
-* Add optional filters (e.g. accept a command only if it's a reply).   
-* Receive feedback when command is rejected and execute a function.   
-* Manage multi-reply commands (ask-answer model) with a timer.   
-* Boot-shutdown hooks.   
+* Filter updates received by the bot according to the type (command, callback, new users, ask-answer model etc.).      
+* Add filters to commands:   
+	* pair 'type of chat'-'status'   
+	* number of following arguments   
+	* additional message options (e.g. message is a reply)   
+	* additional chat options (e.g. bot is an admin)   
+* Execute code if an error occurs   
+* Execute custom code for each type of update received    
+* Manage multi-reply commands (ask-answer model) with custom timers   
+* Manage callback with custom timers   
+* Add and remove simple recurring jobs   
+* Many usefull extensions to the parent library   
 
 
 ## How To   
-* The package ```com.kraktun.kbot.commands``` contains a list of all the commands one or more of your bots support.
-	* You can check ```com.kraktun.kbot.commands.examples``` package for a list of templates for both normal commands and ask-answer commands.  
-* The package ```com.kraktun.kbot.commands.core``` contains the logic to register commands and parse messages.
-* The package ```com.kraktun.kbot.bots``` contains the core of a bot, where you define which commands you want to register for that particular bot.
-	* Note that a command is equal for all bots where it is registered. You can change the behaviour for one or more bot by checking the username (```absSender.username()```) but not the engine (targets, filters etc).
-* The package ```com.kraktun.kbot.jobs``` contains a list of jobs to execute in a time frame. A job may be bound to one or more bots (as of now only LongPolling). Jobs must be registered in ```JobExecutor.kt```.
-* The bots defined in package ```com.kraktun.kbot.bots``` must be registered in ```Main.kt``` and have a valid token + username in ```BotConfig.kt```.
+* Example bots will be available soon.   
 
 
 ## License

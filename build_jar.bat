@@ -1,5 +1,5 @@
 @echo off
 cd /d  "%~dp0"
 ::build jar 
-gradlew jar
+gradlew fatJar
 pause

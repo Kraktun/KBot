@@ -1,11 +1,11 @@
 package com.kraktun.kbot.commands.callbacks
 
 import com.kraktun.kbot.utils.executeMethod
-import java.time.Instant
 import org.telegram.telegrambots.meta.api.methods.AnswerCallbackQuery
 import org.telegram.telegrambots.meta.api.objects.CallbackQuery
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.InlineKeyboardButton
 import org.telegram.telegrambots.meta.bots.AbsSender
+import java.time.Instant
 
 /**
  * Stores data used while processing the callback.
@@ -31,9 +31,10 @@ interface CallbackHolder {
     // Override this if you want to send a message with custom options (e.g. as an alert)
     val answerCallback: (absSender: AbsSender, message: String) -> Unit
         get() = { absSender, message ->
-            val answer = AnswerCallbackQuery()
-            answer.callbackQueryId = id
-            answer.text = message
+            val answer = AnswerCallbackQuery.builder()
+                .callbackQueryId(id)
+                .text(message)
+                .build()
             executeMethod(absSender = absSender, m = answer)
         }
 }

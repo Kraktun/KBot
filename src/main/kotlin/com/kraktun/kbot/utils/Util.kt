@@ -26,23 +26,29 @@ fun <T : java.io.Serializable> executeMethod(absSender: AbsSender, m: BotApiMeth
 fun getSimpleListKeyboard(list: List<Any>, buttonsInRow: Int = -1): ReplyKeyboardMarkup {
     val key = ReplyKeyboardMarkup()
     if (buttonsInRow <= 0) {
-        key.keyboard.addAll(list.map {
-            val row = KeyboardRow()
-            row.add(it.toString())
-            row
-        })
+        key.keyboard.addAll(
+            list.map {
+                val row = KeyboardRow()
+                row.add(it.toString())
+                row
+            }
+        )
     } else {
         val listHolder = mutableListOf<List<Any>>()
         for (counter in 0 until buttonsInRow) {
-            listHolder.add(list.filter {
-                list.indexOf(it) / buttonsInRow == counter
-            })
+            listHolder.add(
+                list.filter {
+                    list.indexOf(it) / buttonsInRow == counter
+                }
+            )
         }
-        key.keyboard.addAll(listHolder.map {
-            val row = KeyboardRow()
-            row.addAll(it.map { button -> button.toString() })
-            row
-        })
+        key.keyboard.addAll(
+            listHolder.map {
+                val row = KeyboardRow()
+                row.addAll(it.map { button -> button.toString() })
+                row
+            }
+        )
     }
     key.resizeKeyboard = true
     return key

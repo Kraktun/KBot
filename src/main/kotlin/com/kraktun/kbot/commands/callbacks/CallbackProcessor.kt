@@ -3,13 +3,13 @@ package com.kraktun.kbot.commands.callbacks
 import com.kraktun.kbot.jobs.JobInfo
 import com.kraktun.kutils.other.readInLock
 import com.kraktun.kutils.other.writeInLock
-import java.time.Instant
-import java.util.concurrent.locks.ReentrantReadWriteLock
 import org.quartz.InterruptableJob
 import org.quartz.JobExecutionContext
 import org.quartz.JobExecutionException
 import org.telegram.telegrambots.meta.api.objects.CallbackQuery
 import org.telegram.telegrambots.meta.bots.AbsSender
+import java.time.Instant
+import java.util.concurrent.locks.ReentrantReadWriteLock
 
 /**
  * Process a callback.
@@ -31,9 +31,11 @@ object CallbackProcessor {
     fun fireCallback(absSender: AbsSender, user: Int, chatInstance: String, callback: CallbackQuery): Boolean {
         return if (callback.data.isNotEmpty()) {
             lock.readInLock {
-                val c = list.find { it.callback.id == callback.id &&
+                val c = list.find {
+                    it.callback.id == callback.id &&
                         (it.user == user || it.user == -1) &&
-                        it.chatInstance == chatInstance }
+                        it.chatInstance == chatInstance
+                }
                 if (c != null) {
                     val text = c.callback.processCallback(absSender, callback)
                     c.callback.answerCallback(absSender, text)
@@ -92,7 +94,8 @@ object CallbackProcessor {
                 interval = 5, // seconds
                 trigger = "CALLBACKCLEANER_TRIGGER",
                 group = "jobs",
-                delay = 10)
+                delay = 10
+            )
         }
 
         @Throws(JobExecutionException::class)
@@ -102,9 +105,11 @@ object CallbackProcessor {
                 list.filter {
                     it.callback.time.plusSeconds(it.callback.ttl).isBefore(now)
                 }.forEach {
-                    list.removeIf { f -> it.callback.id == f.callback.id &&
+                    list.removeIf { f ->
+                        it.callback.id == f.callback.id &&
                             it.chatInstance == f.chatInstance &&
-                            it.user == f.user }
+                            it.user == f.user
+                    }
                 }
             }
         }

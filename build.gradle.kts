@@ -1,21 +1,21 @@
-import org.gradle.jvm.tasks.Jar
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 plugins {
     java
     application
     maven
-    kotlin("jvm") version "1.3.70"
-    id("org.jlleitschuh.gradle.ktlint") version "9.1.1"
+    kotlin("jvm") version "1.4.20"
+    id("org.jlleitschuh.gradle.ktlint") version "9.4.1"
+    id("com.github.johnrengelman.shadow") version "6.1.0"
 }
 
 group = "com.kraktun"
-version = "0.5.2"
+version = "0.5.3"
 
-val coroutinesVersion = "1.3.3"
-val kotlinVersion = "1.3.70"
+val coroutinesVersion = "1.4.2"
+val kotlinVersion = "1.4.20"
 val quartzVersion = "2.3.2"
-val telegramVersion = "4.6"
+val telegramVersion = "5.0.1"
 val kUtilsVersion = "bde9d66"
 
 java {
@@ -52,19 +52,9 @@ ktlint {
     disabledRules.set(setOf("no-wildcard-imports"))
 }
 
-val fatJar = task("fatJar", type = Jar::class) {
-    baseName = project.name
-    manifest {
-        attributes["Implementation-Title"] = "KBot"
-        attributes["Implementation-Version"] = version
-    }
-    from(configurations.runtimeClasspath.get().map { if (it.isDirectory) it else zipTree(it) })
-    with(tasks.jar.get() as CopySpec)
-}
-
 tasks {
     "build" {
-        dependsOn(fatJar)
+        dependsOn(shadowJar)
     }
 }
 

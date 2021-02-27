@@ -1,46 +1,54 @@
 
+# KBot
+
 ## Info
-Libraries used:   
-[TelegramBots](https://github.com/rubenlagus/TelegramBots)   
-[Quartz](https://github.com/quartz-scheduler/quartz)   
-[Coroutines](https://github.com/Kotlin/kotlinx.coroutines)  
-[ktlint-gradle](https://github.com/jlleitschuh/ktlint-gradle)   
-[KUtils](https://github.com/Kraktun/KUtils)   
 
+Libraries used:
 
-### Build Status   
-#### Dev:   
+[TelegramBots](https://github.com/rubenlagus/TelegramBots)\
+[Quartz](https://github.com/quartz-scheduler/quartz)\
+[Coroutines](https://github.com/Kotlin/kotlinx.coroutines)\
+[ktlint-gradle](https://github.com/jlleitschuh/ktlint-gradle)\
+[KUtils](https://github.com/Kraktun/KUtils)
+
+Examples available at [KBotExamples](https://github.com/Kraktun/KBotExamples)
+
+### Build Status
+
+#### Dev
+
 [![Build Status](https://travis-ci.com/Kraktun/KBot.svg?branch=dev)](https://travis-ci.com/Kraktun/KBot)
-#### Master:   
-[![Build Status](https://travis-ci.com/Kraktun/KBot.svg?branch=master)](https://travis-ci.com/Kraktun/KBot)   
 
+#### Master
 
-## Latest release   
-[![GitHub release](https://img.shields.io/github/release/Kraktun/KBot.svg?)](https://github.com/Kraktun/KBot/releases/latest)   
+[![Build Status](https://travis-ci.com/Kraktun/KBot.svg?branch=master)](https://travis-ci.com/Kraktun/KBot)
 
+## Latest release
 
-## Features   
-* Filter updates received by the bot according to the type (command, callback, new users, ask-answer model etc.).      
-* Add filters to commands:   
-	* pair 'type of chat'-'status'   
-	* number of following arguments   
-	* additional message options (e.g. message is a reply)   
-	* additional chat options (e.g. bot is an admin)   
-* Execute code if an error occurs   
-* Execute custom code for each type of update received    
-* Manage multi-reply commands (ask-answer model) with custom timers   
-* Manage callback with custom timers   
-* Add and remove simple recurring jobs   
-* Many usefull extensions to the parent library   
+[![GitHub release](https://img.shields.io/github/release/Kraktun/KBot.svg?)](https://github.com/Kraktun/KBot/releases/latest)
 
+## Features
 
-## How To   
-* Example bots will be available soon.   
+* Filter updates received by the bot according to the type (command, callback, new users, ask-answer model etc.).
+* Add filters to commands:
+  * pair 'type of chat'-'status'
+  * number of following arguments
+  * additional message options (e.g. message is a reply)
+  * additional chat options (e.g. bot is an admin)
+* Execute code if an error occurs
+* Execute custom code for each type of update received
+* Manage multi-reply commands (ask-answer model) with custom timers
+* Manage callback with custom timers
+* Add and remove simple recurring jobs
+* Many usefull extensions to the parent library
 
+## How To
+
+* Example bots will be available soon.
 
 ## License
 
-![GitHub](https://img.shields.io/github/license/Kraktun/KBot.svg)   
+![GitHub](https://img.shields.io/github/license/Kraktun/KBot.svg)
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.

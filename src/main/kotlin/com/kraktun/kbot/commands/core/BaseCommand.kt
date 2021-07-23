@@ -6,14 +6,15 @@ import com.kraktun.kbot.objects.GroupStatus
 import com.kraktun.kbot.objects.Status
 import com.kraktun.kbot.objects.Target
 import com.kraktun.kbot.utils.*
-import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import org.telegram.telegrambots.meta.api.methods.groupadministration.GetChatAdministrators
+import org.telegram.telegrambots.meta.api.methods.groupadministration.GetChatMember
 import org.telegram.telegrambots.meta.api.objects.Chat
-import org.telegram.telegrambots.meta.api.objects.ChatMember
 import org.telegram.telegrambots.meta.api.objects.Message
 import org.telegram.telegrambots.meta.api.objects.User
+import org.telegram.telegrambots.meta.api.objects.chatmember.ChatMember
 import org.telegram.telegrambots.meta.bots.AbsSender
 
 /**
@@ -54,11 +55,13 @@ class BaseCommand(
         // apply filters
         val result = filterAll(absSender, message)
         runBlocking {
-            GlobalScope.launch {
-                if (result == FilterResult.FILTER_RESULT_OK)
-                    exe.execute(absSender, message)
-                else
-                    onError(absSender, message, result)
+            coroutineScope {
+                launch {
+                    if (result == FilterResult.FILTER_RESULT_OK)
+                        exe.execute(absSender, message)
+                    else
+                        onError(absSender, message, result)
+                }
             }
         }
         return result
@@ -126,13 +129,13 @@ class BaseCommand(
      */
     private fun filterBotAdmin(absSender: AbsSender, chat: Chat): Boolean {
         if (chat.isChannelChat) return true // All bots are admins in channels
-        val botId = absSender.botToken().substringBefore(":").toInt()
+        val botId = absSender.botToken().substringBefore(":").toLong()
         return if (chatOptions.contains(ChatOption.BOT_IS_ADMIN) && chat.isGroupOrSuper()) {
             val getAdmins = GetChatAdministrators()
             getAdmins.chatId = chat.id.toString()
             val admins = executeMethod(absSender, getAdmins) ?: listOf<ChatMember>()
             admins.any {
-                it.user.id == botId
+                (it as GetChatMember).userId == botId
             }
         } else true
     }

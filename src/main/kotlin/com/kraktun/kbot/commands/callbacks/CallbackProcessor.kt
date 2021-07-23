@@ -1,11 +1,9 @@
 package com.kraktun.kbot.commands.callbacks
 
 import com.kraktun.kbot.jobs.JobInfo
+import com.kraktun.kbot.jobs.JobTask
 import com.kraktun.kutils.other.readInLock
 import com.kraktun.kutils.other.writeInLock
-import org.quartz.InterruptableJob
-import org.quartz.JobExecutionContext
-import org.quartz.JobExecutionException
 import org.telegram.telegrambots.meta.api.objects.CallbackQuery
 import org.telegram.telegrambots.meta.bots.AbsSender
 import java.time.Instant
@@ -28,12 +26,12 @@ object CallbackProcessor {
      * @param callback callback from the update
      * @return true if a callback exists, false otherwise
      */
-    fun fireCallback(absSender: AbsSender, user: Int, chatInstance: String, callback: CallbackQuery): Boolean {
+    fun fireCallback(absSender: AbsSender, user: Long, chatInstance: String, callback: CallbackQuery): Boolean {
         return if (callback.data.isNotEmpty()) {
             lock.readInLock {
                 val c = list.find {
                     it.callback.id == callback.id &&
-                        (it.user == user || it.user == -1) &&
+                        (it.user == user || it.user == -1L) &&
                         it.chatInstance == chatInstance
                 }
                 if (c != null) {
@@ -53,7 +51,7 @@ object CallbackProcessor {
      * @param chat chat where the callback is defined
      * @param callbackHolder methods to execute
      */
-    fun insertCallback(user: Int, chatInstance: String, callbackHolder: CallbackHolder) {
+    fun insertCallback(user: Long, chatInstance: String, callbackHolder: CallbackHolder) {
         lock.writeInLock {
             list.add(CallbackChat(callbackHolder, user, chatInstance))
         }
@@ -62,7 +60,7 @@ object CallbackProcessor {
     /**
      * Remove a listener for a callback
      */
-    fun removeCallback(user: Int, callbackHolderId: String) {
+    fun removeCallback(user: Long, callbackHolderId: String) {
         lock.writeInLock {
             list.removeIf { it.callback.id == callbackHolderId && it.user == user }
         }
@@ -80,26 +78,23 @@ object CallbackProcessor {
     /**
      * Remove a listener for a callback
      */
-    fun removeCallback(user: Int, chatInstance: String, callbackHolderId: String) {
+    fun removeCallback(user: Long, chatInstance: String, callbackHolderId: String) {
         lock.writeInLock {
             list.removeIf { it.callback.id == callbackHolderId && it.user == user && it.chatInstance == chatInstance }
         }
     }
 
-    class CleanerJob : InterruptableJob {
+    class CleanerJob : JobTask() {
 
         companion object {
             val jobInfo = JobInfo(
-                name = "CALLBACKCLEANER",
+                key = "CALLBACKCLEANER",
                 interval = 5, // seconds
-                trigger = "CALLBACKCLEANER_TRIGGER",
-                group = "jobs",
-                delay = 10
+                initialDelay = 10
             )
         }
 
-        @Throws(JobExecutionException::class)
-        override fun execute(context: JobExecutionContext) {
+        override fun execute() {
             val now = Instant.now()
             lock.writeInLock {
                 list.filter {
@@ -113,7 +108,5 @@ object CallbackProcessor {
                 }
             }
         }
-
-        override fun interrupt() { }
     }
 }

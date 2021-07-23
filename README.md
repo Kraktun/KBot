@@ -6,10 +6,9 @@
 Libraries used:
 
 [TelegramBots](https://github.com/rubenlagus/TelegramBots)\
-[Quartz](https://github.com/quartz-scheduler/quartz)\
 [Coroutines](https://github.com/Kotlin/kotlinx.coroutines)\
 [ktlint-gradle](https://github.com/jlleitschuh/ktlint-gradle)\
-[KUtils](https://github.com/Kraktun/KUtils)
+[KUtils](https://github.com/Kraktun/KUtils)  
 
 Examples available at [KBotExamples](https://github.com/Kraktun/KBotExamples)
 
@@ -41,10 +40,6 @@ Examples available at [KBotExamples](https://github.com/Kraktun/KBotExamples)
 * Manage callback with custom timers
 * Add and remove simple recurring jobs
 * Many usefull extensions to the parent library
-
-## How To
-
-* Example bots will be available soon.
 
 ## License
 

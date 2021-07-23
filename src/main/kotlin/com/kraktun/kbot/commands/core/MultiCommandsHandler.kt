@@ -1,15 +1,13 @@
 package com.kraktun.kbot.commands.core
 
 import com.kraktun.kbot.jobs.JobInfo
+import com.kraktun.kbot.jobs.JobTask
 import com.kraktun.kbot.utils.username
 import com.kraktun.kutils.other.readInLock
 import com.kraktun.kutils.other.writeInLock
-import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
-import org.quartz.InterruptableJob
-import org.quartz.JobExecutionContext
-import org.quartz.JobExecutionException
 import org.telegram.telegrambots.meta.api.objects.Chat
 import org.telegram.telegrambots.meta.api.objects.Message
 import org.telegram.telegrambots.meta.api.objects.User
@@ -43,12 +41,14 @@ object MultiCommandsHandler {
         if (temp != null) deleteCommand(absSender, message.from, message.chat)
         val executor = temp?.multiInterface
         runBlocking {
-            GlobalScope.launch {
-                executor?.executeAfter(
-                    absSender,
-                    message,
-                    temp?.data
-                )
+            coroutineScope {
+                launch {
+                    executor?.executeAfter(
+                        absSender,
+                        message,
+                        temp?.data
+                    )
+                }
             }
         }
         return executor != null
@@ -57,7 +57,7 @@ object MultiCommandsHandler {
     /**
      * Insert new command in chat by user. Overwrite if already present.
      */
-    fun insertCommand(absSender: AbsSender, user: Int, chat: Long, command: MultiCommandInterface, data: Any? = null) {
+    fun insertCommand(absSender: AbsSender, user: Long, chat: Long, command: MultiCommandInterface, data: Any? = null) {
         lock.writeInLock {
             map[MultiCommandChat(absSender.username(), user, chat)] = MultiBaseCommand(command, data)
         }
@@ -74,7 +74,7 @@ object MultiCommandsHandler {
      * Delete last command with pair user and chat.
      * A command is automatically deleted after execution.
      */
-    fun deleteCommand(absSender: AbsSender, user: Int, chat: Long) {
+    fun deleteCommand(absSender: AbsSender, user: Long, chat: Long) {
         lock.writeInLock {
             map.remove(MultiCommandChat(absSender.username(), user, chat))
         }
@@ -91,24 +91,21 @@ object MultiCommandsHandler {
      * Delete last command with pair userId and chatId.
      * Unsynchronized version.
      */
-    private fun deleteUnsynch(botUsername: String, userId: Int, chatId: Long) {
+    private fun deleteUnsynch(botUsername: String, userId: Long, chatId: Long) {
         map.remove(MultiCommandChat(botUsername, userId, chatId))
     }
 
-    class CleanerJob : InterruptableJob {
+    class CleanerJob : JobTask() {
 
         companion object {
             val jobInfo = JobInfo(
-                name = "MULTICOMMANDCLEANER",
+                key = "MULTICOMMANDCLEANER",
                 interval = 5, // seconds
-                trigger = "MULTICOMMANDCLEANER_TRIGGER",
-                group = "jobs",
-                delay = 10
+                initialDelay = 10
             )
         }
 
-        @Throws(JobExecutionException::class)
-        override fun execute(context: JobExecutionContext) {
+        override fun execute() {
             val now = Instant.now()
             lock.writeInLock {
                 map.filter {
@@ -118,7 +115,5 @@ object MultiCommandsHandler {
                 }
             }
         }
-
-        override fun interrupt() { }
     }
 }

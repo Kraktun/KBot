@@ -1,6 +1,6 @@
 package com.kraktun.kbot.utils
 
-import org.telegram.telegrambots.meta.api.methods.groupadministration.KickChatMember
+import org.telegram.telegrambots.meta.api.methods.groupadministration.BanChatMember
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage
 import org.telegram.telegrambots.meta.api.methods.updatingmessages.DeleteMessage
 import org.telegram.telegrambots.meta.api.objects.Chat
@@ -54,7 +54,7 @@ fun AbsSender.simpleMessage(s: String, c: Long, enableHtml: Boolean = false): Me
  * @return true if success, null if an exception was thrown
  */
 fun AbsSender.kickUser(u: User, c: Chat, date: Int = -1): Boolean? {
-    val message = KickChatMember.builder()
+    val message = BanChatMember.builder()
         .chatId(c.id.toString())
         .userId(u.id)
         .build()

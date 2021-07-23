@@ -23,12 +23,12 @@ interface DataManager {
     /**
      * Get user from DB
      */
-    fun getUserStatus(userId: Int): Status
+    fun getUserStatus(userId: Long): Status
 
     /**
      * Get user status in a group
      */
-    fun getGroupUserStatus(groupId: Long, userId: Int): Status
+    fun getGroupUserStatus(groupId: Long, userId: Long): Status
 
     /**
      * Get status of a group

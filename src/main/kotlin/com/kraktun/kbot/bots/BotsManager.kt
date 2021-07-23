@@ -1,13 +1,13 @@
 package com.kraktun.kbot.bots
 
 import com.kraktun.kbot.utils.username
+import org.telegram.telegrambots.meta.TelegramBotsApi
+import org.telegram.telegrambots.meta.api.methods.updates.SetWebhook
 import org.telegram.telegrambots.meta.bots.AbsSender
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException
 import org.telegram.telegrambots.meta.generics.LongPollingBot
-import org.telegram.telegrambots.updatesreceivers.DefaultBotSession
-import org.telegram.telegrambots.meta.TelegramBotsApi
-import org.telegram.telegrambots.meta.api.methods.updates.SetWebhook
 import org.telegram.telegrambots.meta.generics.WebhookBot
+import org.telegram.telegrambots.updatesreceivers.DefaultBotSession
 
 /**
  * Maps bots username with corresponding absSender object

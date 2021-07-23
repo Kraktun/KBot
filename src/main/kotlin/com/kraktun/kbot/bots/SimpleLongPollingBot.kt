@@ -9,12 +9,12 @@ import org.telegram.telegrambots.meta.api.objects.Update
 
 open class SimpleLongPollingBot(private val username: String, private val token: String, botOptions: DefaultBotOptions = DefaultBotOptions()) : TelegramLongPollingBot(botOptions) {
 
-    private var preDigest : (Update) -> Boolean = { true }
-    private var newUser : (Update) -> Unit = { }
-    private var baseCommand : (Update) -> Unit = { }
-    private var callbackMessage : (Update) -> Unit = { }
-    private var multiCommand : (Update) -> Unit = { }
-    private var onElse : (Update) -> Unit = { }
+    private var preDigest: (Update) -> Boolean = { true }
+    private var newUser: (Update) -> Unit = { }
+    private var baseCommand: (Update) -> Unit = { }
+    private var callbackMessage: (Update) -> Unit = { }
+    private var multiCommand: (Update) -> Unit = { }
+    private var onElse: (Update) -> Unit = { }
     private var isRegistered: Boolean = false
 
     override fun getBotToken(): String {
@@ -28,7 +28,8 @@ open class SimpleLongPollingBot(private val username: String, private val token:
     override fun onUpdateReceived(update: Update?) {
         if (!isRegistered) throw BotIsNotRegisteredException()
         if (update == null) return
-        digest(update,
+        digest(
+            update,
             onPreDigest = preDigest,
             onNewUser = newUser,
             onBaseCommand = baseCommand,
@@ -38,7 +39,7 @@ open class SimpleLongPollingBot(private val username: String, private val token:
         )
     }
 
-    fun withCommand(command: BaseCommand) : SimpleLongPollingBot {
+    fun withCommand(command: BaseCommand): SimpleLongPollingBot {
         CommandProcessor.registerCommand(username, command)
         return this
     }

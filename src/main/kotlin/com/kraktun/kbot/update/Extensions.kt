@@ -38,7 +38,15 @@ fun AbsSender.digest(
         onCallbackMessage.invoke(update)
         return
     }
-    val message = if (update.channelPost != null) update.channelPost else update.message
+    val message = when {
+        update.hasChannelPost() -> update.channelPost
+        update.hasMessage() -> update.message
+        else -> {
+            // all other cases (e.g. edited message, polls) are passed directly to the onElse
+            onElse.invoke(update)
+            return
+        }
+    }
     when {
         // If it's a group
         // Remove new user if it's banned, otherwise welcome him

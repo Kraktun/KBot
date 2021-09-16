@@ -2,7 +2,8 @@ package com.kraktun.kbot.jobs
 
 import com.kraktun.kbot.commands.callbacks.CallbackProcessor
 import com.kraktun.kbot.commands.core.MultiCommandsHandler
-import com.kraktun.kutils.jobs.MultiJobExecutorCoroutines
+import com.kraktun.kbot.data.Configurator
+import com.kraktun.kutils.jobs.MultiJobExecutor
 
 /**
  * Executes jobs in set intervals
@@ -10,12 +11,11 @@ import com.kraktun.kutils.jobs.MultiJobExecutorCoroutines
 object JobManager {
 
     private const val sleepTime = 100L // millis
-    private const val threadPool = 5
     private val jobs = mapOf<JobTask, JobInfo>(
         MultiCommandsHandler.CleanerJob() to MultiCommandsHandler.CleanerJob.jobInfo,
         CallbackProcessor.CleanerJob() to CallbackProcessor.CleanerJob.jobInfo
     )
-    private val scheduler = MultiJobExecutorCoroutines(threadPool)
+    private val scheduler = MultiJobExecutor(Configurator.threadPool)
 
     /**
      * Starts threads

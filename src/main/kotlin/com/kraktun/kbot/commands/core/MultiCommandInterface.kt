@@ -12,5 +12,5 @@ interface MultiCommandInterface {
     /*
     The original message is passed if further information is needed (e.g. reply)
      */
-    fun executeAfter(absSender: AbsSender, message: Message, data: Any?)
+    suspend fun executeAfter(absSender: AbsSender, message: Message, data: Any?)
 }

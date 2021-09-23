@@ -9,5 +9,5 @@ fun interface CommandInterface {
     /*
     The original message is passed if further information is needed (e.g. reply)
      */
-    fun execute(absSender: AbsSender, message: Message)
+    suspend fun execute(absSender: AbsSender, message: Message)
 }

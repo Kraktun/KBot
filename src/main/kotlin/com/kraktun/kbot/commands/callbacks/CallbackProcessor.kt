@@ -22,7 +22,7 @@ object CallbackProcessor {
      * Execute methods defined for a callback.
      * @param absSender absSender
      * @param user user who clicked on the button with the callback
-     * @param chat where the user clicked
+     * @param chatInstance where the user clicked
      * @param callback callback from the update
      * @return true if a callback exists, false otherwise
      */
@@ -48,7 +48,7 @@ object CallbackProcessor {
     /**
      * Register a listener for a callback.
      * @param user user who is allowed to fire tha callback. -1 to allow everybody
-     * @param chat chat where the callback is defined
+     * @param chatInstance chat where the callback is defined
      * @param callbackHolder methods to execute
      */
     fun insertCallback(user: Long, chatInstance: String, callbackHolder: CallbackHolder) {

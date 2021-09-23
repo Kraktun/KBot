@@ -67,20 +67,21 @@ fun AbsSender.kickUser(u: User, c: Chat, date: Int = -1): Boolean? {
  * Send a custom keyboard for the user to choose
  * @return message, null if an exception was thrown
  */
-fun AbsSender.sendKeyboard(c: Chat, s: String, keyboard: ReplyKeyboard): Message? {
-    return insertKeyboard(c, s, keyboard)
+fun AbsSender.sendKeyboard(s: String, c: Chat, keyboard: ReplyKeyboard, enableHtml: Boolean = false): Message? {
+    return insertKeyboard(s, c, keyboard, enableHtml)
 }
 
 /**
  * Private method to send\remove keyboards
  * @return message, null if an exception was thrown
  */
-private fun AbsSender.insertKeyboard(c: Chat, s: String, keyboard: ReplyKeyboard): Message? {
+private fun AbsSender.insertKeyboard(s: String, c: Chat, keyboard: ReplyKeyboard, enableHtml: Boolean = false): Message? {
     val message = SendMessage.builder()
         .chatId(c.id.toString())
         .text(s)
         .replyMarkup(keyboard)
         .build()
+    message.enableHtml(enableHtml)
     return executeMethod(this, message)
 }
 
@@ -88,6 +89,6 @@ private fun AbsSender.insertKeyboard(c: Chat, s: String, keyboard: ReplyKeyboard
  * Remove a keyboard restoring normal keyboard
  * @return message, null if an exception was thrown
  */
-fun AbsSender.removeKeyboard(c: Chat, s: String): Message? {
-    return insertKeyboard(c, s, ReplyKeyboardRemove())
+fun AbsSender.removeKeyboard(s: String, c: Chat): Message? {
+    return insertKeyboard(s, c, ReplyKeyboardRemove())
 }

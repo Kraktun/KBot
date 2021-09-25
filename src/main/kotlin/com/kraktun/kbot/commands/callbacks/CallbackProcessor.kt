@@ -105,8 +105,8 @@ object CallbackProcessor {
                     }.forEach {
                         list.removeIf { f ->
                             it.callback.id == f.callback.id &&
-                                    it.chatInstance == f.chatInstance &&
-                                    it.user == f.user
+                                it.chatInstance == f.chatInstance &&
+                                it.user == f.user
                         }
                     }
                 }

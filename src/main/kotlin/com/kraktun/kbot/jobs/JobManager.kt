@@ -46,7 +46,7 @@ object JobManager {
     }
 
     fun addJob(job: JobTask, info: JobInfo) {
-        scheduler.registerTask({ s -> job.execute(s)}, info.key, info.interval, info.initialDelay)
+        scheduler.registerTask({ s -> job.execute(s) }, info.key, info.interval, info.initialDelay)
     }
 
     fun removeJob(jobInfo: JobInfo) {

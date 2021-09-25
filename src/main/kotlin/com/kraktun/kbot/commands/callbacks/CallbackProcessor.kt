@@ -4,6 +4,8 @@ import com.kraktun.kbot.jobs.JobInfo
 import com.kraktun.kbot.jobs.JobTask
 import com.kraktun.kutils.other.readInLock
 import com.kraktun.kutils.other.writeInLock
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.launch
 import org.telegram.telegrambots.meta.api.objects.CallbackQuery
 import org.telegram.telegrambots.meta.bots.AbsSender
 import java.time.Instant
@@ -94,16 +96,18 @@ object CallbackProcessor {
             )
         }
 
-        override fun execute() {
+        override fun execute(scope: CoroutineScope) {
             val now = Instant.now()
-            lock.writeInLock {
-                list.filter {
-                    it.callback.time.plusSeconds(it.callback.ttl).isBefore(now)
-                }.forEach {
-                    list.removeIf { f ->
-                        it.callback.id == f.callback.id &&
-                            it.chatInstance == f.chatInstance &&
-                            it.user == f.user
+            scope.launch {
+                lock.writeInLock {
+                    list.filter {
+                        it.callback.time.plusSeconds(it.callback.ttl).isBefore(now)
+                    }.forEach {
+                        list.removeIf { f ->
+                            it.callback.id == f.callback.id &&
+                                    it.chatInstance == f.chatInstance &&
+                                    it.user == f.user
+                        }
                     }
                 }
             }

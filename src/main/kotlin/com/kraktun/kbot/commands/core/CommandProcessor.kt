@@ -71,7 +71,7 @@ object CommandProcessor {
      */
     class CommandAlreadyRegisteredException : Exception() {
 
-        override val message: String?
+        override val message: String
             get() = "A command with the same activation string is already present"
     }
 }

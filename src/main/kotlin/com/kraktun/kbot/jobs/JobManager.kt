@@ -3,7 +3,7 @@ package com.kraktun.kbot.jobs
 import com.kraktun.kbot.commands.callbacks.CallbackProcessor
 import com.kraktun.kbot.commands.core.MultiCommandsHandler
 import com.kraktun.kbot.data.Configurator
-import com.kraktun.kutils.jobs.MultiJobExecutor
+import com.kraktun.kutils.jobs.MultiJobExecutorCoroutines
 
 /**
  * Executes jobs in set intervals
@@ -15,7 +15,7 @@ object JobManager {
         MultiCommandsHandler.CleanerJob() to MultiCommandsHandler.CleanerJob.jobInfo,
         CallbackProcessor.CleanerJob() to CallbackProcessor.CleanerJob.jobInfo
     )
-    private val scheduler = MultiJobExecutor(Configurator.threadPool)
+    private val scheduler = MultiJobExecutorCoroutines(Configurator.threadPool)
 
     /**
      * Starts threads
@@ -46,7 +46,7 @@ object JobManager {
     }
 
     fun addJob(job: JobTask, info: JobInfo) {
-        scheduler.registerTask({ job.execute() }, info.key, info.interval, info.initialDelay)
+        scheduler.registerTask({ s -> job.execute(s)}, info.key, info.interval, info.initialDelay)
     }
 
     fun removeJob(jobInfo: JobInfo) {

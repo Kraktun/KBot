@@ -3,18 +3,18 @@ import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 plugins {
     `maven-publish`
     java
-    kotlin("jvm") version "1.5.30"
+    kotlin("jvm") version "1.5.31"
     id("org.jlleitschuh.gradle.ktlint") version "10.1.0"
     id("com.github.johnrengelman.shadow") version "7.0.0"
 }
 
 group = "com.kraktun"
-version = "0.6.1"
+version = "0.6.2"
 
 val coroutinesVersion = "1.5.2-native-mt"
-val kotlinVersion = "1.5.30"
+val kotlinVersion = "1.5.31"
 val telegramVersion = "5.3.0"
-val kUtilsVersion = "b8e630a"
+val kUtilsVersion = "441931a"
 
 java {
     sourceCompatibility = JavaVersion.VERSION_1_8

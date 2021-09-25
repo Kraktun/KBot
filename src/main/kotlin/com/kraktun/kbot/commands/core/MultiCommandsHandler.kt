@@ -5,6 +5,7 @@ import com.kraktun.kbot.jobs.JobTask
 import com.kraktun.kbot.utils.username
 import com.kraktun.kutils.other.readInLock
 import com.kraktun.kutils.other.writeInLock
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
@@ -105,13 +106,15 @@ object MultiCommandsHandler {
             )
         }
 
-        override fun execute() {
+        override fun execute(scope: CoroutineScope) {
             val now = Instant.now()
-            lock.writeInLock {
-                map.filter {
-                    it.value.time.plusSeconds(it.value.TTL).isBefore(now)
-                }.forEach {
-                    deleteUnsynch(it.key.bot, it.key.user, it.key.chat)
+            scope.launch {
+                lock.writeInLock {
+                    map.filter {
+                        it.value.time.plusSeconds(it.value.TTL).isBefore(now)
+                    }.forEach {
+                        deleteUnsynch(it.key.bot, it.key.user, it.key.chat)
+                    }
                 }
             }
         }

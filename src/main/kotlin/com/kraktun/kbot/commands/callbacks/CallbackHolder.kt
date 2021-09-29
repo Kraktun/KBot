@@ -2,7 +2,9 @@ package com.kraktun.kbot.commands.callbacks
 
 import com.kraktun.kbot.utils.executeMethod
 import org.telegram.telegrambots.meta.api.methods.AnswerCallbackQuery
+import org.telegram.telegrambots.meta.api.methods.updatingmessages.EditMessageReplyMarkup
 import org.telegram.telegrambots.meta.api.objects.CallbackQuery
+import org.telegram.telegrambots.meta.api.objects.replykeyboard.InlineKeyboardMarkup
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.InlineKeyboardButton
 import org.telegram.telegrambots.meta.bots.AbsSender
 import java.time.Instant
@@ -36,5 +38,22 @@ interface CallbackHolder {
                 .text(message)
                 .build()
             executeMethod(absSender = absSender, m = answer)
+        }
+    // toggle button label
+    val changeLabel: (absSender: AbsSender, callback: CallbackQuery, newLabel: String) -> Unit
+        get() = { absSender, callback, newLabel ->
+            val key = callback.message.replyMarkup.keyboard
+            key.forEach { ex ->
+                ex.forEach {
+                    if (it.callbackData == id)
+                        it.text = newLabel
+                }
+            }
+            val e = EditMessageReplyMarkup.builder()
+                .replyMarkup(InlineKeyboardMarkup(key))
+                .messageId(callback.message.messageId)
+                .chatId(callback.message.chatId.toString())
+                .build()
+            executeMethod(absSender = absSender, m = e)
         }
 }

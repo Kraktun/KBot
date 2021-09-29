@@ -29,10 +29,10 @@ interface CallbackHolder {
     val processCallback: (absSender: AbsSender, callback: CallbackQuery) -> String
 
     // Override this if you want to send a message with custom options (e.g. as an alert)
-    val answerCallback: (absSender: AbsSender, message: String) -> Unit
-        get() = { absSender, message ->
+    val answerCallback: (absSender: AbsSender, message: String, callbackId: String) -> Unit
+        get() = { absSender, message, callbackId ->
             val answer = AnswerCallbackQuery.builder()
-                .callbackQueryId(id)
+                .callbackQueryId(callbackId)
                 .text(message)
                 .build()
             executeMethod(absSender = absSender, m = answer)

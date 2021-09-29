@@ -24,21 +24,21 @@ object CallbackProcessor {
      * Execute methods defined for a callback.
      * @param absSender absSender
      * @param user user who clicked on the button with the callback
-     * @param chatInstance where the user clicked
+     * @param chat where the user clicked
      * @param callback callback from the update
      * @return true if a callback exists, false otherwise
      */
-    fun fireCallback(absSender: AbsSender, user: Long, chatInstance: String, callback: CallbackQuery): Boolean {
+    fun fireCallback(absSender: AbsSender, user: Long, chat: Long, callback: CallbackQuery): Boolean {
         return if (callback.data.isNotEmpty()) {
             lock.readInLock {
                 val c = list.find {
-                    it.callback.id == callback.id &&
+                    it.callback.id == callback.data &&
                         (it.user == user || it.user == -1L) &&
-                        it.chatInstance == chatInstance
+                        it.chat == chat
                 }
                 if (c != null) {
                     val text = c.callback.processCallback(absSender, callback)
-                    c.callback.answerCallback(absSender, text)
+                    c.callback.answerCallback(absSender, text, callback.id)
                     true
                 } else {
                     false
@@ -50,12 +50,12 @@ object CallbackProcessor {
     /**
      * Register a listener for a callback.
      * @param user user who is allowed to fire tha callback. -1 to allow everybody
-     * @param chatInstance chat where the callback is defined
+     * @param chat chat where the callback is defined
      * @param callbackHolder methods to execute
      */
-    fun insertCallback(user: Long, chatInstance: String, callbackHolder: CallbackHolder) {
+    fun insertCallback(user: Long, chat: Long, callbackHolder: CallbackHolder) {
         lock.writeInLock {
-            list.add(CallbackChat(callbackHolder, user, chatInstance))
+            list.add(CallbackChat(callbackHolder, user, chat))
         }
     }
 
@@ -71,18 +71,9 @@ object CallbackProcessor {
     /**
      * Remove a listener for a callback
      */
-    fun removeCallback(chatInstance: String, callbackHolderId: String) {
+    fun removeCallback(user: Long, chat: Long, callbackHolderId: String) {
         lock.writeInLock {
-            list.removeIf { it.callback.id == callbackHolderId && it.chatInstance == chatInstance }
-        }
-    }
-
-    /**
-     * Remove a listener for a callback
-     */
-    fun removeCallback(user: Long, chatInstance: String, callbackHolderId: String) {
-        lock.writeInLock {
-            list.removeIf { it.callback.id == callbackHolderId && it.user == user && it.chatInstance == chatInstance }
+            list.removeIf { it.callback.id == callbackHolderId && it.user == user && it.chat == chat }
         }
     }
 
@@ -105,7 +96,7 @@ object CallbackProcessor {
                     }.forEach {
                         list.removeIf { f ->
                             it.callback.id == f.callback.id &&
-                                it.chatInstance == f.chatInstance &&
+                                it.chat == f.chat &&
                                 it.user == f.user
                         }
                     }

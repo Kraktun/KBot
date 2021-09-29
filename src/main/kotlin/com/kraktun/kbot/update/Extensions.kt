@@ -33,7 +33,7 @@ fun AbsSender.digest(
             absSender = this,
             callback = update.callbackQuery,
             user = update.callbackQuery.from.id,
-            chatInstance = update.callbackQuery.chatInstance
+            chat = update.callbackQuery.message.chatId
         )
         onCallbackMessage.invoke(update)
         return

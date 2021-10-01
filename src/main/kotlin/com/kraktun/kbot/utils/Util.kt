@@ -25,34 +25,19 @@ fun <T : java.io.Serializable> executeMethod(absSender: AbsSender, m: BotApiMeth
  * Get keyboard with buttons from a list.
  * Optional: define how many buttons for each row (default = 1).
  */
-fun getSimpleListKeyboard(list: List<Any>, buttonsInRow: Int = -1): ReplyKeyboardMarkup {
+fun getSimpleListKeyboard(list: List<Any>, buttonsInRow: Int = 1): ReplyKeyboardMarkup {
     val key = ReplyKeyboardMarkup()
-    if (buttonsInRow <= 0) {
-        key.keyboard.addAll(
-            list.map {
-                val row = KeyboardRow()
-                row.add(it.toString())
-                row
-            }
-        )
-    } else {
-        val listHolder = mutableListOf<List<Any>>()
-        for (counter in 0 until buttonsInRow) {
-            listHolder.add(
-                list.filter {
-                    list.indexOf(it) / buttonsInRow == counter
-                }
-            )
-        }
-        key.keyboard.addAll(
-            listHolder.map {
-                val row = KeyboardRow()
-                row.addAll(it.map { button -> button.toString() })
-                row
-            }
-        )
+    val repartitionedList = mutableListOf<KeyboardRow>()
+    for (rowNum in 0 until list.size / buttonsInRow) {
+        val row = KeyboardRow()
+        row.addAll(list.filter {
+            list.indexOf(it) / buttonsInRow == rowNum
+        }.map { it.toString() })
+        repartitionedList.add(row)
     }
+    key.keyboard = repartitionedList
     key.resizeKeyboard = true
+    key.oneTimeKeyboard = true
     return key
 }
 

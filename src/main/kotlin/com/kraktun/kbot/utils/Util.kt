@@ -30,9 +30,11 @@ fun getSimpleListKeyboard(list: List<Any>, buttonsInRow: Int = 1): ReplyKeyboard
     val repartitionedList = mutableListOf<KeyboardRow>()
     for (rowNum in 0 until list.size / buttonsInRow) {
         val row = KeyboardRow()
-        row.addAll(list.filter {
-            list.indexOf(it) / buttonsInRow == rowNum
-        }.map { it.toString() })
+        row.addAll(
+            list.filter {
+                list.indexOf(it) / buttonsInRow == rowNum
+            }.map { it.toString() }
+        )
         repartitionedList.add(row)
     }
     key.keyboard = repartitionedList

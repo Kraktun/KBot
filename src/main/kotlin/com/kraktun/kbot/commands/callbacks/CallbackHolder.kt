@@ -13,12 +13,14 @@ import java.time.Instant
  * Stores data used while processing the callback.
  * Also defines methods to invoke when firing the callback.
  */
-interface CallbackHolder {
+abstract class CallbackHolder {
 
-    val id: String // callback data, used as a ID. Must be unique.
-    val label: String // string to show in the button
+    abstract val id: String // callback data, used as a ID. Must be unique.
+    abstract var label: String // string to show in the button
     val time: Instant get() = Instant.now()
-    val ttl: Long // how long must the callback be kept alive (i.e. clickable)
+    abstract val ttl: Long // how long must the callback be kept alive (i.e. clickable)
+    abstract var resultAsAlert: Boolean // show result as alert
+    abstract var resultAsUrl: Boolean // true to send the message from getCallbackMessage as an url
     val button: InlineKeyboardButton
         get() {
             return InlineKeyboardButton().apply {
@@ -27,20 +29,27 @@ interface CallbackHolder {
             }
         } // return button with label and data
 
-    // return message to send to the user. Override answerCallback to customize it.
-    val processCallback: (absSender: AbsSender, callback: CallbackQuery) -> String
+    // return message to send to the user.
+    abstract val getCallbackMessage: (callback: CallbackQuery) -> String
 
-    // Override this if you want to send a message with custom options (e.g. as an alert)
     val answerCallback: (absSender: AbsSender, message: String, callbackId: String) -> Unit
         get() = { absSender, message, callbackId ->
-            val answer = AnswerCallbackQuery.builder()
+            var answerBuilder = AnswerCallbackQuery.builder()
                 .callbackQueryId(callbackId)
-                .text(message)
-                .build()
+                .showAlert(resultAsAlert)
+            answerBuilder = if (resultAsUrl)
+                answerBuilder.url(message)
+            else
+                answerBuilder.text(message)
+            val answer = answerBuilder.build()
             executeMethod(absSender = absSender, m = answer)
         }
+
+    // function to execute before the callback is answered
+    abstract fun onCallbackFired(absSender: AbsSender, callback: CallbackQuery)
+
     // toggle button label
-    val changeLabel: (absSender: AbsSender, callback: CallbackQuery, newLabel: String) -> Unit
+    protected val changeLabel: (absSender: AbsSender, callback: CallbackQuery, newLabel: String) -> Unit
         get() = { absSender, callback, newLabel ->
             val key = callback.message.replyMarkup.keyboard
             key.forEach { ex ->
@@ -55,5 +64,6 @@ interface CallbackHolder {
                 .chatId(callback.message.chatId.toString())
                 .build()
             executeMethod(absSender = absSender, m = e)
+            this.label = newLabel
         }
 }

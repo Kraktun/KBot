@@ -37,7 +37,9 @@ object CallbackProcessor {
                         it.chat == chat
                 }
                 if (c != null) {
-                    val text = c.callback.processCallback(absSender, callback)
+                    c.callback.onCallbackFired(absSender, callback)
+                    val text = c.callback.getCallbackMessage(callback)
+                    checkMessageLength(text)
                     c.callback.answerCallback(absSender, text, callback.id)
                     true
                 } else {

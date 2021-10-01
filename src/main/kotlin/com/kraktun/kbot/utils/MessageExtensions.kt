@@ -90,5 +90,5 @@ private fun AbsSender.insertKeyboard(s: String, c: Chat, keyboard: ReplyKeyboard
  * @return message, null if an exception was thrown
  */
 fun AbsSender.removeKeyboard(s: String, c: Chat, enableHtml: Boolean = false): Message? {
-    return insertKeyboard(s, c, ReplyKeyboardRemove(), enableHtml)
+    return insertKeyboard(s, c, ReplyKeyboardRemove().apply { removeKeyboard = true }, enableHtml)
 }

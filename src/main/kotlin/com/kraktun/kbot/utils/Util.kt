@@ -8,6 +8,7 @@ import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.InlineKe
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.KeyboardRow
 import org.telegram.telegrambots.meta.bots.AbsSender
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException
+import kotlin.math.ceil
 
 /**
  * Execute a generic method, catching the exceptions
@@ -28,7 +29,7 @@ fun <T : java.io.Serializable> executeMethod(absSender: AbsSender, m: BotApiMeth
 fun getSimpleListKeyboard(list: List<Any>, buttonsInRow: Int = 1): ReplyKeyboardMarkup {
     val key = ReplyKeyboardMarkup()
     val repartitionedList = mutableListOf<KeyboardRow>()
-    for (rowNum in 0 until list.size / buttonsInRow) {
+    for (rowNum in 0 until ceil(list.size.toDouble() / buttonsInRow).toInt()) {
         val row = KeyboardRow()
         row.addAll(
             list.filter {
@@ -47,24 +48,17 @@ fun getSimpleListKeyboard(list: List<Any>, buttonsInRow: Int = 1): ReplyKeyboard
  * Get inline keyboard to append to a message.
  * Optional: define how many buttons per row (default = 1).
  */
-fun getSimpleInlineKeyboard(list: List<InlineKeyboardButton>, buttonsInRow: Int = -1): InlineKeyboardMarkup {
+fun getSimpleInlineKeyboard(list: List<InlineKeyboardButton>, buttonsInRow: Int = 1): InlineKeyboardMarkup {
     val key = InlineKeyboardMarkup()
-    if (buttonsInRow > 0) {
-        val listHolder = mutableListOf<List<InlineKeyboardButton>>()
-        for (counter in 0 until buttonsInRow) {
-            listHolder.add(
-                list.filter {
-                    list.indexOf(it) / buttonsInRow == counter
-                }
-            )
-        }
-        key.keyboard = listHolder
-    } else {
-        key.keyboard = list.map {
-            val row = mutableListOf<InlineKeyboardButton>()
-            row.add(it)
-            row
-        }
+    val repartitionedList = mutableListOf<List<InlineKeyboardButton>>()
+    for (rowNum in 0 until ceil(list.size.toDouble() / buttonsInRow).toInt()) {
+        val row = mutableListOf<InlineKeyboardButton>()
+        row.addAll(
+            list.filter {
+                list.indexOf(it) / buttonsInRow == rowNum
+            }
+        )
+        repartitionedList.add(row)
     }
     return key
 }

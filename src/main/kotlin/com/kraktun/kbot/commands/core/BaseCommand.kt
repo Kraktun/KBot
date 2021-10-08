@@ -21,7 +21,7 @@ import org.telegram.telegrambots.meta.bots.AbsSender
  * Class that represents a command.
  * Single commands must extend this class.
  */
-class BaseCommand(
+open class BaseCommand(
     // string that fires the command, starting symbol may be anything (e.g. '/', '#'). Must be unique for a single bot.
     val command: String,
     // description for the command, used when calling /help. Supports html.

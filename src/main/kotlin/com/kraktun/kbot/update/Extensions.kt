@@ -54,16 +54,16 @@ fun AbsSender.digest(
             onNewUser.invoke(update)
         }
 
-        // Check if it's a ask-answer interaction
-        // Nothing to do here, as the command is fired directly in the 'if'
-        // Note that this goes after the check on locks and bans, as the commands in MultiCommandsHandler
+        // Check if it's an ask-answer interaction
+        // The command is fired directly in the 'if'
+        // Note that the commands in MultiCommandsHandler
         // do not implement a check on bans and locks
         MultiCommandsHandler.fireCommand(message, this) -> {
             onMultiCommand.invoke(update)
         }
 
         // Check if it's a command and attempt to fire the response
-        // Nothing to do in the function here, as the command is fired directly in the 'if'.
+        // The command is fired directly in the 'if'.
         // This goes after multiCommandsHandler as you may need to use a command in a multiCommand interaction
         CommandProcessor.fireCommand(message, this) != FilterResult.NOT_COMMAND -> {
             onBaseCommand.invoke(update)

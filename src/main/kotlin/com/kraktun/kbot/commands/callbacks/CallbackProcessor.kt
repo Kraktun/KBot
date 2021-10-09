@@ -7,6 +7,7 @@ import com.kraktun.kutils.other.writeInLock
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import org.telegram.telegrambots.meta.api.objects.CallbackQuery
+import org.telegram.telegrambots.meta.api.objects.Message
 import org.telegram.telegrambots.meta.bots.AbsSender
 import java.time.Instant
 import java.util.concurrent.locks.ReentrantReadWriteLock
@@ -51,14 +52,25 @@ object CallbackProcessor {
 
     /**
      * Register a listener for a callback.
+     * @param absSender absSender for the current callback
      * @param user user who is allowed to fire tha callback. -1 to allow everybody
      * @param chat chat where the callback is defined
      * @param callbackHolder methods to execute
      */
-    fun insertCallback(user: Long, chat: Long, callbackHolder: CallbackHolder) {
+    fun insertCallback(absSender: AbsSender, user: Long, chat: Long, callbackHolder: CallbackHolder) {
         lock.writeInLock {
-            list.add(CallbackChat(callbackHolder, user, chat))
+            list.add(CallbackChat(absSender, callbackHolder, user, chat))
         }
+    }
+
+    /**
+     * Register a listener for a callback.
+     * @param absSender absSender for the current callback
+     * @param message message
+     * @param callbackHolder methods to execute
+     */
+    fun insertCallback(absSender: AbsSender, message: Message, callbackHolder: CallbackHolder) {
+        insertCallback(absSender, message.from.id, message.chatId, callbackHolder)
     }
 
     /**
@@ -95,11 +107,14 @@ object CallbackProcessor {
                 lock.writeInLock {
                     list.filter {
                         it.callback.time.plusSeconds(it.callback.ttl).isBefore(now)
-                    }.forEach {
+                    }.forEach { expiredCallback ->
+                        // execute function for callback expiration
+                        expiredCallback.callback.onTtlExpired(expiredCallback.absSender)
+                        // remove expired callbacks from list
                         list.removeIf { f ->
-                            it.callback.id == f.callback.id &&
-                                it.chat == f.chat &&
-                                it.user == f.user
+                            expiredCallback.callback.id == f.callback.id &&
+                                expiredCallback.chat == f.chat &&
+                                expiredCallback.user == f.user
                         }
                     }
                 }

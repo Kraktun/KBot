@@ -48,6 +48,9 @@ abstract class CallbackHolder {
     // function to execute before the callback is answered
     abstract fun onCallbackFired(absSender: AbsSender, callback: CallbackQuery)
 
+    // function to execute when the ttl time expires
+    abstract fun onTtlExpired(absSender: AbsSender)
+
     // toggle button label
     protected val changeLabel: (absSender: AbsSender, callback: CallbackQuery, newLabel: String) -> Unit
         get() = { absSender, callback, newLabel ->

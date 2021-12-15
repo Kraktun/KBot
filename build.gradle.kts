@@ -3,18 +3,18 @@ import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 plugins {
     `maven-publish`
     java
-    kotlin("jvm") version "1.5.31"
-    id("org.jlleitschuh.gradle.ktlint") version "10.1.0"
-    id("com.github.johnrengelman.shadow") version "7.0.0"
+    kotlin("jvm") version "1.6.10"
+    id("org.jlleitschuh.gradle.ktlint") version "10.2.0"
+    id("com.github.johnrengelman.shadow") version "7.1.1"
 }
 
 group = "com.kraktun"
-version = "0.6.4"
+version = "0.6.5"
 
-val coroutinesVersion = "1.5.2-native-mt"
-val kotlinVersion = "1.5.31"
-val telegramVersion = "5.3.0"
-val kUtilsVersion = "441931a"
+val coroutinesVersion = "1.6.0-RC2"
+val kotlinVersion = "1.6.10"
+val telegramVersion = "5.5.0"
+val kUtilsVersion = "cb3b9e6"
 
 java {
     sourceCompatibility = JavaVersion.VERSION_1_8
@@ -31,7 +31,7 @@ dependencies {
     implementation("org.telegram:telegrambots:$telegramVersion")
     implementation("org.telegram:telegrambots-meta:$telegramVersion")
     implementation("org.telegram:telegrambotsextensions:$telegramVersion")
-    implementation("org.slf4j:slf4j-log4j12:1.7.32")
+    // implementation("org.slf4j:slf4j-log4j12:1.7.32")
     implementation("com.github.kraktun:kutils:$kUtilsVersion")
 }
 

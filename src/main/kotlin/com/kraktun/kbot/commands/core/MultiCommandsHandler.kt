@@ -47,7 +47,7 @@ object MultiCommandsHandler {
                     executor?.executeAfter(
                         absSender,
                         message,
-                        temp?.data
+                        temp?.data,
                     )
                 }
             }
@@ -102,7 +102,7 @@ object MultiCommandsHandler {
             val jobInfo = JobInfo(
                 key = "MULTICOMMANDCLEANER",
                 interval = 5, // seconds
-                initialDelay = 10
+                initialDelay = 10,
             )
         }
 

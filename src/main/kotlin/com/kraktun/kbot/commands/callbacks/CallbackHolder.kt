@@ -37,10 +37,11 @@ abstract class CallbackHolder {
             var answerBuilder = AnswerCallbackQuery.builder()
                 .callbackQueryId(callbackId)
                 .showAlert(resultAsAlert)
-            answerBuilder = if (resultAsUrl)
+            answerBuilder = if (resultAsUrl) {
                 answerBuilder.url(message)
-            else
+            } else {
                 answerBuilder.text(message)
+            }
             val answer = answerBuilder.build()
             executeMethod(absSender = absSender, m = answer)
         }
@@ -57,8 +58,9 @@ abstract class CallbackHolder {
             val key = callback.message.replyMarkup.keyboard
             key.forEach { ex ->
                 ex.forEach {
-                    if (it.callbackData == id)
+                    if (it.callbackData == id) {
                         it.text = newLabel
+                    }
                 }
             }
             val e = EditMessageReplyMarkup.builder()

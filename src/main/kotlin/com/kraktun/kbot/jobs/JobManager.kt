@@ -13,7 +13,7 @@ object JobManager {
     private const val sleepTime = 100L // millis
     private val jobs = mapOf<JobTask, JobInfo>(
         MultiCommandsHandler.CleanerJob() to MultiCommandsHandler.CleanerJob.jobInfo,
-        CallbackProcessor.CleanerJob() to CallbackProcessor.CleanerJob.jobInfo
+        CallbackProcessor.CleanerJob() to CallbackProcessor.CleanerJob.jobInfo,
     )
     private val scheduler = MultiJobExecutorCoroutines(Configurator.threadPool)
 

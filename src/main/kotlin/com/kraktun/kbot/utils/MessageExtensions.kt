@@ -58,8 +58,9 @@ fun AbsSender.kickUser(u: User, c: Chat, date: Int = -1): Boolean? {
         .chatId(c.id.toString())
         .userId(u.id)
         .build()
-    if (date >= 0)
+    if (date >= 0) {
         message.untilDate = Instant.now().plusSeconds(date.toLong()).epochSecond.toInt()
+    }
     return executeMethod(this, message)
 }
 

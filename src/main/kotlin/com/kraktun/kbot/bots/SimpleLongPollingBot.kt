@@ -7,7 +7,7 @@ import org.telegram.telegrambots.bots.DefaultBotOptions
 import org.telegram.telegrambots.bots.TelegramLongPollingBot
 import org.telegram.telegrambots.meta.api.objects.Update
 
-open class SimpleLongPollingBot(private val username: String, private val token: String, botOptions: DefaultBotOptions = DefaultBotOptions()) : TelegramLongPollingBot(botOptions) {
+open class SimpleLongPollingBot(private val username: String, token: String, botOptions: DefaultBotOptions = DefaultBotOptions()) : TelegramLongPollingBot(botOptions, token) {
 
     private var preDigest: (Update) -> Boolean = { true }
     private var newUser: (Update) -> Unit = { }
@@ -16,10 +16,6 @@ open class SimpleLongPollingBot(private val username: String, private val token:
     private var multiCommand: (Update) -> Unit = { }
     private var onElse: (Update) -> Unit = { }
     private var isRegistered: Boolean = false
-
-    override fun getBotToken(): String {
-        return token
-    }
 
     override fun getBotUsername(): String {
         return username
@@ -35,7 +31,7 @@ open class SimpleLongPollingBot(private val username: String, private val token:
             onBaseCommand = baseCommand,
             onCallbackMessage = callbackMessage,
             onMultiCommand = multiCommand,
-            onElse = onElse
+            onElse = onElse,
         )
     }
 

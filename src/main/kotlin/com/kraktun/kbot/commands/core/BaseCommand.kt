@@ -42,7 +42,7 @@ open class BaseCommand(
     // Function to execute when a filter (including filterFun) fails and returns false
     private val onError: (absSender: AbsSender, message: Message, filterResult: FilterResult) -> Unit = { _, _, _ -> },
     // implementation of the CommandInterface (aka execute method)
-    private val exe: CommandInterface
+    private val exe: CommandInterface,
 ) {
 
     /**
@@ -50,17 +50,19 @@ open class BaseCommand(
      * Return result of filters.
      */
     fun fire(absSender: AbsSender, message: Message): FilterResult {
-        if (Configurator.dataManager[absSender.username()] == null)
+        if (Configurator.dataManager[absSender.username()] == null) {
             throw InvalidDataManagerException("DataManger for bot: ${absSender.username()} does not exist")
+        }
         // apply filters
         val result = filterAll(absSender, message)
         runBlocking {
             coroutineScope {
                 launch {
-                    if (result == FilterResult.FILTER_RESULT_OK)
+                    if (result == FilterResult.FILTER_RESULT_OK) {
                         exe.execute(absSender, message)
-                    else
+                    } else {
                         onError(absSender, message, result)
+                    }
                 }
             }
         }
@@ -137,7 +139,9 @@ open class BaseCommand(
             admins.any {
                 (it as GetChatMember).userId == botId
             }
-        } else true
+        } else {
+            true
+        }
     }
 
     /**
@@ -146,6 +150,8 @@ open class BaseCommand(
     private fun filterBannedGroup(absSender: AbsSender, chat: Chat): Boolean {
         return if (chat.isGroupOrSuper()) {
             Configurator.dataManager[absSender.username()]!!.getGroupStatus(chat.id) != GroupStatus.BANNED
-        } else true
+        } else {
+            true
+        }
     }
 }

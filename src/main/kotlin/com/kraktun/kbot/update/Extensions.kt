@@ -24,16 +24,17 @@ fun AbsSender.digest(
     // execute when callback fired (after the callback has been processed)
     onCallbackMessage: (update: Update) -> Unit = {},
     // execute when there is no match
-    onElse: (update: Update) -> Unit = {}
+    onElse: (update: Update) -> Unit = {},
 ) {
-    if (!onPreDigest.invoke(update))
+    if (!onPreDigest.invoke(update)) {
         return
+    }
     if (update.hasCallbackQuery()) {
         CallbackProcessor.fireCallback(
             absSender = this,
             callback = update.callbackQuery,
             user = update.callbackQuery.from.id,
-            chat = update.callbackQuery.message.chatId
+            chat = update.callbackQuery.message.chatId,
         )
         onCallbackMessage.invoke(update)
         return

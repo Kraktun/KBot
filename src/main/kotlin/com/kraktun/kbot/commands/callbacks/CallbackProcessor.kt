@@ -47,7 +47,9 @@ object CallbackProcessor {
                     false
                 }
             }
-        } else false
+        } else {
+            false
+        }
     }
 
     /**
@@ -97,7 +99,7 @@ object CallbackProcessor {
             val jobInfo = JobInfo(
                 key = "CALLBACKCLEANER",
                 interval = 5, // seconds
-                initialDelay = 10
+                initialDelay = 10,
             )
         }
 

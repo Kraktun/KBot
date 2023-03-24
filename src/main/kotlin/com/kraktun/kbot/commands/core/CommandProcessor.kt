@@ -22,8 +22,9 @@ object CommandProcessor {
      */
     fun registerCommand(botUsername: String, kCommand: BaseCommand) {
         lock.writeInLock {
-            if (map.containsKey(Pair(botUsername, kCommand.command)))
+            if (map.containsKey(Pair(botUsername, kCommand.command))) {
                 throw CommandAlreadyRegisteredException()
+            }
             map[Pair(botUsername, kCommand.command)] = kCommand
         }
     }
@@ -61,7 +62,7 @@ object CommandProcessor {
                 .substringBefore("@$botName")
             return map[Pair(botName, commandInput)]?.fire(
                 absSender,
-                message
+                message,
             ) ?: FilterResult.NOT_COMMAND // when key is not present, map[]? equals null, so return is NOT_COMMAND
         }
     }

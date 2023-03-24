@@ -34,7 +34,7 @@ fun getSimpleListKeyboard(list: List<Any>, buttonsInRow: Int = 1): ReplyKeyboard
         row.addAll(
             list.filter {
                 list.indexOf(it) / buttonsInRow == rowNum
-            }.map { it.toString() }
+            }.map { it.toString() },
         )
         repartitionedList.add(row)
     }
@@ -56,7 +56,7 @@ fun getSimpleInlineKeyboard(list: List<InlineKeyboardButton>, buttonsInRow: Int 
         row.addAll(
             list.filter {
                 list.indexOf(it) / buttonsInRow == rowNum
-            }
+            },
         )
         repartitionedList.add(row)
     }
